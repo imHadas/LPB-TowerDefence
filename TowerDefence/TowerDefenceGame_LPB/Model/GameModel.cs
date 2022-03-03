@@ -9,5 +9,7 @@ namespace TowerDefenceGame_LPB.Model
     
     public class GameModel : ModelBase
     {
+
+
     }
 }

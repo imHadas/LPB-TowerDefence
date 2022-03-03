@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.ViewModel
 {
@@ -21,13 +22,23 @@ namespace TowerDefenceGame_LPB.ViewModel
                 {
                     Fields.Add(new TestField
                     {
-                        BlueBasic = (i+1)*(j+1),
-                        BlueTank = (i + 1) * (j + 2),
-                        RedBasic = (i + 1) * (j + 3),
-                        RedTank = (i + 1) * (j + 4)
+                        Coords = (j,i),
+                        Number = i * GridSize + j,
+                        BlueBasic = 0,
+                        BlueTank = 0,
+                        RedBasic = 0,
+                        RedTank = 0,
+                        PlayerType = PlayerType.NEUTRAL,
+                        ClickCommand = new DelegateCommand(param=>BuildTower(Convert.ToInt32(param)))
                     });
                 }
             }
+        }
+        public void BuildTower(int index)
+        {
+            TestField testField = Fields[index];
+            testField.IsTower = true;
+            testField.PlayerType = PlayerType.BLUE;
         }
     }
 }
