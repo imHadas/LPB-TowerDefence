@@ -6,7 +6,11 @@
         xmlns:local="clr-namespace:TowerDefenceGame_LPB"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <Grid>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -23,24 +27,54 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border BorderThickness="1" BorderBrush="Black">
-                        <Button>
+                        <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PlayerType}" Value="NEUTRAL">
+                                            <Setter Property="Background" Value="white"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding PlayerType}" Value="RED">
+                                            <Setter Property="Background" Value="red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding PlayerType}" Value="BLUE">
+                                            <Setter Property="Background" Value="blue"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                                
-                            <TextBox Text="{Binding BlueBasic}" Foreground="Blue" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-                                <TextBox Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-                                <TextBox Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Image Grid.ColumnSpan="2" Grid.RowSpan="2">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCastle}" Value="true">
+                                                    <Setter Property="Source" Value="..\Images\Castle.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsBarrack}" Value="true">
+                                                    <Setter Property="Source" Value="..\Images\Barrack.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsTower}" Value="true">
+                                                    <Setter Property="Source" Value="..\Images\Tower.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <TextBox Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                <TextBox Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                <TextBox Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
                             </Grid>
                         </Button>
-
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
