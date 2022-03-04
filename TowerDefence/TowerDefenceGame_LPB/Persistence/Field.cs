@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace TowerDefenceGame_LPB.Persistence
 {
     public class Field
     {
-        private (int x, int y) coords;
-        private Placement placement;
-        private Unit[] units;
+        public (int x, int y) Coords { get; private set; }
+        public Placement? Placement;
+        public ISet<Unit> Units;
+
+        public Field(int x, int y)
+        {
+            Coords = new(x,y);
+            Units = new HashSet<Unit>();
+            Placement = null;
+        }
+
+        public Field((int x, int y) coords) : this(coords.x, coords.y) { }
     }
 }

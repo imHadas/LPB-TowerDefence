@@ -1,32 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TowerDefenceGame_LPB.Persistence
+﻿namespace TowerDefenceGame_LPB.Persistence
 {
-    public class Tower : Placement
+    public abstract class Tower : Placement
     {
-        private int speed;
-        private int damage;
-        private int range;
-        private int level;
-
+        public int Speed { get; protected set; }
+        public int Damage { get; protected set; }
+        public int Range { get; protected set; }
+        public int Level { get; protected set; }
 
         public virtual void LevelUp() { }
+
+        internal Tower(Player player, (int, int) coords) : base(player, coords) { }
     }
     public class BasicTower : Tower
     {
         public override void LevelUp() { }
+
+        public BasicTower(Player player, (int, int) coords) : base (player, coords) { }
     }
     public class SniperTower : Tower
     {
         public override void LevelUp() { }
+
+        public SniperTower(Player player, (int, int) coords) : base(player, coords) { }
     }
     public class BomberTower : Tower
     {
         public override void LevelUp() { }
+
+        public BomberTower(Player player, (int, int) coords) : base(player, coords) { }
     }
 
 }

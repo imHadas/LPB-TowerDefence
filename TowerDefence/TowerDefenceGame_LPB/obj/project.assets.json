@@ -8,30 +8,20 @@
     "net6.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\hadas\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Leslie\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\EGYETEM\\4. FE\\Szofttech\\lpb\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
+      "projectUniqueName": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
       "projectName": "TowerDefenceGame_LPB",
-      "projectPath": "E:\\EGYETEM\\4. FE\\Szofttech\\lpb\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
-      "packagesPath": "C:\\Users\\hadas\\.nuget\\packages\\",
-      "outputPath": "E:\\EGYETEM\\4. FE\\Szofttech\\lpb\\TowerDefence\\TowerDefenceGame_LPB\\obj\\",
+      "projectPath": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
+      "packagesPath": "C:\\Users\\Leslie\\.nuget\\packages\\",
+      "outputPath": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\hadas\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "D:\\userfiles\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0-windows7.0"

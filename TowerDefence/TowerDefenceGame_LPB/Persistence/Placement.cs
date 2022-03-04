@@ -1,32 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TowerDefenceGame_LPB.Persistence
+﻿namespace TowerDefenceGame_LPB.Persistence
 {
+    public enum TerrainType { Mountain, Lake }
+
     public class Placement
     {
-        private Player owner;
-        private (int x, int y) coords;
+        public Player Owner { get; private set; }
+        public (int x, int y) Coords { get; private set; }
+
+        internal Placement(Player player, (int x, int y) coords)
+        {
+            Owner = player;
+            Coords = coords;
+        }
     }
     public class Terrain : Placement
     {
-        private int type;
+        public TerrainType Type { get; private set; }
+
+        public int NumericType => (int)Type; // maybe unnecessary
+
+        public Terrain(Player owner, int x, int y, TerrainType type) : base(owner, (x, y))
+        {
+            Type = type;
+        }
     }
     public class Castle : Placement
     {
-        private int health;
+        public uint Health { get; private set; }  // changed to unsigned
 
-        public void Damage(int amount)
+        public Castle(Player owner, int x, int y) : base(owner, (x, y))
         {
-            health -= amount;
+            Health = Constants.CASTLE_STARTING_HEALTH;
+        }
+
+        public void Damage(uint amount = 1)  
+        {
+            Health -= amount;
         }
     }
 
     public class Barrack : Placement
     {
+        public Barrack(Player owner, int x, int y) : base(owner, (x, y))
+        {
 
+        }
     }
 }

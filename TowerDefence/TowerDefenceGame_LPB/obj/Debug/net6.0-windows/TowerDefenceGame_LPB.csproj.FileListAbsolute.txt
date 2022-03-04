@@ -40,3 +40,24 @@ E:\EGYETEM\4. FE\Szofttech\lpb\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.
 E:\EGYETEM\4. FE\Szofttech\lpb\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.pdb
 E:\EGYETEM\4. FE\Szofttech\lpb\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.genruntimeconfig.cache
 E:\EGYETEM\4. FE\Szofttech\lpb\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\ref\TowerDefenceGame_LPB.dll
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\bin\Debug\net6.0-windows\TowerDefenceGame_LPB.exe
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\bin\Debug\net6.0-windows\TowerDefenceGame_LPB.deps.json
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\bin\Debug\net6.0-windows\TowerDefenceGame_LPB.runtimeconfig.json
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\bin\Debug\net6.0-windows\TowerDefenceGame_LPB.dll
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\bin\Debug\net6.0-windows\TowerDefenceGame_LPB.pdb
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.csproj.AssemblyReference.cache
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\View\MainWindow.g.cs
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\App.g.cs
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB_MarkupCompile.cache
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB_MarkupCompile.lref
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\View\MainWindow.baml
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.g.resources
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.GeneratedMSBuildEditorConfig.editorconfig
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.AssemblyInfoInputs.cache
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.AssemblyInfo.cs
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.csproj.CoreCompileInputs.cache
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.dll
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\refint\TowerDefenceGame_LPB.dll
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.pdb
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\TowerDefenceGame_LPB.genruntimeconfig.cache
+D:\userfiles\Documents\Egyetem\4\szoftvertechG\gitclone\TowerDefence\TowerDefenceGame_LPB\obj\Debug\net6.0-windows\ref\TowerDefenceGame_LPB.dll
