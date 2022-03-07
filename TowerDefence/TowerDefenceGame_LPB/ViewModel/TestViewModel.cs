@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceGame_LPB.Model;
 
 namespace TowerDefenceGame_LPB.ViewModel
 {
     public class TestViewModel : ViewModelBase
     {
+        private GameModel model;
         public int GridSize { get; set; }
         public ObservableCollection<TestField> Fields { get; set; }
-        public TestViewModel()
+        public TestViewModel(GameModel model)
         {
+            this.model = model;
             GridSize = 11;
+
             GenerateTable();
         }
         private void GenerateTable()
@@ -28,7 +32,8 @@ namespace TowerDefenceGame_LPB.ViewModel
                         BlueTank = 0,
                         RedBasic = 0,
                         RedTank = 0,
-                        PlayerType = PlayerType.NEUTRAL,
+                        PlayerType = model.Table.fields[(uint)i,(uint)j].Placement.Owner.Type,
+                        Placement = model.Table.fields[(uint)i,(uint)j].Placement,
                         ClickCommand = new DelegateCommand(param=>BuildTower(Convert.ToInt32(param)))
                     });
                 }

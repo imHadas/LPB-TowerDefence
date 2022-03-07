@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj": {}
+    "A:\\suli\\negyedik_felev\\Szofttech\\GY\\Tower_Defense_v0_03\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj": {}
   },
   "projects": {
-    "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj": {
+    "A:\\suli\\negyedik_felev\\Szofttech\\GY\\Tower_Defense_v0_03\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
+        "projectUniqueName": "A:\\suli\\negyedik_felev\\Szofttech\\GY\\Tower_Defense_v0_03\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
         "projectName": "TowerDefenceGame_LPB",
-        "projectPath": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
-        "packagesPath": "C:\\Users\\Leslie\\.nuget\\packages\\",
-        "outputPath": "D:\\userfiles\\Documents\\Egyetem\\4\\szoftvertechG\\gitclone\\TowerDefence\\TowerDefenceGame_LPB\\obj\\",
+        "projectPath": "A:\\suli\\negyedik_felev\\Szofttech\\GY\\Tower_Defense_v0_03\\TowerDefence\\TowerDefenceGame_LPB\\TowerDefenceGame_LPB.csproj",
+        "packagesPath": "C:\\Users\\naran\\.nuget\\packages\\",
+        "outputPath": "A:\\suli\\negyedik_felev\\Szofttech\\GY\\Tower_Defense_v0_03\\TowerDefence\\TowerDefenceGame_LPB\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "D:\\userfiles\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\naran\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

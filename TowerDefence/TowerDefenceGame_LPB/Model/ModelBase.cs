@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceGame_LPB.DataAccess;
 
 namespace TowerDefenceGame_LPB.Model
 {
@@ -26,5 +28,55 @@ namespace TowerDefenceGame_LPB.Model
     }
     public abstract class ModelBase
     {
+        #region Variables
+
+        private IDataAccess dataAccess;
+        private Field selectedField;
+
+        #endregion
+
+        #region Properties
+
+        public Table Table { get; set; }
+        public Field SelectedField { get; set; }
+
+        #endregion
+
+        public MenuOption[] SelectField(Field field)
+        {
+            int n;
+            selectedField = field;
+            MenuOption[] menus = new MenuOption[3];
+            return menus;
+        }
+        private void SetupTable()
+        {
+            return;
+        }
+
+        private (int,int)[] FindPath(Field start, Field end)
+        {
+            return new (int, int)[2];
+        }
+
+        public virtual void SelectOption(MenuOption menus)
+        {
+            return;
+        }
+
+        #region Events
+
+        /*public EventHandler<Field> FieldChanged()
+        {
+
+        }*/
+
+        #endregion
+
+        public async void LoadMap()
+        {
+
+        }
+
     }
 }

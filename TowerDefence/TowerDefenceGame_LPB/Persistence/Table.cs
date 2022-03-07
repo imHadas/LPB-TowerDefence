@@ -4,7 +4,7 @@ namespace TowerDefenceGame_LPB.Persistence
 {
     public class Table : IEnumerable
     {
-        private readonly Field[,] fields;
+        public Field[,] fields;
 
         public uint PhaseCounter { get; set; }  //named more accurately and changed to unsigned
 
