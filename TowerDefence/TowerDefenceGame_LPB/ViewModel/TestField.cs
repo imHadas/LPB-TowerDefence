@@ -19,9 +19,20 @@ namespace TowerDefenceGame_LPB.ViewModel
         private bool isBarrack;
         private bool isTower;
         private PlayerType playerType;
+        private Placement placement;
 
         public int Number { get; set; }
         public (int x, int y) Coords { get; set; }
+
+        public Placement Placement
+        {
+            get { return placement; }
+            set 
+            { 
+                placement = value;
+                OnPropertyChanged();
+            }
+        }
 
         public PlayerType PlayerType 
         { 
