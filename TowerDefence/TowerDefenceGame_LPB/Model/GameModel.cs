@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -75,8 +75,8 @@ namespace TowerDefenceGame_LPB.Model
             {
                 for(int j = 0; j < table.Size.y; j++)
                 {
-                    table.fields[(uint)i, (uint)j] = new Field(i,j);
-                    table.fields[(uint)i, (uint)j].Placement = new Placement(ne, (i,j));
+                    table[(uint)i, (uint)j] = new Field(i,j);
+                    table[(uint)i, (uint)j].Placement = new Placement(ne, (i,j));
                 }
             }
             SetupBarracks(rp);
@@ -91,7 +91,7 @@ namespace TowerDefenceGame_LPB.Model
                 int x = barrack.Coords.x;
                 int y = barrack.Coords.y;
                 //table.fields[(uint)x, (uint)y] = new Field(x,y);
-                table.fields[(uint)x, (uint)y].Placement = new Barrack(player, x, y);
+                table[(uint)x, (uint)y].Placement = new Barrack(player, x, y);
             }
         }
 
