@@ -11,5 +11,7 @@
         public const uint BASIC_UNIT_SPEED = 3;
         public const uint TANK_UNIT_STARTING_HEALTH = 3;
         public const uint TANK_UNIT_SPEED = 1;
+
+        public const uint MAX_TOWER_LEVEL = 3;
     }
 }

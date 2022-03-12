@@ -19,6 +19,7 @@ namespace TowerDefenceGame_LPB.Model
         DestroyTower,
         ShowUnits,
 
+        // for map maker only
         DestroyPlacement,
         BuildCastle,
         BuildTerrain,
@@ -30,8 +31,8 @@ namespace TowerDefenceGame_LPB.Model
     {
         #region Variables
 
-        private IDataAccess dataAccess;
-        private Field selectedField;
+        protected IDataAccess dataAccess;
+        protected Field? selectedField;
 
         #endregion
 
@@ -42,13 +43,8 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public MenuOption[] SelectField(Field field)
-        {
-            int n;
-            selectedField = field;
-            MenuOption[] menus = new MenuOption[3];
-            return menus;
-        }
+        public abstract ICollection<MenuOption>? SelectField(Field field);
+        
         private void SetupTable()
         {
             return;

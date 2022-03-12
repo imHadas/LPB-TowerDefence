@@ -9,7 +9,7 @@
 
         public virtual void LevelUp() { }
 
-        internal Tower(Player player, (int, int) coords) : base(player, coords) { }
+        internal Tower(Player player, (int, int) coords) : base(coords, player) { }
     }
     public class BasicTower : Tower
     {

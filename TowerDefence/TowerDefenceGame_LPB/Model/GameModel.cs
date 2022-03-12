@@ -13,7 +13,7 @@ namespace TowerDefenceGame_LPB.Model
     {
         #region Variables
 
-        Table table;
+        //Table Table; // ModelBase has a Table
         Player rp;
         Player bp;
         Player ne;
@@ -28,33 +28,36 @@ namespace TowerDefenceGame_LPB.Model
         public int Phase { get; set; }
         public Player CurrentPlayer { get { return currentPlayer; } }
 
-        public Table Table { get { return table; } }
+        // public Table Table { get { return table; } } // ModelBase already has a Table
 
         #endregion
 
         public GameModel(IDataAccess dataAccess)
         {
-            table = new Table(11, 11);
+            //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
+
+            /*Table = new Table(11, 11);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rp = new Player(PlayerType.RED, rBarracks);
             bp = new Player(PlayerType.BLUE, bBarracks);
-            ne = new Player(PlayerType.NEUTRAL, new HashSet<Barrack>());
             rBarracks.Add(new Barrack(rp, 9, 9)); rBarracks.Add(new Barrack(rp, 9, 1));
             bBarracks.Add(new Barrack(bp, 1, 1)); bBarracks.Add(new Barrack(bp, 1, 9));
             currentPlayer = bp;
-            SetupTable();
+            SetupTable();*/
+
+            NewGame();
         }
 
         public void NewGame()
         {
-            table = new Table(11, 11);
+            Table = new Table(11, 11);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, rBarracks);
-            bp = new Player(PlayerType.BLUE, bBarracks);
+            rp = new Player(PlayerType.RED, new(rp, 9, 5) ,rBarracks);
+            bp = new Player(PlayerType.BLUE, new(bp, 1, 4), bBarracks);
             currentPlayer = bp;
             SetupTable();
         }
@@ -71,12 +74,12 @@ namespace TowerDefenceGame_LPB.Model
 
         private void SetupTable()
         {
-            for(int i = 0; i < table.Size.x; i++)
+            for(int i = 0; i < Table.Size.x; i++)
             {
-                for(int j = 0; j < table.Size.y; j++)
+                for(int j = 0; j < Table.Size.y; j++)
                 {
-                    table[(uint)i, (uint)j] = new Field(i,j);
-                    table[(uint)i, (uint)j].Placement = new Placement(ne, (i,j));
+                    Table[(uint)i, (uint)j] = new Field(i,j);
+                    Table[(uint)i, (uint)j].Placement = new Placement((i, j), ne);
                 }
             }
             SetupBarracks(rp);
@@ -91,7 +94,7 @@ namespace TowerDefenceGame_LPB.Model
                 int x = barrack.Coords.x;
                 int y = barrack.Coords.y;
                 //table.fields[(uint)x, (uint)y] = new Field(x,y);
-                table[(uint)x, (uint)y].Placement = new Barrack(player, x, y);
+                Table[(uint)x, (uint)y].Placement = new Barrack(player, x, y);
             }
         }
 
@@ -125,6 +128,42 @@ namespace TowerDefenceGame_LPB.Model
                 
         }
 
+        /// <summary>
+        /// Method for selecting a field model-side
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns>List of possible menu options for a field</returns>
+        public override ICollection<MenuOption> SelectField(Field field)
+        {
+            selectedField = field;
+            ICollection<MenuOption> options = new List<MenuOption>();
+            if(selectedField.Placement is null)
+            {
+                if (selectedField.Units.Count != 0)
+                    options.Add(MenuOption.ShowUnits);
+                else
+                {
+                    options.Add(MenuOption.BuildBasic);
+                    options.Add(MenuOption.BuildBomber);
+                    options.Add(MenuOption.BuildSniper);
+                }
+            }
+            else if(selectedField.Placement.Owner == currentPlayer) 
+                switch(selectedField.Placement)
+                {
+                    case Tower:
+                        options.Add(MenuOption.DestroyTower);
+                        if (((Tower)selectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
+                            options.Add(MenuOption.UpgradeTower); 
+                        break;
+                    case Castle: /*FALLTHROUGH*/
+                    case Barrack:
+                        options.Add(MenuOption.TrainBasic);
+                        options.Add(MenuOption.TrainTank);
+                        break;
+                }
 
+            return options;
+        }
     }
 }
