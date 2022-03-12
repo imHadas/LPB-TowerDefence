@@ -27,7 +27,7 @@ namespace TowerDefenceGame_LPB.Model
         public int Round { get; set; }
         public int Phase { get; set; }
         public Player CurrentPlayer { get { return currentPlayer; } }
-
+        public Player NeutralPlayer { get { return ne; } }
         public Table Table { get { return table; } }
 
         #endregion

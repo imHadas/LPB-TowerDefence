@@ -5,20 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceGame_LPB"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="TowerDefence" Height="1000" Width="1000">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
     <Grid>
-        
+
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Menu Grid.Row="0" Grid.ColumnSpan="2">
+            <MenuItem Header="Fájl">
+                
+            </MenuItem>
+            <MenuItem Header="Pálya">
 
-        <ItemsControl Grid.Row="0" ItemsSource="{Binding Fields}">
+            </MenuItem>
+            <MenuItem Header="Kilépés">
+
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="1" IsEnabled="False"/>
+            <Button Grid.Column="2" Content="Támadás"/>
+
+        </Grid>
+        <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding GridSize}" Columns="{Binding GridSize}"/>
@@ -62,8 +90,14 @@
                                                 <DataTrigger Binding="{Binding IsBarrack}" Value="true">
                                                     <Setter Property="Source" Value="..\Images\Barrack.png"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsTower}" Value="true">
+                                                <DataTrigger Binding="{Binding IsBasicTower}" Value="true">
                                                     <Setter Property="Source" Value="..\Images\Tower.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSniperTower}" Value="true">
+                                                    <Setter Property="Source" Value="..\Images\SniperTower.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsBomberTower}" Value="true">
+                                                    <Setter Property="Source" Value="..\Images\BomberTower.png"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -74,6 +108,52 @@
                                 <TextBox Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
                                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
                             </Grid>
+                        </Button>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ItemsControl Grid.Column="1" Grid.Row="2" ItemsSource="{Binding OptionFields}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border>
+                        <Button Command="{Binding OptionsClickCommand}" CommandParameter="{Binding Type}">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Player}" Value="NEUTRAL">
+                                            <Setter Property="Background" Value="white"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Player}" Value="RED">
+                                            <Setter Property="Background" Value="red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Player}" Value="BLUE">
+                                            <Setter Property="Background" Value="blue"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding TrainBasic}" Value="true">
+                                            <Setter Property="Content" Value="TB"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding TrainTank}" Value="true">
+                                            <Setter Property="Content" Value="TT"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BuildBasic}" Value="true">
+                                            <Setter Property="Content" Value="BBa"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BuildBomber}" Value="true">
+                                            <Setter Property="Content" Value="BBo"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding BuildSniper}" Value="true">
+                                            <Setter Property="Content" Value="BS"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding UpgradeTower}" Value="true">
+                                            <Setter Property="Content" Value="Upgrade"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding DestroyTower}" Value="true">
+                                            <Setter Property="Content" Value="Destroy"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                         </Button>
                     </Border>
                 </DataTemplate>

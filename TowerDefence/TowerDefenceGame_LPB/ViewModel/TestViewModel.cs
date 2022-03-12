@@ -7,15 +7,18 @@ namespace TowerDefenceGame_LPB.ViewModel
 {
     public class TestViewModel : ViewModelBase
     {
+        private int selectedField;
         private GameModel model;
         public int GridSize { get; set; }
         public ObservableCollection<TestField> Fields { get; set; }
+        public ObservableCollection<OptionField> OptionFields { get; set; }
         public TestViewModel(GameModel model)
         {
             this.model = model;
             GridSize = 11;
-
+            OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
+            RefreshTable();
         }
         private void GenerateTable()
         {
@@ -26,7 +29,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 {
                     Fields.Add(new TestField
                     {
-                        Coords = (j,i),
+                        Coords = (i,j),
                         Number = i * GridSize + j,
                         BlueBasic = 0,
                         BlueTank = 0,
@@ -34,16 +37,71 @@ namespace TowerDefenceGame_LPB.ViewModel
                         RedTank = 0,
                         PlayerType = model.Table[(uint)i,(uint)j].Placement.Owner.Type,
                         Placement = model.Table[(uint)i,(uint)j].Placement,
-                        ClickCommand = new DelegateCommand(param=>BuildTower(Convert.ToInt32(param)))
+                        ClickCommand = new DelegateCommand(param=>ButtonClick(Convert.ToInt32(param)))
                     });
                 }
             }
         }
-        public void BuildTower(int index)
+        private void RefreshTable()
         {
+            foreach(TestField field in Fields)
+            {
+                //add units
+                field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
+                field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement.Owner.Type;
+            }
+        }
+        public void ButtonClick(int index)
+        {
+            selectedField = index;
             TestField testField = Fields[index];
-            testField.IsTower = true;
-            testField.PlayerType = PlayerType.BLUE;
+            if (testField.IsBarrack || testField.IsCastle)
+            {
+                OptionFields.Clear();
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, TrainBasic = true, Type = "TrainBasic", OptionsClickCommand = new DelegateCommand(param=>OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, TrainTank = true, Type = "TrainTank", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+            }
+            else if (testField.IsUnits)
+            {
+                OptionFields.Clear();
+            }
+            else if (testField.IsBasicTower || testField.IsSniperTower || testField.IsBomberTower)
+            {
+                OptionFields.Clear();
+                //Check if path blocked
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, UpgradeTower = true, Type = "UpgradeTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, DestroyTower = true, Type = "DestroyTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+            }
+           
+            else
+            {
+                OptionFields.Clear();
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, BuildBasic = true, Type="BuildBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, BuildBomber = true, Type = "BuildBomber", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, BuildSniper = true, Type = "BuildSniper", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+            }
+
+        }
+        public void OptionsButtonClick(string option)
+        {
+            //Modellben levo SelectOption?
+            switch(option)
+            {
+                case "BuildBasic":
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BasicTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    break;
+                case "BuildBomber":
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BomberTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    break;
+                case "BuildSniper":
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    break;
+                case "DestroyTower":
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(model.NeutralPlayer, Fields[selectedField].Coords);
+                    break;
+            }
+            RefreshTable();
+            ButtonClick(selectedField);
         }
     }
 }
