@@ -19,11 +19,30 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         private void GenerateTable()
         {
+            bool isBarrack = false;
+            bool isTower = false;
+            bool isCastle = false;
             Fields = new ObservableCollection<TestField>();
             for (int i = 0; i < GridSize; i++)
             {
                 for (int j = 0; j < GridSize; j++)
                 {
+                    if(model.Table[(uint)i, (uint)j].Placement != null)
+                    {
+                        if (model.Table[(uint)i, (uint)j].Placement.GetType() == typeof(Castle))
+                        {
+                            isCastle = true;
+                        }
+                        else if (model.Table[(uint)i, (uint)j].Placement.GetType() == typeof(Barrack))
+                        {
+                            isBarrack = true;
+                        }
+                        else if (model.Table[(uint)i, (uint)j].Placement.GetType() == typeof(Tower))
+                        {
+                            isTower = true;
+                        }
+                    }
+                    
                     Fields.Add(new TestField
                     {
                         Coords = (j,i),
@@ -34,8 +53,14 @@ namespace TowerDefenceGame_LPB.ViewModel
                         RedTank = 0,
                         PlayerType = model.Table[(uint)i,(uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
                         Placement = model.Table[(uint)i,(uint)j].Placement,
+                        IsBarrack = isBarrack,
+                        IsCastle = isCastle,
+                        IsTower = isTower,
                         ClickCommand = new DelegateCommand(param=>BuildTower(Convert.ToInt32(param)))
                     });
+                    isBarrack = false;
+                    isTower = false;
+                    isCastle = false;
                 }
             }
         }

@@ -23,6 +23,7 @@ namespace TowerDefenceGame_LPB.Model
         #region Properties
 
         public bool SaveEnabled { get; private set; }
+        public bool BuildEnabled { get; set; }
         public int Round { get; set; }
         public int Phase { get; set; }
         public Player CurrentPlayer { get; private set; }
@@ -58,28 +59,94 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
+            Phase = 1;
+            Round = 1;
             Table = new Table(11, 11);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
             rp = new Player(PlayerType.RED, new(rp, 9, 5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, new(bp, 1, 4), bBarracks);
+            bp = new Player(PlayerType.BLUE, new(bp, 1, 5), bBarracks);
             CurrentPlayer = bp;
             SetupTable();
+            Table[rp.Castle.Coords.x, rp.Castle.Coords.y].Placement = rp.Castle;  // sets red player castle on table
+            Table[bp.Castle.Coords.x, bp.Castle.Coords.y].Placement = bp.Castle;
             SetupBarracks(rp);
             SetupBarracks(bp);
         }
 
         public void Advance()
         {
-
+            Phase++;
+            if(Phase % 3 == 0)
+            {
+                BuildEnabled = false; // in attack phase you can't build, or place units
+                Round++;
+                MoveUnits();
+            }
+            else if(Phase % 2 == 0)
+            {
+                BuildEnabled=true;
+                CurrentPlayer = bp;
+            }
+            else if(Phase % 2 == 1)
+            {
+                BuildEnabled = true;
+                CurrentPlayer = rp;
+            }
         }
 
         private void MoveUnits()
         {
+            for(int i = 0; i < Table.Size.x; i++)
+            {
+                for(int j = 0; j < Table.Size.y; j++)
+                {
+                    if(Table[(uint)i,(uint)j].Units.Count > 0)
+                    {
+                        IList<(uint x, uint y)> rpPath = null;
+                        IList<(uint x, uint y)> bpPath = null;
+                        bool rpTobp = false;
+                        bool bpTorp = false;
+                        foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                        {
+                            if (bpTorp && rpTobp)
+                                break;
+                            else if(!bpTorp && unit.Owner == bp)
+                            {
+                                bpTorp = true;  
+                            }
+                            else if(!rpTobp && unit.Owner == rp)
+                            {
+                                rpTobp = true;
+                            }
+                        }
+                        if (bpTorp || rpTobp)
+                        {
+                            if(rpTobp)
+                                rpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
+                            if(bpTorp)
+                                bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
+                            foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                if(unit.Owner == bp)
+                                {
+                                    unit.NewPath(bpPath);
+                                }
+                                else if(unit.Owner == rp)
+                                {
+                                    unit.NewPath(rpPath);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
+            return;
         }
+
 
         private void SetupBarracks(Player player)
         {
@@ -87,7 +154,6 @@ namespace TowerDefenceGame_LPB.Model
             {
                 uint x = barrack.Coords.x;
                 uint y = barrack.Coords.y;
-                //table.fields[(uint)x, (uint)y] = new Field(x,y);
                 Table[x, y].Placement = new Barrack(player, x, y);
             }
         }
@@ -168,18 +234,23 @@ namespace TowerDefenceGame_LPB.Model
                     OnShowUnit();
                 else
                 {
+                    if (!BuildEnabled)  // you can still view units but can't build
+                        return options;
                     options.Add(MenuOption.BuildBasic);
                     options.Add(MenuOption.BuildBomber);
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(SelectedField.Placement.Owner == CurrentPlayer) 
-                switch(SelectedField.Placement)
+            else if(SelectedField.Placement.Owner == CurrentPlayer)
+            {
+                if (!BuildEnabled)  // you can still view units but can't upgrade, or destroy towers, or place units
+                    return options;
+                switch (SelectedField.Placement)
                 {
                     case Tower:
                         options.Add(MenuOption.DestroyTower);
                         if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
-                            options.Add(MenuOption.UpgradeTower); 
+                            options.Add(MenuOption.UpgradeTower);
                         break;
                     case Castle: /*FALLTHROUGH*/
                     case Barrack:
@@ -187,6 +258,8 @@ namespace TowerDefenceGame_LPB.Model
                         options.Add(MenuOption.TrainTank);
                         break;
                 }
+            } 
+                
 
             return options;
         }
