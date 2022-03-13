@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using TowerDefenceGame_LPB.Persistence;
 
@@ -12,8 +12,6 @@ namespace TowerDefenceGame_LPB.Model
         public NotEnoughMoneyException(uint money, uint cost, string? message = null) : base(message) { Money = money; Cost = cost; }
     }
 
-
-    [Serializable]
     public class InvalidPlacementException : Exception
     {
         public Field Field { get; private set; }
