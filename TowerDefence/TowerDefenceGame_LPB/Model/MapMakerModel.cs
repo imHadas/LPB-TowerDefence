@@ -13,5 +13,10 @@ namespace TowerDefenceGame_LPB.Model
         {
             throw new NotImplementedException();
         }
+
+        public override void SelectOption(MenuOption option)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

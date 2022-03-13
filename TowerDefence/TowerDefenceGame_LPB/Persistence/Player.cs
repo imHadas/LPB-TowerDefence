@@ -20,7 +20,7 @@ namespace TowerDefenceGame_LPB.Persistence
         // all have been changed to sets, since order doesn't matter
         public ISet<Tower> Towers { get; set; }
         public ISet<Unit> Units { get; set; }
-        public ISet<Barrack>? Barracks { get; set; }  // added nullability for neutral player
+        public ISet<Barrack> Barracks { get; set; }
 
         public Player(PlayerType type, Castle castle, ICollection<Barrack> barracks)
         {

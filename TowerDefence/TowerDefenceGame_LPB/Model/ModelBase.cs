@@ -43,22 +43,31 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public abstract ICollection<MenuOption>? SelectField(Field field);
+        public abstract ICollection<MenuOption> SelectField(Field field);
         
-        private void SetupTable()
+        protected void SetupTable()
         {
-            return;
+            for (uint i = 0; i < Table.Size.x; i++)
+            {
+                for (uint j = 0; j < Table.Size.y; j++)
+                {
+                    Table[i, j] = new Field(i, j);
+                    Table[i, j].Placement = new Placement((i, j));
+                }
+            }
         }
 
-        private (int,int)[] FindPath(Field start, Field end)
+        protected IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
         {
-            return new (int, int)[2];
+            throw new NotImplementedException();
         }
 
-        public virtual void SelectOption(MenuOption menus)
+        protected IList<(uint, uint)> FindPath(Field from, Field to)
         {
-            return;
+            throw new NotImplementedException();
         }
+
+        public abstract void SelectOption(MenuOption option);
 
         #region Events
 

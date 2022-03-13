@@ -15,6 +15,12 @@ namespace TowerDefenceGame_LPB.Persistence
             get { return fields[x, y]; }
             set { fields[x,y] = value; }
         }
+        
+        public Field this[(uint x, uint y) c]
+        {
+            get { return fields[c.x, c.y]; }
+            set { fields[c.x,c.y] = value; }
+        }
 
         public Table(int height, int width)
         {
