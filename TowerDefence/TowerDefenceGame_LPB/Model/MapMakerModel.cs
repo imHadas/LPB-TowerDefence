@@ -9,7 +9,7 @@ namespace TowerDefenceGame_LPB.Model
 {
     public class MapMakerModel : ModelBase
     {
-        public override ICollection<MenuOption>? SelectField(Field field)
+        public override ICollection<MenuOption> SelectField(Field field)
         {
             throw new NotImplementedException();
         }

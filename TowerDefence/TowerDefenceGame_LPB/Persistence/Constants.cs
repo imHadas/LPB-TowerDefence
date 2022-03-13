@@ -17,5 +17,9 @@
         public const uint TANK_UNIT_COST = 50;
 
         public const uint MAX_TOWER_LEVEL = 3;
+
+        public const uint BASIC_TOWER_COST = 50;
+        public const uint SNIPER_TOWER_COST = 100;
+        public const uint BOMBER_TOWER_COST = 120;
     }
 }

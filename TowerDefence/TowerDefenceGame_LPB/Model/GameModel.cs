@@ -33,6 +33,12 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
+        #region Events
+
+        public event EventHandler<(ICollection<Unit> friendly, ICollection<Unit> enemy)> ShowUnits;
+
+        #endregion
+
         public GameModel(IDataAccess dataAccess)
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
@@ -97,17 +103,21 @@ namespace TowerDefenceGame_LPB.Model
                     PlaceUnit(new BasicUnit(CurrentPlayer));
                     break;
                 case MenuOption.BuildSniper:
+                    BuildTower(new SniperTower(CurrentPlayer, SelectedField.Coords));
                     break;
                 case MenuOption.BuildBasic:
+                    BuildTower(new BasicTower(CurrentPlayer, SelectedField.Coords));
                     break;
                 case MenuOption.BuildBomber:
+                    BuildTower(new BomberTower(CurrentPlayer, SelectedField.Coords));
                     break;
                 case MenuOption.UpgradeTower:
                     break;
                 case MenuOption.DestroyTower:
                     break;
-                case MenuOption.ShowUnits:
-                    break;
+                /*case MenuOption.ShowUnits:      //not an option, but a consequence of selecting a field with units
+                    OnShowUnit();
+                    break;*/
                 default:
                     break;
             }
@@ -120,13 +130,27 @@ namespace TowerDefenceGame_LPB.Model
                     .ElementAt(new Random().Next(1)).WhereToPlace;
 
             if (Table[coords].Placement != null)
-                throw new Exception("Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");
+                throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");
 
             if (CurrentPlayer.Money < unit.Cost)
-                throw new Exception("Player does not have enough money to buy unit");
+                throw new NotEnoughMoneyException(CurrentPlayer.Money, unit.Cost, "Player does not have enough money to buy unit");
             
             Table[coords].Units.Add(unit);
             unit.NewPath(FindPath(coords, OtherPlayer.Castle.Coords));
+            CurrentPlayer.Units.Add(unit);
+        }
+
+        private void BuildTower(Tower tower)
+        {
+            if (SelectedField.Placement != null)
+                throw new InvalidPlacementException(SelectedField, "Cannot build tower on non-empty field");
+            if (SelectedField.Units.Count > 0)
+                throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");
+            if (CurrentPlayer.Money < tower.Cost)
+                throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
+
+            SelectedField.Placement = tower;
+            CurrentPlayer.Towers.Add(tower);
         }
 
         /// <summary>
@@ -136,12 +160,12 @@ namespace TowerDefenceGame_LPB.Model
         /// <returns>List of possible menu options for a field</returns>
         public override ICollection<MenuOption> SelectField(Field field)
         {
-            selectedField = field;
+            SelectedField = field;
             ICollection<MenuOption> options = new List<MenuOption>();
-            if(selectedField.Placement is null)
+            if(SelectedField.Placement is null)
             {
-                if (selectedField.Units.Count != 0)
-                    options.Add(MenuOption.ShowUnits);
+                if (SelectedField.Units.Count != 0)
+                    OnShowUnit();
                 else
                 {
                     options.Add(MenuOption.BuildBasic);
@@ -149,12 +173,12 @@ namespace TowerDefenceGame_LPB.Model
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(selectedField.Placement.Owner == CurrentPlayer) 
-                switch(selectedField.Placement)
+            else if(SelectedField.Placement.Owner == CurrentPlayer) 
+                switch(SelectedField.Placement)
                 {
                     case Tower:
                         options.Add(MenuOption.DestroyTower);
-                        if (((Tower)selectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
+                        if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
                             options.Add(MenuOption.UpgradeTower); 
                         break;
                     case Castle: /*FALLTHROUGH*/
@@ -165,6 +189,14 @@ namespace TowerDefenceGame_LPB.Model
                 }
 
             return options;
+        }
+
+        private void OnShowUnit()
+        {
+            ShowUnits?.Invoke(this,
+                (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
+                SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
+                );
         }
     }
 }

@@ -17,7 +17,7 @@ namespace TowerDefenceGame_LPB.Model
         BuildBomber,
         UpgradeTower,
         DestroyTower,
-        ShowUnits,
+        // ShowUnits,
 
         // for map maker only
         DestroyPlacement,
@@ -32,14 +32,14 @@ namespace TowerDefenceGame_LPB.Model
         #region Variables
 
         protected IDataAccess dataAccess;
-        protected Field? selectedField;
 
         #endregion
 
         #region Properties
 
+        public Field? SelectedField { get; protected set; }
+
         public Table Table { get; set; }
-        public Field SelectedField { get; set; }
 
         #endregion
 
