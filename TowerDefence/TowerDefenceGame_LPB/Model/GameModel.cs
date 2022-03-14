@@ -18,7 +18,7 @@ namespace TowerDefenceGame_LPB.Model
         //Table Table; // ModelBase has a Table
         private Player rp;
         private Player bp;
-        private static Timer timer;
+        private IList<Unit> AvailableUnits;
         //Player ne;
 
         #endregion
@@ -43,7 +43,7 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public GameModel(IDataAccess dataAccess)
+        public GameModel(IDataAccess dataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
@@ -82,6 +82,7 @@ namespace TowerDefenceGame_LPB.Model
         /// <summary>
         /// Method for end turn.
         /// Checks Phase and sets Round.
+        /// In attack phase, it disables building and it calls Attack().
         /// </summary>
         public void Advance()
         {
@@ -90,7 +91,7 @@ namespace TowerDefenceGame_LPB.Model
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
                 Round++;
-                MoveUnits();
+                Attack();
             }
             else if(Phase % 2 == 0)
             {
@@ -105,11 +106,12 @@ namespace TowerDefenceGame_LPB.Model
         }
 
         /// <summary>
-        /// Method for moving the units on the table model side.
-        /// Checks for new path, then every 1 sec calls Timer_Elapsed method.
+        /// Checks for new path, calls MoveUnits() and FireTowers() untill there are available units.
         /// </summary>
-        private void MoveUnits()
+        private void Attack()
         {
+            AvailableUnits = new List<Unit>(); // List for available units
+
             for (int i = 0; i < Table.Size.x; i++)
             {
                 for (int j = 0; j < Table.Size.y; j++)
@@ -141,6 +143,8 @@ namespace TowerDefenceGame_LPB.Model
                                 bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
                             foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                             {
+                                AvailableUnits.Add(unit); // add unit to list
+
                                 if (unit.Owner == bp)
                                 {
                                     unit.NewPath(bpPath);
@@ -155,36 +159,22 @@ namespace TowerDefenceGame_LPB.Model
                 }
             } // sets new path for all units
 
-            timer = new Timer(1000);  // sets a timer with 1 sec interval
-            timer.Elapsed += Timer_Elapsed;  // on every 1 sec
-            timer.Start();
-
-            return;
+            while(AvailableUnits.Count > 0)
+            {
+                MoveUnits();
+                // FireTower();
+            }
         }
 
         /// <summary>
-        /// Every 1 sec it moves the units on their path.
+        /// Method for moving the units on the table model side.
+        /// Moves the units untill they run out of stamina, resets it and removes them from AvailableUnits.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+        private async void MoveUnits()
         {
-            int stopTimer = 0; // check if all units exhausted their stamina
+            await Task.Delay(500); // waits 500 millisec/ 0.5 sec
 
-            foreach (Unit unit in rp.Units) // move units of RED player by one if they have stamina
-            {
-                if(unit.Stamina > 0)
-                {
-                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Remove(unit);
-                    unit.Moved();
-                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
-                }
-                if (unit.Stamina == 0)
-                {
-                    stopTimer++;
-                }
-            }
-            foreach (Unit unit in bp.Units) // move units of BLUE player by one if they have stamina
+            foreach (Unit unit in AvailableUnits) // move units of RED player by one if they have stamina
             {
                 if (unit.Stamina > 0)
                 {
@@ -192,30 +182,12 @@ namespace TowerDefenceGame_LPB.Model
                     unit.Moved();
                     Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
                 }
-                if(unit.Stamina == 0)
-                {
-                    stopTimer++;
-                }
-            }
-
-            ///////////////////////////////
-            // Tower damaging units here //
-            ///////////////////////////////
-
-            if(stopTimer == bp.Units.Count + rp.Units.Count) // if all units moved untill stamina reached 0
-            {
-                timer.Stop(); // end of attacking phase
-
-                foreach(Unit unit in bp.Units) // reset the stamina of all units
+                if (unit.Stamina == 0)
                 {
                     unit.ResetStamina();
-                }
-                foreach (Unit unit in rp.Units)
-                {
-                    unit.ResetStamina();
+                    AvailableUnits.Remove(unit);
                 }
             }
-
 
             return;
         }
