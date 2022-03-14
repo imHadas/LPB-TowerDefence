@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using TowerDefenceGame_LPB.Persistence;
 using TowerDefenceGame_LPB.DataAccess;
+
 
 namespace TowerDefenceGame_LPB.Model
 {
@@ -16,6 +18,7 @@ namespace TowerDefenceGame_LPB.Model
         //Table Table; // ModelBase has a Table
         private Player rp;
         private Player bp;
+        private static Timer timer;
         //Player ne;
 
         #endregion
@@ -76,6 +79,10 @@ namespace TowerDefenceGame_LPB.Model
             SetupBarracks(bp);
         }
 
+        /// <summary>
+        /// Method for end turn.
+        /// Checks Phase and sets Round.
+        /// </summary>
         public void Advance()
         {
             Phase++;
@@ -97,44 +104,48 @@ namespace TowerDefenceGame_LPB.Model
             }
         }
 
+        /// <summary>
+        /// Method for moving the units on the table model side.
+        /// Checks for new path, then every 1 sec calls Timer_Elapsed method.
+        /// </summary>
         private void MoveUnits()
         {
-            for(int i = 0; i < Table.Size.x; i++)
+            for (int i = 0; i < Table.Size.x; i++)
             {
-                for(int j = 0; j < Table.Size.y; j++)
+                for (int j = 0; j < Table.Size.y; j++)
                 {
-                    if(Table[(uint)i,(uint)j].Units.Count > 0)
+                    if (Table[(uint)i, (uint)j].Units.Count > 0)
                     {
                         IList<(uint x, uint y)> rpPath = null;
                         IList<(uint x, uint y)> bpPath = null;
                         bool rpTobp = false;
                         bool bpTorp = false;
-                        foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                        foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                         {
                             if (bpTorp && rpTobp)
                                 break;
-                            else if(!bpTorp && unit.Owner == bp)
+                            else if (!bpTorp && unit.Owner == bp)
                             {
-                                bpTorp = true;  
+                                bpTorp = true;
                             }
-                            else if(!rpTobp && unit.Owner == rp)
+                            else if (!rpTobp && unit.Owner == rp)
                             {
                                 rpTobp = true;
                             }
                         }
                         if (bpTorp || rpTobp)
                         {
-                            if(rpTobp)
+                            if (rpTobp)
                                 rpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
-                            if(bpTorp)
+                            if (bpTorp)
                                 bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
-                            foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                             {
-                                if(unit.Owner == bp)
+                                if (unit.Owner == bp)
                                 {
                                     unit.NewPath(bpPath);
                                 }
-                                else if(unit.Owner == rp)
+                                else if (unit.Owner == rp)
                                 {
                                     unit.NewPath(rpPath);
                                 }
@@ -142,11 +153,72 @@ namespace TowerDefenceGame_LPB.Model
                         }
                     }
                 }
-            }
-            
+            } // sets new path for all units
+
+            timer = new Timer(1000);  // sets a timer with 1 sec interval
+            timer.Elapsed += Timer_Elapsed;  // on every 1 sec
+            timer.Start();
+
             return;
         }
 
+        /// <summary>
+        /// Every 1 sec it moves the units on their path.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            int stopTimer = 0; // check if all units exhausted their stamina
+
+            foreach (Unit unit in rp.Units) // move units of RED player by one if they have stamina
+            {
+                if(unit.Stamina > 0)
+                {
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Remove(unit);
+                    unit.Moved();
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
+                }
+                if (unit.Stamina == 0)
+                {
+                    stopTimer++;
+                }
+            }
+            foreach (Unit unit in bp.Units) // move units of BLUE player by one if they have stamina
+            {
+                if (unit.Stamina > 0)
+                {
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Remove(unit);
+                    unit.Moved();
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
+                }
+                if(unit.Stamina == 0)
+                {
+                    stopTimer++;
+                }
+            }
+
+            ///////////////////////////////
+            // Tower damaging units here //
+            ///////////////////////////////
+
+            if(stopTimer == bp.Units.Count + rp.Units.Count) // if all units moved untill stamina reached 0
+            {
+                timer.Stop(); // end of attacking phase
+
+                foreach(Unit unit in bp.Units) // reset the stamina of all units
+                {
+                    unit.ResetStamina();
+                }
+                foreach (Unit unit in rp.Units)
+                {
+                    unit.ResetStamina();
+                }
+            }
+
+
+            return;
+        }
 
         private void SetupBarracks(Player player)
         {
@@ -204,6 +276,7 @@ namespace TowerDefenceGame_LPB.Model
             Table[coords].Units.Add(unit);
             unit.NewPath(FindPath(coords, OtherPlayer.Castle.Coords));
             CurrentPlayer.Units.Add(unit);
+            CurrentPlayer.Money -= unit.Cost;
         }
 
         private void BuildTower(Tower tower)
@@ -217,6 +290,7 @@ namespace TowerDefenceGame_LPB.Model
 
             SelectedField.Placement = tower;
             CurrentPlayer.Towers.Add(tower);
+            CurrentPlayer.Money -= tower.Cost;
         }
 
         /// <summary>

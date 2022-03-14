@@ -24,7 +24,11 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public void Damage(uint amount = 1) => Health -= amount;
 
-        public void Moved() => Path.RemoveFirst();
+        public void Moved()
+        {
+            Path.RemoveFirst();
+            Stamina--;
+        }
 
         public void NewPath(LinkedList<(uint, uint)> path) => Path = new(path);  //if being a linked list directly
 
