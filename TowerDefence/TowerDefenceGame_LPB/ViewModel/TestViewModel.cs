@@ -32,7 +32,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                         BlueTank = 0,
                         RedBasic = 0,
                         RedTank = 0,
-                        PlayerType = model.Table[(uint)i,(uint)j].Placement.Owner.Type,
+                        PlayerType = model.Table[(uint)i,(uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
                         Placement = model.Table[(uint)i,(uint)j].Placement,
                         ClickCommand = new DelegateCommand(param=>BuildTower(Convert.ToInt32(param)))
                     });

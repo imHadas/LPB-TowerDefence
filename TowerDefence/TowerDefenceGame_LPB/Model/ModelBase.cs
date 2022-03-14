@@ -17,8 +17,9 @@ namespace TowerDefenceGame_LPB.Model
         BuildBomber,
         UpgradeTower,
         DestroyTower,
-        ShowUnits,
+        // ShowUnits,
 
+        // for map maker only
         DestroyPlacement,
         BuildCastle,
         BuildTerrain,
@@ -30,39 +31,43 @@ namespace TowerDefenceGame_LPB.Model
     {
         #region Variables
 
-        private IDataAccess dataAccess;
-        private Field selectedField;
+        protected IDataAccess dataAccess;
 
         #endregion
 
         #region Properties
 
+        public Field? SelectedField { get; protected set; }
+
         public Table Table { get; set; }
-        public Field SelectedField { get; set; }
 
         #endregion
 
-        public MenuOption[] SelectField(Field field)
+        public abstract ICollection<MenuOption> SelectField(Field field);
+        
+        protected void SetupTable()
         {
-            int n;
-            selectedField = field;
-            MenuOption[] menus = new MenuOption[3];
-            return menus;
-        }
-        private void SetupTable()
-        {
-            return;
-        }
-
-        private (int,int)[] FindPath(Field start, Field end)
-        {
-            return new (int, int)[2];
+            for (uint i = 0; i < Table.Size.x; i++)
+            {
+                for (uint j = 0; j < Table.Size.y; j++)
+                {
+                    Table[i, j] = new Field(i, j);
+                    Table[i, j].Placement = new Placement((i, j));
+                }
+            }
         }
 
-        public virtual void SelectOption(MenuOption menus)
+        protected IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
         {
-            return;
+            throw new NotImplementedException();
         }
+
+        protected IList<(uint, uint)> FindPath(Field from, Field to)
+        {
+            throw new NotImplementedException();
+        }
+
+        public abstract void SelectOption(MenuOption option);
 
         #region Events
 
