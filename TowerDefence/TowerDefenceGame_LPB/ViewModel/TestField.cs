@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.ViewModel
@@ -20,6 +22,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private bool isBasicTower;
         private bool isSniperTower;
         private bool isBomberTower;
+        private Brush isSelected;
         private PlayerType playerType;
         private Placement placement;
 
@@ -160,6 +163,16 @@ namespace TowerDefenceGame_LPB.ViewModel
                 IsUnits = false;
             else
                 IsUnits = true;
+        }
+
+        public Brush IsSelected 
+        { 
+            get { return isSelected; } 
+            set 
+            { 
+                isSelected = value;
+                OnPropertyChanged();
+            }
         }
 
         public DelegateCommand ClickCommand { get; set; }

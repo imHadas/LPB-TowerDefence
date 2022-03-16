@@ -54,7 +54,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="1" BorderBrush="Black">
+                    <Border BorderThickness="3" BorderBrush="{Binding IsSelected}">
                         <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">

@@ -10,6 +10,16 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int selectedField;
         private GameModel model;
         public int GridSize { get; set; }
+        public int SelectedField 
+        { 
+            get { return selectedField; } 
+            set 
+            {
+                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Black;
+                selectedField = value;
+                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Red;
+            }
+        }
         public ObservableCollection<TestField> Fields { get; set; }
         public ObservableCollection<OptionField> OptionFields { get; set; }
         public TestViewModel(GameModel model)
@@ -29,15 +39,16 @@ namespace TowerDefenceGame_LPB.ViewModel
                 {
                     Fields.Add(new TestField
                     {
-                        Coords = (i,j),
+                        Coords = (i, j),
                         Number = i * GridSize + j,
                         BlueBasic = 0,
                         BlueTank = 0,
                         RedBasic = 0,
                         RedTank = 0,
-                        PlayerType = model.Table[(uint)i,(uint)j].Placement.Owner.Type,
-                        Placement = model.Table[(uint)i,(uint)j].Placement,
-                        ClickCommand = new DelegateCommand(param=>ButtonClick(Convert.ToInt32(param)))
+                        PlayerType = model.Table[(uint)i, (uint)j].Placement.Owner.Type,
+                        Placement = model.Table[(uint)i, (uint)j].Placement,
+                        IsSelected =  System.Windows.Media.Brushes.Black,
+                        ClickCommand = new DelegateCommand(param => ButtonClick(Convert.ToInt32(param)))
                     });
                 }
             }
@@ -53,7 +64,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public void ButtonClick(int index)
         {
-            selectedField = index;
+            SelectedField = index;
             TestField testField = Fields[index];
             if (testField.IsBarrack || testField.IsCastle)
             {
