@@ -10,7 +10,7 @@ using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.ViewModel
 {
-    public class TestField : ViewModelBase
+    public class FieldViewModel : ViewModelBase
     {
         private int blueBasic;
         private int blueTank;

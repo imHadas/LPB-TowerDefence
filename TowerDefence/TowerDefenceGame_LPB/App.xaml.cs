@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using TowerDefenceGame_LPB.ViewModel;
 using TowerDefenceGame_LPB.Model;
 using TowerDefenceGame_LPB.DataAccess;
+using TowerDefenceGame_LPB.View;
 
 namespace TowerDefenceGame_LPB
 {
@@ -14,9 +15,15 @@ namespace TowerDefenceGame_LPB
     public partial class App : Application
     {
         private MainWindow _view;
-        private TestViewModel _viewModel;
+        private MapMaker _mapMaker;
+        private MainMenu _mainMenu;
+        private GameViewModel _viewModel;
+        private MapMakerViewModel _mapMakerViewModel;
         private GameModel _model;
-
+        private DialogBox _dialogBox;
+        public DelegateCommand OpenNewWindowCommand { get; set; }
+        public DelegateCommand OKCommand { get; set; }
+        public DelegateCommand DialogCloseCommand { get; set; }
 
         public App()
         {
@@ -30,13 +37,61 @@ namespace TowerDefenceGame_LPB
             _model.NewGame();
 
             // Creating viewmodel
-            _viewModel = new TestViewModel(_model);
+            _viewModel = new GameViewModel(_model);
+            _viewModel.ExitCommand = new DelegateCommand(p => ExitFromGame());
+
+            //Creating main menu
+            _mainMenu = new MainMenu();
+            OpenNewWindowCommand= new DelegateCommand(p => OpenNewWindow(Convert.ToInt32(p)));
+            _mainMenu.DataContext = this;
+            _mainMenu.Show();
+
 
             // Creating view
+            //_view = new MainWindow();
+            //_view.DataContext = _viewModel;
+            //_view.Show();
+
+        }
+        private void OpenNewWindow(int windowType)
+        { 
+            _dialogBox = new DialogBox();
+            _dialogBox.DataContext = this;
+            OKCommand = new DelegateCommand(p => SetupNewWindow(windowType));
+            DialogCloseCommand = new DelegateCommand(p => _dialogBox.Close());
+            _dialogBox.Show();
+            /*
             _view = new MainWindow();
             _view.DataContext = _viewModel;
             _view.Show();
-            
+            _mainMenu.Close();
+            */        
+        }
+        private void SetupNewWindow(int windowType)
+        {
+            //use values from dialogBox for gridSize
+            //can use _dialogBox.Rows.Text and _dialogBox.Columns.Text with converting
+            if(windowType == 1)
+            {
+                _view = new MainWindow();
+                _view.DataContext = _viewModel;
+                _view.Show();
+            }
+            else if(windowType == 2)
+            {
+                _mapMaker = new MapMaker();
+                _mapMaker.DataContext = _mapMakerViewModel;
+                _mapMaker.Show();
+            }
+            _dialogBox.Close();
+            _mainMenu.Close();
+        }
+        private void ExitFromGame()
+        {
+            _mainMenu = new MainMenu();
+            _mainMenu.DataContext = this;
+            _mainMenu.Show(); ;
+            _view.Close();
         }
     }
 }

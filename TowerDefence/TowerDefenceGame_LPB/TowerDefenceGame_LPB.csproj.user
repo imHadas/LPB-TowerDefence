@@ -7,7 +7,27 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="View\DialogBox.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\MainMenu.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\MapMaker.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="View\DialogBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="View\MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\MainMenu.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\MapMaker.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

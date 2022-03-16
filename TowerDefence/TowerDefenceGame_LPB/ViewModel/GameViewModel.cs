@@ -5,11 +5,12 @@ using TowerDefenceGame_LPB.Model;
 
 namespace TowerDefenceGame_LPB.ViewModel
 {
-    public class TestViewModel : ViewModelBase
+    public class GameViewModel : ViewModelBase
     {
         private int selectedField;
         private GameModel model;
         public int GridSize { get; set; }
+        public DelegateCommand ExitCommand { get; set; }
         public int SelectedField 
         { 
             get { return selectedField; } 
@@ -20,9 +21,9 @@ namespace TowerDefenceGame_LPB.ViewModel
                 Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Red;
             }
         }
-        public ObservableCollection<TestField> Fields { get; set; }
+        public ObservableCollection<FieldViewModel> Fields { get; set; }
         public ObservableCollection<OptionField> OptionFields { get; set; }
-        public TestViewModel(GameModel model)
+        public GameViewModel(GameModel model)
         {
             this.model = model;
             GridSize = 11;
@@ -32,12 +33,12 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         private void GenerateTable()
         {
-            Fields = new ObservableCollection<TestField>();
+            Fields = new ObservableCollection<FieldViewModel>();
             for (int i = 0; i < GridSize; i++)
             {
                 for (int j = 0; j < GridSize; j++)
                 {
-                    Fields.Add(new TestField
+                    Fields.Add(new FieldViewModel
                     {
                         Coords = (i, j),
                         Number = i * GridSize + j,
@@ -55,7 +56,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         private void RefreshTable()
         {
-            foreach(TestField field in Fields)
+            foreach(FieldViewModel field in Fields)
             {
                 //add units
                 field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
@@ -65,7 +66,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         public void ButtonClick(int index)
         {
             SelectedField = index;
-            TestField testField = Fields[index];
+            FieldViewModel testField = Fields[index];
             if (testField.IsBarrack || testField.IsCastle)
             {
                 OptionFields.Clear();
