@@ -36,11 +36,11 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 placement = value;
                 //OnPropertyChanged(); //kinda unnecessary
-                IsBarrack = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.Barrack" ? true : false;
-                IsCastle = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.Caslte" ? true : false;
-                IsBasicTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.BasicTower" ? true : false;
-                IsBomberTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.BomberTower" ? true : false;
-                IsSniperTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.SniperTower" ? true : false;
+                IsBarrack = placement.GetType() == typeof(Barrack) ? true : false;
+                IsCastle = placement.GetType() == typeof(Castle) ? true : false;
+                IsBasicTower = placement.GetType() == typeof(BasicTower) ? true : false;
+                IsBomberTower = placement.GetType() == typeof(BomberTower) ? true : false;
+                IsSniperTower = placement.GetType() == typeof(SniperTower) ? true : false;
             }
         }
 

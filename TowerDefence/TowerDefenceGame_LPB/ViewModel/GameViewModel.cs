@@ -46,7 +46,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                         BlueTank = 0,
                         RedBasic = 0,
                         RedTank = 0,
-                        PlayerType = model.Table[(uint)i, (uint)j].Placement.Owner.Type,
+                        PlayerType = model.Table[(uint)i, (uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
                         Placement = model.Table[(uint)i, (uint)j].Placement,
                         IsSelected =  System.Windows.Media.Brushes.Black,
                         ClickCommand = new DelegateCommand(param => ButtonClick(Convert.ToInt32(param)))
@@ -60,7 +60,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 //add units
                 field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
-                field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement.Owner.Type;
+                field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement?.Owner?.Type ?? PlayerType.NEUTRAL;
             }
         }
         public void ButtonClick(int index)
@@ -100,16 +100,16 @@ namespace TowerDefenceGame_LPB.ViewModel
             switch(option)
             {
                 case "BuildBasic":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BasicTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BasicTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "BuildBomber":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BomberTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BomberTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "BuildSniper":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, Fields[selectedField].Coords);
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "DestroyTower":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(model.NeutralPlayer, Fields[selectedField].Coords);
+                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
             }
             RefreshTable();
