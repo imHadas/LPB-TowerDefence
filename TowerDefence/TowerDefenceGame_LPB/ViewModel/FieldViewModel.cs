@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.ViewModel
 {
-    public class TestField : ViewModelBase
+    public class FieldViewModel : ViewModelBase
     {
         private int blueBasic;
         private int blueTank;
@@ -17,7 +19,10 @@ namespace TowerDefenceGame_LPB.ViewModel
         private bool isUnits;
         private bool isCastle;
         private bool isBarrack;
-        private bool isTower;
+        private bool isBasicTower;
+        private bool isSniperTower;
+        private bool isBomberTower;
+        private Brush isSelected;
         private PlayerType playerType;
         private Placement placement;
 
@@ -28,9 +33,14 @@ namespace TowerDefenceGame_LPB.ViewModel
         {
             get { return placement; }
             set 
-            { 
+            {
                 placement = value;
-                OnPropertyChanged();
+                //OnPropertyChanged(); //kinda unnecessary
+                IsBarrack = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.Barrack" ? true : false;
+                IsCastle = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.Caslte" ? true : false;
+                IsBasicTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.BasicTower" ? true : false;
+                IsBomberTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.BomberTower" ? true : false;
+                IsSniperTower = placement.GetType().ToString() == "TowerDefenceGame_LPB.Persistence.SniperTower" ? true : false;
             }
         }
 
@@ -44,12 +54,30 @@ namespace TowerDefenceGame_LPB.ViewModel
             } 
         }
 
-        public bool IsTower
+        public bool IsBasicTower
         {
-            get { return isTower; }
+            get { return isBasicTower; }
             set 
             {
-                isTower = value;
+                isBasicTower = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool IsSniperTower
+        {
+            get { return isSniperTower; }
+            set
+            {
+                isSniperTower = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool IsBomberTower
+        {
+            get { return isBomberTower; }
+            set
+            {
+                isBomberTower = value;
                 OnPropertyChanged();
             }
         }
@@ -94,6 +122,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             { 
                 redTank = value;
                 IsOccupied();
+                OnPropertyChanged();
             }
         }
 
@@ -103,6 +132,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             set {
                 redBasic = value;
                 IsOccupied();
+                OnPropertyChanged();
             }
         }
 
@@ -113,6 +143,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 blueTank = value;
                 IsOccupied();
+                OnPropertyChanged();
             }
         }
         public int BlueBasic
@@ -122,6 +153,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             { 
                 blueBasic = value;
                 IsOccupied();
+                OnPropertyChanged();
             }
         }
 
@@ -131,6 +163,16 @@ namespace TowerDefenceGame_LPB.ViewModel
                 IsUnits = false;
             else
                 IsUnits = true;
+        }
+
+        public Brush IsSelected 
+        { 
+            get { return isSelected; } 
+            set 
+            { 
+                isSelected = value;
+                OnPropertyChanged();
+            }
         }
 
         public DelegateCommand ClickCommand { get; set; }
