@@ -65,8 +65,9 @@ namespace TowerDefenceGame_LPB.Model
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
             rp = new Player(PlayerType.RED, new(rp, 9, 5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, new(bp, 1, 4), bBarracks);
+            bp = new Player(PlayerType.BLUE, new(bp, 1, 5), bBarracks);
             CurrentPlayer = bp;
+            SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
         }
@@ -79,6 +80,12 @@ namespace TowerDefenceGame_LPB.Model
         private void MoveUnits()
         {
             
+        }
+
+        private void SetupCastles()
+        {
+            Table[(uint)rp.Castle.Coords.x, (uint)rp.Castle.Coords.y].Placement = rp.Castle;
+            Table[(uint)bp.Castle.Coords.x, (uint)bp.Castle.Coords.y].Placement = bp.Castle;
         }
 
         private void SetupBarracks(Player player)
