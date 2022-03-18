@@ -58,7 +58,8 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            Table = new Table(11, 11);
+            //Table = new Table(11, 11);
+            SetupTable(11,11);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
@@ -66,7 +67,6 @@ namespace TowerDefenceGame_LPB.Model
             rp = new Player(PlayerType.RED, new(rp, 9, 5) ,rBarracks);
             bp = new Player(PlayerType.BLUE, new(bp, 1, 4), bBarracks);
             CurrentPlayer = bp;
-            SetupTable();
             SetupBarracks(rp);
             SetupBarracks(bp);
         }

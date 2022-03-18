@@ -36,7 +36,16 @@ namespace TowerDefenceGame_LPB
             _view = new MainWindow();
             _view.DataContext = _viewModel;
             _view.Show();
+
+            _view.Closing += _view_Closing;
             
+        }
+
+        private void _view_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // esetleges automata mentés?
+
+            this.Shutdown();
         }
     }
 }

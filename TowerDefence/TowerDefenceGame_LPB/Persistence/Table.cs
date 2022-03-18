@@ -22,7 +22,7 @@ namespace TowerDefenceGame_LPB.Persistence
             set { fields[c.x,c.y] = value; }
         }
 
-        public Table(int height, int width)
+        public Table(uint height, uint width)
         {
             fields = new Field[height, width];
         }
