@@ -33,6 +33,10 @@ namespace TowerDefenceGame_LPB.Model
 
         protected IDataAccess dataAccess;
 
+        protected HashSet<(uint, uint)> allCoords = new HashSet<(uint, uint)>();
+
+        internal IPathfinder pathfinder;
+
         #endregion
 
         #region Properties
@@ -45,26 +49,30 @@ namespace TowerDefenceGame_LPB.Model
 
         public abstract ICollection<MenuOption> SelectField(Field field);
         
-        protected void SetupTable()
+        protected void SetupTable(uint width, uint height)  //height is the x coordinates (columns), width is the y (rows)
         {
-            for (uint i = 0; i < Table.Size.x; i++)
+            Table = new(height, width);
+            allCoords.Clear();
+            for (uint i = 0; i < height; i++) //go through every column (x coord)
             {
-                for (uint j = 0; j < Table.Size.y; j++)
+                for (uint j = 0; j < width; j++) //go through every row (y coord)
                 {
                     Table[i, j] = new Field(i, j);
                     Table[i, j].Placement = new Placement((i, j));
+                    allCoords.Add((i, j));
                 }
             }
+            pathfinder = new AStar(Table);
         }
 
         protected IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
         {
-            throw new NotImplementedException();
+            return pathfinder.FindPath(from, to);
         }
 
         protected IList<(uint, uint)> FindPath(Field from, Field to)
         {
-            throw new NotImplementedException();
+            return FindPath(from.Coords, to.Coords);
         }
 
         public abstract void SelectOption(MenuOption option);
