@@ -22,14 +22,20 @@ namespace TowerDefenceGame_LPB.Persistence
             set { fields[c.x,c.y] = value; }
         }
 
-        public Table(int height, int width)
+        public Table(uint height, uint width)
         {
             fields = new Field[height, width];
         }
 
         public IEnumerator GetEnumerator()  // make it easier to iterate through all fields
         {
-            throw new System.NotImplementedException();
+            for (uint i = 0; i < fields.GetLength(0); i++)
+            {
+                for (uint j = 0; j < fields.GetLength(1); j++)
+                {
+                    yield return fields[i, j];
+                }
+            }
         }
     }
 }
