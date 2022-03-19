@@ -106,7 +106,7 @@ namespace TowerDefenceGame_LPB.Model
         /// <summary>
         /// Checks for new path, calls MoveUnits() and FireTowers() untill there are available units.
         /// </summary>
-        private void Attack()
+        private async void Attack()
         {
             AvailableUnits = new List<Unit>(); // List for available units
 
@@ -157,20 +157,25 @@ namespace TowerDefenceGame_LPB.Model
                 }
             } // sets new path for all units
 
-            while(AvailableUnits.Count > 0)
+            int au = AvailableUnits.Count;
+
+            while(au > 0)
             {
-                MoveUnits();
-                FireTower();
+                au -= await MoveUnits();
+                await FireTower();
             }
+
+            // reset stamina
         }
 
         /// <summary>
         /// Method for moving the units on the table model side.
         /// Moves the units untill they run out of stamina, resets it and removes them from AvailableUnits.
         /// </summary>
-        private async void MoveUnits()
+        private async Task<int> MoveUnits()
         {
-            await Task.Delay(500); // waits 500 millisec/ 0.5 sec
+            int exhaustedunits = 0;
+            await Task.Delay(50); // waits 500 millisec/ 0.5 sec
 
             foreach (Unit unit in AvailableUnits) // move units of RED player by one if they have stamina
             {
@@ -182,15 +187,14 @@ namespace TowerDefenceGame_LPB.Model
                 }
                 if (unit.Stamina == 0)
                 {
-                    unit.ResetStamina();
-                    AvailableUnits.Remove(unit);
+                    exhaustedunits++;
                 }
             }
 
-            return;
+            return exhaustedunits;
         }
 
-        private void FireTower()
+        private async Task FireTower()
         {
 
         }
@@ -248,7 +252,7 @@ namespace TowerDefenceGame_LPB.Model
             var coords = CurrentPlayer.Barracks
                     .ElementAt(new Random().Next(2)).WhereToPlace;
 
-            if (Table[coords].Placement.GetType() != typeof(Placement)) //empty field has type Placement
+            if (Table[coords].Placement is not null) //empty field has type Placement
                 throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");
 
             if (CurrentPlayer.Money < unit.Cost)

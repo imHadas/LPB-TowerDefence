@@ -58,7 +58,6 @@ namespace TowerDefenceGame_LPB.Model
                 for (uint j = 0; j < width; j++) //go through every row (y coord)
                 {
                     Table[i, j] = new Field(i, j);
-                    Table[i, j].Placement = new Placement((i, j));
                     allCoords.Add((i, j));
                 }
             }

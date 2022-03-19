@@ -53,9 +53,9 @@ namespace TowerDefenceGame_LPB.Model
 
                 foreach (var node in Neighbours(current))
                 {
-                    if (!node.Walkable || closedSet.Contains(node))
+                    if (!node.Equals(end) && (!node.Walkable || closedSet.Contains(node)))
                         continue;
-                    WeightedNode wnode = new(node, current.Distance, Heuristic(node, end));
+                    WeightedNode wnode = new(node, current.Distance + 1, Heuristic(node, end));
                     wnode.Parent = current;
                     if(!openSet.ContainsKey(wnode))
                     {
@@ -85,7 +85,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private uint Heuristic(Node from, Node to)
         {
-            return (uint)(Math.Abs(from.Coords.x - to.Coords.x) + Math.Abs(from.Coords.y - to.Coords.y)); //ki hitte volna, hogy a nummod hasznos lesz? (delta x + delta y) aka Manhattan norma
+            return (uint)(Math.Abs((int)from.Coords.x - (int)to.Coords.x) + Math.Abs((int)from.Coords.y - (int)to.Coords.y)); //ki hitte volna, hogy a nummod hasznos lesz? (delta x + delta y) aka Manhattan norma
         }
 
         private ICollection<Node> Neighbours(Node node)
@@ -119,7 +119,7 @@ namespace TowerDefenceGame_LPB.Model
         }
     }
 
-    class Node : IEquatable<Node>, ICloneable
+    class Node : IEquatable<Node>, ICloneable, IComparable<Node>
     {
         public Node? Parent { get; set; }
         public Field Field { get; private set; }
@@ -150,6 +150,12 @@ namespace TowerDefenceGame_LPB.Model
         public override int GetHashCode()
         {
             return Coords.GetHashCode();
+        }
+
+        public int CompareTo(Node? other)
+        {
+            if(other == null) return int.MaxValue;
+            return Math.Abs((int)this.Coords.x - (int)other.Coords.x) + Math.Abs((int)this.Coords.y - (int)other.Coords.y);
         }
     }
 

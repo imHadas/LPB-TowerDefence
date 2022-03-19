@@ -9,7 +9,7 @@ namespace TowerDefenceGame_LPB.Persistence
         public Player? Owner { get; private set; }
         public (uint x, uint y) Coords { get; private set; }
 
-        internal Placement((uint x, uint y) coords, Player? player = null)
+        protected Placement((uint x, uint y) coords, Player? player = null)
         {
             Owner = player;
             Coords = coords;
