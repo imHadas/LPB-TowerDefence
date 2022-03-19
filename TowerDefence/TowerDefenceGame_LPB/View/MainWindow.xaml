@@ -42,14 +42,14 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="1" IsEnabled="False"/>
-            <Button Grid.Column="2" Content="Támadás"/>
+            <TextBox Grid.Column="1" Text="{Binding TurnText}" IsEnabled="False"/>
+            <Button Grid.Column="2" Command="{Binding AdvanceCommand}" Content="{Binding NextTurnText}" IsEnabled="{Binding AdvanceEnable}"/>
 
         </Grid>
         <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Rows="{Binding GridSize}" Columns="{Binding GridSize}"/>
+                    <UniformGrid Rows="{Binding GridSizeY}" Columns="{Binding GridSizeX}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>

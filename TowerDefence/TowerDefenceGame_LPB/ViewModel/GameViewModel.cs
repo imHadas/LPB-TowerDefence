@@ -7,10 +7,20 @@ namespace TowerDefenceGame_LPB.ViewModel
 {
     public class GameViewModel : ViewModelBase
     {
+        private string turnText;
+        private string nextTurnText;
+        private bool advanceEnable;
+
         private int selectedField;
         private GameModel model;
-        public int GridSize { get; set; }
+        
+        public int GridSizeX { get; set; }
+        public int GridSizeY { get; set; }
+        public string TurnText { get { return turnText; } set { turnText = value; OnPropertyChanged(); } }
+        public string NextTurnText { get { return nextTurnText; } set { nextTurnText = value; OnPropertyChanged(); } }
+        public bool AdvanceEnable { get { return advanceEnable; } set { advanceEnable = value; OnPropertyChanged(); } }
         public DelegateCommand ExitCommand { get; set; }
+        public DelegateCommand AdvanceCommand { get; set; }
         public int SelectedField 
         { 
             get { return selectedField; } 
@@ -18,6 +28,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Black;
                 selectedField = value;
+                model.SelectField(model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y]);
                 Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Red;
             }
         }
@@ -26,7 +37,10 @@ namespace TowerDefenceGame_LPB.ViewModel
         public GameViewModel(GameModel model)
         {
             this.model = model;
-            GridSize = 11;
+            GridSizeX = model.Table.Size.Item1;
+            GridSizeY = model.Table.Size.Item2;
+            AdvanceCommand = new DelegateCommand(p => AdvanceGame());
+            SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
@@ -34,14 +48,14 @@ namespace TowerDefenceGame_LPB.ViewModel
         private void GenerateTable()
         {
             Fields = new ObservableCollection<FieldViewModel>();
-            for (int i = 0; i < GridSize; i++)
+            for (int i = 0; i < GridSizeX; i++)
             {
-                for (int j = 0; j < GridSize; j++)
+                for (int j = 0; j < GridSizeY; j++)
                 {
                     Fields.Add(new FieldViewModel
                     {
                         Coords = (i, j),
-                        Number = i * GridSize + j,
+                        Number = i * GridSizeX + j,
                         BlueBasic = 0,
                         BlueTank = 0,
                         RedBasic = 0,
@@ -61,12 +75,67 @@ namespace TowerDefenceGame_LPB.ViewModel
                 //add units
                 field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
                 field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement?.Owner?.Type ?? PlayerType.NEUTRAL;
+                field.BlueBasic = 0;
+                field.BlueTank = 0;
+                field.RedBasic = 0;
+                field.RedTank = 0;
+                foreach(Unit unit in model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Units)
+                {
+                    switch(unit.Owner?.Type)
+                    {
+                        case PlayerType.BLUE:
+                            if (unit.GetType() == typeof(BasicUnit))
+                                field.BlueBasic++;
+                            else if(unit.GetType() == typeof(TankUnit))
+                                field.BlueTank++;
+                            break;
+                        case PlayerType.RED:
+                            if (unit.GetType() == typeof(BasicUnit))
+                                field.RedBasic++;
+                            else if (unit.GetType() == typeof(TankUnit))
+                                field.RedTank++;
+                            break;
+                    }
+                }
+            }
+        }
+        private void AdvanceGame()
+        {
+            model.Advance();
+            SetupText();
+        }
+        private void SetupText()
+        {
+
+            if (model.Phase % 3 == 0)
+            {
+                AdvanceEnable = false;
+                NextTurnText = "Kék Építés";
+                TurnText = "Támadás";
+            }
+            if (model.Phase % 3 == 2)
+            {
+                AdvanceEnable = true;
+                NextTurnText = "Támadás";
+                TurnText = "Piros Építés";
+            }
+            if (model.Phase % 3 == 1)
+            {
+                AdvanceEnable = true;
+                NextTurnText="Piros Építés";
+                TurnText = "Kék Építés";
             }
         }
         public void ButtonClick(int index)
         {
             SelectedField = index;
             FieldViewModel testField = Fields[index];
+            if (testField.PlayerType == model.OtherPlayer.Type)
+            {
+                OptionFields.Clear();
+                return;
+            }
+                
             if (testField.IsBarrack || testField.IsCastle)
             {
                 OptionFields.Clear();
@@ -99,17 +168,26 @@ namespace TowerDefenceGame_LPB.ViewModel
             //Modellben levo SelectOption?
             switch(option)
             {
+                case "TrainBasic":
+                    model.SelectOption(MenuOption.TrainBasic);
+                    break;
+                case "TrainTank":
+                    model.SelectOption(MenuOption.TrainTank);
+                    break;
                 case "BuildBasic":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BasicTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
+                    model.SelectOption(MenuOption.BuildBasic);
+                    //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BasicTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "BuildBomber":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BomberTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
+                    model.SelectOption(MenuOption.BuildBomber);
+                    //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new BomberTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "BuildSniper":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
+                    model.SelectOption(MenuOption.BuildSniper);
+                    //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "DestroyTower":
-                    model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
+                    //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
             }
             RefreshTable();

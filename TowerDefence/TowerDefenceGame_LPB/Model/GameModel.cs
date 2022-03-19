@@ -91,12 +91,12 @@ namespace TowerDefenceGame_LPB.Model
                 Round++;
                 Attack();
             }
-            else if(Phase % 2 == 0)
+            else if(Phase % 3 == 1)
             {
                 BuildEnabled=true;
                 CurrentPlayer = bp;
             }
-            else if(Phase % 2 == 1)
+            else if(Phase % 3 == 2)
             {
                 BuildEnabled = true;
                 CurrentPlayer = rp;
@@ -219,7 +219,7 @@ namespace TowerDefenceGame_LPB.Model
                     PlaceUnit(new BasicUnit(CurrentPlayer));
                     break;
                 case MenuOption.TrainTank:
-                    PlaceUnit(new BasicUnit(CurrentPlayer));
+                    PlaceUnit(new TankUnit(CurrentPlayer));
                     break;
                 case MenuOption.BuildSniper:
                     BuildTower(new SniperTower(CurrentPlayer, SelectedField.Coords));
@@ -246,9 +246,9 @@ namespace TowerDefenceGame_LPB.Model
         private void PlaceUnit(Unit unit)
         {
             var coords = CurrentPlayer.Barracks
-                    .ElementAt(new Random().Next(1)).WhereToPlace;
+                    .ElementAt(new Random().Next(2)).WhereToPlace;
 
-            if (Table[coords].Placement != null)
+            if (Table[coords].Placement.GetType() != typeof(Placement)) //empty field has type Placement
                 throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");
 
             if (CurrentPlayer.Money < unit.Cost)
@@ -262,7 +262,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private void BuildTower(Tower tower)
         {
-            if (SelectedField.Placement != null)
+            if (SelectedField.Placement.GetType() != typeof(Placement)) //empty field has tyype Placement
                 throw new InvalidPlacementException(SelectedField, "Cannot build tower on non-empty field");
             if (SelectedField.Units.Count > 0)
                 throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");

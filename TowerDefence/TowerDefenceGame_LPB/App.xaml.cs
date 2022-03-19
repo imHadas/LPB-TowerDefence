@@ -34,7 +34,7 @@ namespace TowerDefenceGame_LPB
         {
             // Creating model
             _model = new GameModel(new DataAccess.DataAccess());
-            _model.NewGame();
+            //_model.NewGame();
 
             // Creating viewmodel
             _viewModel = new GameViewModel(_model);
