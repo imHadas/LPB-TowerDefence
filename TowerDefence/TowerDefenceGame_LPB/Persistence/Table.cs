@@ -29,11 +29,11 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public IEnumerator GetEnumerator()  // make it easier to iterate through all fields
         {
-            for (uint i = 0; i < fields.GetLength(0); i++)
+            for(uint i = 0; i < fields.GetLength(0); i++)
             {
-                for (uint j = 0; j < fields.GetLength(1); j++)
+                for(uint j = 0; j < fields.GetLength(1); j++)
                 {
-                    yield return fields[i, j];
+                    yield return fields[i,j];
                 }
             }
         }
