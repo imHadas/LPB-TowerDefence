@@ -160,7 +160,7 @@ namespace TowerDefenceGame_LPB.Model
             while(AvailableUnits.Count > 0)
             {
                 MoveUnits();
-                // FireTower();
+                FireTower();
             }
         }
 
@@ -188,6 +188,17 @@ namespace TowerDefenceGame_LPB.Model
             }
 
             return;
+        }
+
+        private void FireTower()
+        {
+
+        }
+
+        private void SetupCastles()
+        {
+            Table[(uint)rp.Castle.Coords.x, (uint)rp.Castle.Coords.y].Placement = rp.Castle;
+            Table[(uint)bp.Castle.Coords.x, (uint)bp.Castle.Coords.y].Placement = bp.Castle;
         }
 
         private void SetupBarracks(Player player)
