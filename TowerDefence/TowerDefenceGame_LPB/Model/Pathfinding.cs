@@ -25,7 +25,7 @@ namespace TowerDefenceGame_LPB.Model
         public override IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
         {
             HashSet<Node> closedSet = new();
-            SortedList<WeightedNode, uint> openSet = new();
+            SortedSet<WeightedNode> openSet = new(new WeightedNodeComparer());
             LinkedList<Node> path = new();
 
             Node end = getNodeByCoord(to.Item1, to.Item2);
@@ -35,13 +35,13 @@ namespace TowerDefenceGame_LPB.Model
                 start = new(temp, 0, Heuristic(temp, end));
             }
 
-            openSet.Add(start, start.Value);
-            while(openSet.Count != 0)
+            openSet.Add(start);
+            while (openSet.Count != 0)
             {
-                WeightedNode current = openSet.Keys[0];
+                WeightedNode current = openSet.Min;
                 openSet.Remove(current);
                 closedSet.Add(current);
-                if(current.Equals(end))
+                if (current.Equals(end))
                 {
                     while (!(current.Equals(start) || current is null))
                     {
@@ -57,14 +57,20 @@ namespace TowerDefenceGame_LPB.Model
                         continue;
                     WeightedNode wnode = new(node, current.Distance + 1, Heuristic(node, end));
                     wnode.Parent = current;
-                    if(!openSet.ContainsKey(wnode))
+                    if (!openSet.Contains(wnode))
                     {
-                        openSet.Add(wnode, wnode.Value);
+                        openSet.Add(wnode);
                     }
-                    else if(openSet[wnode] > current.Distance + 1 + Heuristic(current, end))
+                    else
                     {
-                        openSet.Remove(wnode);
-                        openSet.Add(wnode, wnode.Value);
+                        WeightedNode containedNode;
+                        openSet.TryGetValue(wnode, out containedNode);
+
+                        if (containedNode.Distance > current.Distance + 1)
+                        {
+                            openSet.Remove(containedNode);
+                            openSet.Add(wnode);
+                        }
                     }
 
                 }
@@ -116,6 +122,15 @@ namespace TowerDefenceGame_LPB.Model
             Node? result = null;
             allNodes.TryGetValue(new(new(x, y)), out result);
             return result;
+        }
+    }
+    class WeightedNodeComparer : IComparer<WeightedNode>
+    {
+        public int Compare(WeightedNode? x, WeightedNode? y)
+        {
+            if (x == null) return int.MinValue;
+            else if (y == null) return int.MaxValue;
+            return (int)x.Value - (int)y.Value;
         }
     }
 
