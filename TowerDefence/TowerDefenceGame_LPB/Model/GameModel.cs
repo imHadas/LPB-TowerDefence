@@ -192,7 +192,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private void FireTower()
         {
-
+            
         }
 
         private void SetupCastles()
