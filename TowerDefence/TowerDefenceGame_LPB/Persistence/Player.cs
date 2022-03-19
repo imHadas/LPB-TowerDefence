@@ -15,7 +15,7 @@ namespace TowerDefenceGame_LPB.Persistence
         public PlayerType Type { get; private set; }
         public uint Money { get; set; }  // changed to unsigned
 
-        public Castle Castle { get; private set; }
+        public Castle Castle { get; set; }
 
         // all have been changed to sets, since order doesn't matter
         public ISet<Tower> Towers { get; set; }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TowerDefenceGame_LPB.Persistence;
 using TowerDefenceGame_LPB.DataAccess;
 
+
 namespace TowerDefenceGame_LPB.Model
 {
     
@@ -16,6 +17,7 @@ namespace TowerDefenceGame_LPB.Model
         //Table Table; // ModelBase has a Table
         private Player rp;
         private Player bp;
+        private IList<Unit> AvailableUnits;
         //Player ne;
 
         #endregion
@@ -23,6 +25,7 @@ namespace TowerDefenceGame_LPB.Model
         #region Properties
 
         public bool SaveEnabled { get; private set; }
+        public bool BuildEnabled { get; set; }
         public int Round { get; set; }
         public int Phase { get; set; }
         public Player CurrentPlayer { get; private set; }
@@ -39,7 +42,7 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public GameModel(IDataAccess dataAccess)
+        public GameModel(IDataAccess dataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
@@ -58,6 +61,8 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
+            Phase = 1;
+            Round = 1;
             //Table = new Table(11, 11);
             SetupTable(11,11);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
@@ -72,20 +77,117 @@ namespace TowerDefenceGame_LPB.Model
             SetupBarracks(bp);
         }
 
+        /// <summary>
+        /// Method for end turn.
+        /// Checks Phase and sets Round.
+        /// In attack phase, it disables building and it calls Attack().
+        /// </summary>
         public void Advance()
         {
-
+            Phase++;
+            if(Phase % 3 == 0)
+            {
+                BuildEnabled = false; // in attack phase you can't build, or place units
+                Round++;
+                Attack();
+            }
+            else if(Phase % 2 == 0)
+            {
+                BuildEnabled=true;
+                CurrentPlayer = bp;
+            }
+            else if(Phase % 2 == 1)
+            {
+                BuildEnabled = true;
+                CurrentPlayer = rp;
+            }
         }
 
-        private void MoveUnits()
+        /// <summary>
+        /// Checks for new path, calls MoveUnits() and FireTowers() untill there are available units.
+        /// </summary>
+        private void Attack()
         {
-            
+            AvailableUnits = new List<Unit>(); // List for available units
+
+            for (int i = 0; i < Table.Size.x; i++)
+            {
+                for (int j = 0; j < Table.Size.y; j++)
+                {
+                    if (Table[(uint)i, (uint)j].Units.Count > 0)
+                    {
+                        IList<(uint x, uint y)> rpPath = null;
+                        IList<(uint x, uint y)> bpPath = null;
+                        bool rpTobp = false;
+                        bool bpTorp = false;
+                        foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                        {
+                            if (bpTorp && rpTobp)
+                                break;
+                            else if (!bpTorp && unit.Owner == bp)
+                            {
+                                bpTorp = true;
+                            }
+                            else if (!rpTobp && unit.Owner == rp)
+                            {
+                                rpTobp = true;
+                            }
+                        }
+                        if (bpTorp || rpTobp)
+                        {
+                            if (rpTobp)
+                                rpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
+                            if (bpTorp)
+                                bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
+                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                AvailableUnits.Add(unit); // add unit to list
+
+                                if (unit.Owner == bp)
+                                {
+                                    unit.NewPath(bpPath);
+                                }
+                                else if (unit.Owner == rp)
+                                {
+                                    unit.NewPath(rpPath);
+                                }
+                            }
+                        }
+                    }
+                }
+            } // sets new path for all units
+
+            while(AvailableUnits.Count > 0)
+            {
+                MoveUnits();
+                // FireTower();
+            }
         }
 
-        private void SetupCastles()
+        /// <summary>
+        /// Method for moving the units on the table model side.
+        /// Moves the units untill they run out of stamina, resets it and removes them from AvailableUnits.
+        /// </summary>
+        private async void MoveUnits()
         {
-            Table[(uint)rp.Castle.Coords.x, (uint)rp.Castle.Coords.y].Placement = rp.Castle;
-            Table[(uint)bp.Castle.Coords.x, (uint)bp.Castle.Coords.y].Placement = bp.Castle;
+            await Task.Delay(500); // waits 500 millisec/ 0.5 sec
+
+            foreach (Unit unit in AvailableUnits) // move units of RED player by one if they have stamina
+            {
+                if (unit.Stamina > 0)
+                {
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Remove(unit);
+                    unit.Moved();
+                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
+                }
+                if (unit.Stamina == 0)
+                {
+                    unit.ResetStamina();
+                    AvailableUnits.Remove(unit);
+                }
+            }
+
+            return;
         }
 
         private void SetupBarracks(Player player)
@@ -94,7 +196,6 @@ namespace TowerDefenceGame_LPB.Model
             {
                 uint x = barrack.Coords.x;
                 uint y = barrack.Coords.y;
-                //table.fields[(uint)x, (uint)y] = new Field(x,y);
                 Table[x, y].Placement = new Barrack(player, x, y);
             }
         }
@@ -145,6 +246,7 @@ namespace TowerDefenceGame_LPB.Model
             Table[coords].Units.Add(unit);
             unit.NewPath(FindPath(coords, OtherPlayer.Castle.Coords));
             CurrentPlayer.Units.Add(unit);
+            CurrentPlayer.Money -= unit.Cost;
         }
 
         private void BuildTower(Tower tower)
@@ -158,6 +260,7 @@ namespace TowerDefenceGame_LPB.Model
 
             SelectedField.Placement = tower;
             CurrentPlayer.Towers.Add(tower);
+            CurrentPlayer.Money -= tower.Cost;
         }
 
         /// <summary>
@@ -175,18 +278,23 @@ namespace TowerDefenceGame_LPB.Model
                     OnShowUnit();
                 else
                 {
+                    if (!BuildEnabled)  // you can still view units but can't build
+                        return options;
                     options.Add(MenuOption.BuildBasic);
                     options.Add(MenuOption.BuildBomber);
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(SelectedField.Placement.Owner == CurrentPlayer) 
-                switch(SelectedField.Placement)
+            else if(SelectedField.Placement.Owner == CurrentPlayer)
+            {
+                if (!BuildEnabled)  // you can still view units but can't upgrade, or destroy towers, or place units
+                    return options;
+                switch (SelectedField.Placement)
                 {
                     case Tower:
                         options.Add(MenuOption.DestroyTower);
                         if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
-                            options.Add(MenuOption.UpgradeTower); 
+                            options.Add(MenuOption.UpgradeTower);
                         break;
                     case Castle: /*FALLTHROUGH*/
                     case Barrack:
@@ -194,6 +302,8 @@ namespace TowerDefenceGame_LPB.Model
                         options.Add(MenuOption.TrainTank);
                         break;
                 }
+            } 
+                
 
             return options;
         }
