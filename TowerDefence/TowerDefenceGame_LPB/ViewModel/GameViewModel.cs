@@ -10,6 +10,8 @@ namespace TowerDefenceGame_LPB.ViewModel
         private string turnText;
         private string nextTurnText;
         private bool advanceEnable;
+        private int round;
+        private uint money;
 
         private int selectedField;
         private GameModel model;
@@ -19,6 +21,8 @@ namespace TowerDefenceGame_LPB.ViewModel
         public string TurnText { get { return turnText; } set { turnText = value; OnPropertyChanged(); } }
         public string NextTurnText { get { return nextTurnText; } set { nextTurnText = value; OnPropertyChanged(); } }
         public bool AdvanceEnable { get { return advanceEnable; } set { advanceEnable = value; OnPropertyChanged(); } }
+        public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
+        public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
         public int SelectedField 
@@ -40,11 +44,15 @@ namespace TowerDefenceGame_LPB.ViewModel
             GridSizeX = model.Table.Size.Item1;
             GridSizeY = model.Table.Size.Item2;
             AdvanceCommand = new DelegateCommand(p => AdvanceGame());
+            model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
+            model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
         }
+
         private void GenerateTable()
         {
             Fields = new ObservableCollection<FieldViewModel>();
@@ -55,7 +63,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                     Fields.Add(new FieldViewModel
                     {
                         Coords = (i, j),
-                        Number = i * GridSizeX + j,
+                        Number = i * GridSizeY + j,
                         BlueBasic = 0,
                         BlueTank = 0,
                         RedBasic = 0,
@@ -79,6 +87,8 @@ namespace TowerDefenceGame_LPB.ViewModel
                 field.BlueTank = 0;
                 field.RedBasic = 0;
                 field.RedTank = 0;
+                if (model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Units.Count == 0)
+                    continue;
                 foreach(Unit unit in model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Units)
                 {
                     switch(unit.Owner?.Type)
@@ -103,10 +113,12 @@ namespace TowerDefenceGame_LPB.ViewModel
         {
             model.Advance();
             SetupText();
+            ButtonClick(SelectedField);
         }
         private void SetupText()
         {
-
+            Money = model.CurrentPlayer.Money;
+            Round = model.Round;
             if (model.Phase % 3 == 0)
             {
                 AdvanceEnable = false;
@@ -187,9 +199,11 @@ namespace TowerDefenceGame_LPB.ViewModel
                     //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new SniperTower(model.CurrentPlayer, ((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
                 case "DestroyTower":
+                    model.SelectOption(MenuOption.DestroyTower);
                     //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
             }
+            Money = model.CurrentPlayer.Money;
             RefreshTable();
             ButtonClick(selectedField);
         }

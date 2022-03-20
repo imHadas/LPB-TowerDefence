@@ -49,7 +49,7 @@
         <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Rows="{Binding GridSizeY}" Columns="{Binding GridSizeX}"/>
+                    <UniformGrid Rows="{Binding GridSizeX}" Columns="{Binding GridSizeY}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
@@ -159,5 +159,10 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <StatusBar Grid.Row="3">
+            <TextBlock Text="Kör: "/>
+            <TextBlock Text="{Binding Round}"/>
+        </StatusBar>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Money}" IsEnabled="False"/>
     </Grid>
 </Window>

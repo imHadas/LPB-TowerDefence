@@ -36,6 +36,11 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 placement = value;
                 //OnPropertyChanged(); //kinda unnecessary
+                if (placement is null)
+                {
+                    IsBarrack = false; IsCastle = false; IsBasicTower = false; IsBomberTower = false; IsSniperTower = false; 
+                    return;
+                }
                 IsBarrack = placement.GetType() == typeof(Barrack) ? true : false;
                 IsCastle = placement.GetType() == typeof(Castle) ? true : false;
                 IsBasicTower = placement.GetType() == typeof(BasicTower) ? true : false;

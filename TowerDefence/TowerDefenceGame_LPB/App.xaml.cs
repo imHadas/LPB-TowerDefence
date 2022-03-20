@@ -55,18 +55,33 @@ namespace TowerDefenceGame_LPB
 
         }
         private void OpenNewWindow(int windowType)
-        { 
+        {
+            if (windowType == 1)
+            {
+                _view = new MainWindow();
+                _view.DataContext = _viewModel;
+                _model.NewGame();
+                _view.Show();
+            }
+            else if (windowType == 2)
+            {
+                _mapMaker = new MapMaker();
+                _mapMaker.DataContext = _mapMakerViewModel;
+                _mapMaker.Show();
+            }
+            _mainMenu.Close();
+            /*
             _dialogBox = new DialogBox();
             _dialogBox.DataContext = this;
             OKCommand = new DelegateCommand(p => SetupNewWindow(windowType));
             DialogCloseCommand = new DelegateCommand(p => _dialogBox.Close());
             _dialogBox.Show();
-            /*
+            
             _view = new MainWindow();
             _view.DataContext = _viewModel;
             _view.Show();
             _mainMenu.Close();
-            */        
+            */
         }
         private void SetupNewWindow(int windowType)
         {
