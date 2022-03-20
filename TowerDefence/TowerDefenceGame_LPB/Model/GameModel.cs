@@ -71,8 +71,8 @@ namespace TowerDefenceGame_LPB.Model
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, new(rp, 9, 5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, new(bp, 1, 5), bBarracks);
+            rp = new Player(PlayerType.RED, (9,5) ,rBarracks);
+            bp = new Player(PlayerType.BLUE, (1,5), bBarracks);
             CurrentPlayer = bp;
             SetupCastles();
             SetupBarracks(rp);
@@ -165,6 +165,7 @@ namespace TowerDefenceGame_LPB.Model
                                 bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
                             foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                             {
+                                unit.ResetStamina();
                                 AvailableUnits.Add(unit); // add unit to list
 
                                 if (unit.Owner == bp)
@@ -181,47 +182,63 @@ namespace TowerDefenceGame_LPB.Model
                 }
             } // sets new path for all units
 
-            int au = AvailableUnits.Count;
 
-            while(au > 0)
+            while(AvailableUnits.Count > 0)
             {
-                au -= await MoveUnits();
+                await MoveUnits();
+                RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
                 await FireTower();
             }
 
-            foreach (Unit unit in AvailableUnits)
-                unit.ResetStamina();
-            // reset stamina
-
             if(AttackEnded != null)
                 AttackEnded(this, EventArgs.Empty);
+        }
+
+        private void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
+        {
+            List<T> toRemove = new();
+            foreach (T item in coll)
+            {
+                if (pred.Invoke(item)) toRemove.Add(item);
+            }
+            foreach (T item in toRemove)
+            {
+                coll.Remove(item);
+            }
         }
 
         /// <summary>
         /// Method for moving the units on the table model side.
         /// Moves the units untill they run out of stamina, resets it and removes them from AvailableUnits.
         /// </summary>
-        private async Task<int> MoveUnits()
+        private async Task MoveUnits()
         {
-            int exhaustedunits = 0;
             await Task.Delay(500); // waits 500 millisec/ 0.5 sec
 
             foreach (Unit unit in AvailableUnits) // move units of RED player by one if they have stamina
             {
                 if (unit.Stamina > 0)
                 {
-                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Remove(unit);
+                    Table[unit.Path.First.Value].Units.Remove(unit);
                     unit.Moved();
-                    Table[unit.Path.First.Value.x, unit.Path.First.Value.y].Units.Add(unit);
-                }
-                if (unit.Stamina == 0)
-                {
-                    exhaustedunits++;
+                    Table[unit.Path.First.Value].Units.Add(unit);
+                    if(unit.Path.First.Value.Equals(GetOppositePlayer(unit.Owner).Castle.Coords))
+                    {
+                        GetOppositePlayer(unit.Owner).Castle.Damage();
+                        Table[unit.Path.First.Value].Units.Remove(unit);
+                        unit.Owner.Units.Remove(unit);
+                        unit.Damage(unit.Health);
+                    }
                 }
             }
             if(UnitMoved != null)
                 UnitMoved(this, EventArgs.Empty);
-            return exhaustedunits;
+        }
+
+        private Player GetOppositePlayer(Player player)
+        {
+            if (player == bp) return rp;
+            else return bp;
         }
 
         private async Task FireTower()
@@ -304,6 +321,7 @@ namespace TowerDefenceGame_LPB.Model
                 throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
 
             SelectedField.Placement = tower;
+            pathfinder.ChangeState(SelectedField);
             CurrentPlayer.Towers.Add(tower);
             CurrentPlayer.Money -= tower.Cost;
         }
@@ -315,9 +333,7 @@ namespace TowerDefenceGame_LPB.Model
             CurrentPlayer.Money += tower.Cost;
             CurrentPlayer.Towers.Remove(tower);
             SelectedField.Placement = null;
-
-            
-            
+            pathfinder.ChangeState(SelectedField);
         }
 
         /// <summary>

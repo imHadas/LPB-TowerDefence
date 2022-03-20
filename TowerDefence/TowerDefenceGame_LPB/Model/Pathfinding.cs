@@ -7,6 +7,8 @@ namespace TowerDefenceGame_LPB.Model
     internal abstract class IPathfinder
     {
         public abstract IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to);
+        public abstract IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to, ICollection<Field> except);
+        public abstract void ChangeState(Field changedField);
     }
 
     internal class AStar : IPathfinder
@@ -22,10 +24,23 @@ namespace TowerDefenceGame_LPB.Model
             }
         }
 
-        public override IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
+        public override void ChangeState(Field changedField)
         {
+            Node node = new(changedField);
+            allNodes.Remove(node);
+            allNodes.Add(node);
+        }
+
+        public override IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to, ICollection<Field> except)
+        {
+            HashSet<Node> exceptNodes = new();
+            foreach (var field in except)
+            {
+                exceptNodes.Add(new Node(field));
+            }
+
             HashSet<Node> closedSet = new();
-            SortedSet<WeightedNode> openSet = new(new WeightedNodeComparer());
+            List<WeightedNode> openSet = new();
             LinkedList<Node> path = new();
 
             Node end = getNodeByCoord(to.Item1, to.Item2);
@@ -36,9 +51,12 @@ namespace TowerDefenceGame_LPB.Model
             }
 
             openSet.Add(start);
+            WeightedNodeComparer comp = new WeightedNodeComparer();
             while (openSet.Count != 0)
             {
-                WeightedNode current = openSet.Min;
+                openSet.Sort(comp);
+
+                WeightedNode current = openSet[0];
                 openSet.Remove(current);
                 closedSet.Add(current);
                 if (current.Equals(end))
@@ -54,7 +72,7 @@ namespace TowerDefenceGame_LPB.Model
 
                 foreach (var node in Neighbours(current))
                 {
-                    if (!node.Equals(end) && (!node.Walkable || closedSet.Contains(node)))
+                    if (!node.Equals(end) && !exceptNodes.Contains(node) && (!node.Walkable || closedSet.Contains(node)))
                         continue;
                     WeightedNode wnode = new(node, current.Distance + 1, Heuristic(node, end));
                     wnode.Parent = current;
@@ -64,12 +82,9 @@ namespace TowerDefenceGame_LPB.Model
                     }
                     else
                     {
-                        WeightedNode containedNode;
-                        openSet.TryGetValue(wnode, out containedNode);
-
-                        if (containedNode.Distance > current.Distance + 1)
+                        if (openSet[openSet.IndexOf(wnode)].Distance > current.Distance + 1)
                         {
-                            openSet.Remove(containedNode);
+                            openSet.Remove(wnode);
                             openSet.Add(wnode);
                         }
                     }
@@ -78,6 +93,11 @@ namespace TowerDefenceGame_LPB.Model
             }
 
             return new List<(uint, uint)>();
+        }
+
+        public override IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
+        {
+            return FindPath(from, to, new List<Field>());
         }
 
         private List<(uint, uint)> NodesToCoords(ICollection<Node> nodes)
@@ -124,6 +144,8 @@ namespace TowerDefenceGame_LPB.Model
             allNodes.TryGetValue(new(new(x, y)), out result);
             return result;
         }
+
+        
     }
     class WeightedNodeComparer : IComparer<WeightedNode>
     {

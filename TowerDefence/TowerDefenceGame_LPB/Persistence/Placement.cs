@@ -37,7 +37,7 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public void Damage(uint amount = 1)  
         {
-            Health -= amount;
+            if(Health != 0) Health -= amount;
         }
     }
 
