@@ -28,7 +28,7 @@
             <MenuItem Header="Pálya">
 
             </MenuItem>
-            <MenuItem Header="Kilépés">
+            <MenuItem Header="Kilépés" Command="{Binding CloseGameCommand}">
 
             </MenuItem>
         </Menu>

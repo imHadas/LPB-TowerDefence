@@ -24,6 +24,7 @@ namespace TowerDefenceGame_LPB
         public DelegateCommand OpenNewWindowCommand { get; set; }
         public DelegateCommand OKCommand { get; set; }
         public DelegateCommand DialogCloseCommand { get; set; }
+        public DelegateCommand CloseGameCommand { get; set; }
 
         public App()
         {
@@ -39,6 +40,7 @@ namespace TowerDefenceGame_LPB
             // Creating viewmodel
             _viewModel = new GameViewModel(_model);
             _viewModel.ExitCommand = new DelegateCommand(p => ExitFromGame());
+            _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
 
             //Creating main menu
             _mainMenu = new MainMenu();
@@ -62,6 +64,7 @@ namespace TowerDefenceGame_LPB
                 _view.DataContext = _viewModel;
                 _model.NewGame();
                 _view.Show();
+                _view.Closing += CloseGame;
             }
             else if (windowType == 2)
             {
@@ -92,7 +95,6 @@ namespace TowerDefenceGame_LPB
                 _view = new MainWindow();
                 _view.DataContext = _viewModel;
                 _view.Show();
-                _view.Closing += CloseGame;
             }
             else if(windowType == 2)
             {

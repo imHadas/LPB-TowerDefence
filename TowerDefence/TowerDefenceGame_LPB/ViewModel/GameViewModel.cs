@@ -24,6 +24,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public DelegateCommand ExitCommand { get; set; }
+        public DelegateCommand CloseGameCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
         public int SelectedField 
         { 
