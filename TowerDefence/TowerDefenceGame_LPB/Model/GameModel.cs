@@ -304,7 +304,8 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");*/
 
             if (CurrentPlayer.Money < unit.Cost)
-                throw new NotEnoughMoneyException(CurrentPlayer.Money, unit.Cost, "Player does not have enough money to buy unit");
+                return;
+                //throw new NotEnoughMoneyException(CurrentPlayer.Money, unit.Cost, "Player does not have enough money to buy unit");
             
             placeTo.UnitQueue.Enqueue(unit);
             CurrentPlayer.Units.Add(unit);
@@ -318,7 +319,8 @@ namespace TowerDefenceGame_LPB.Model
             if (SelectedField.Units.Count > 0)
                 throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");
             if (CurrentPlayer.Money < tower.Cost)
-                throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
+                return;
+            //throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
 
             SelectedField.Placement = tower;
             pathfinder.ChangeState(SelectedField);
