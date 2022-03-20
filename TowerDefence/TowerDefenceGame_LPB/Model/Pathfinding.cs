@@ -48,6 +48,7 @@ namespace TowerDefenceGame_LPB.Model
                         path.AddFirst(current);
                         current = current.Parent as WeightedNode ?? throw new Exception("Parent of node was not weighted");
                     }
+                    path.AddFirst(start);
                     return NodesToCoords(path);
                 }
 

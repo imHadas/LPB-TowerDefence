@@ -39,6 +39,8 @@ namespace TowerDefenceGame_LPB.Model
         #region Events
 
         public event EventHandler<(ICollection<Unit> friendly, ICollection<Unit> enemy)> ShowUnits;
+        public event EventHandler UnitMoved;
+        public event EventHandler AttackEnded;
 
         #endregion
 
@@ -64,7 +66,7 @@ namespace TowerDefenceGame_LPB.Model
             Phase = 1;
             Round = 1;
             //Table = new Table(11, 11);
-            SetupTable(11,11);
+            SetupTable(10,15);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
@@ -165,7 +167,12 @@ namespace TowerDefenceGame_LPB.Model
                 await FireTower();
             }
 
+            foreach (Unit unit in AvailableUnits)
+                unit.ResetStamina();
             // reset stamina
+
+            if(AttackEnded != null)
+                AttackEnded(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -175,7 +182,7 @@ namespace TowerDefenceGame_LPB.Model
         private async Task<int> MoveUnits()
         {
             int exhaustedunits = 0;
-            await Task.Delay(50); // waits 500 millisec/ 0.5 sec
+            await Task.Delay(500); // waits 500 millisec/ 0.5 sec
 
             foreach (Unit unit in AvailableUnits) // move units of RED player by one if they have stamina
             {
@@ -190,7 +197,8 @@ namespace TowerDefenceGame_LPB.Model
                     exhaustedunits++;
                 }
             }
-
+            if(UnitMoved != null)
+                UnitMoved(this, EventArgs.Empty);
             return exhaustedunits;
         }
 
@@ -237,6 +245,7 @@ namespace TowerDefenceGame_LPB.Model
                 case MenuOption.UpgradeTower:
                     break;
                 case MenuOption.DestroyTower:
+                    DestroyTower((Tower)SelectedField.Placement);
                     break;
                 /*case MenuOption.ShowUnits:      //not an option, but a consequence of selecting a field with units
                     OnShowUnit();
@@ -266,7 +275,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private void BuildTower(Tower tower)
         {
-            if (SelectedField.Placement.GetType() != typeof(Placement)) //empty field has tyype Placement
+            if (SelectedField.Placement is not null) //empty field has tyype Placement
                 throw new InvalidPlacementException(SelectedField, "Cannot build tower on non-empty field");
             if (SelectedField.Units.Count > 0)
                 throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");
@@ -276,6 +285,18 @@ namespace TowerDefenceGame_LPB.Model
             SelectedField.Placement = tower;
             CurrentPlayer.Towers.Add(tower);
             CurrentPlayer.Money -= tower.Cost;
+        }
+
+        private void DestroyTower(Tower tower)
+        {
+            if (!(SelectedField.Placement.GetType() != typeof(BasicTower) || SelectedField.Placement.GetType() != typeof(SniperTower) || SelectedField.Placement.GetType() != typeof(BomberTower)))
+                throw new InvalidPlacementException(SelectedField, "Cannot destroy Placement that is not a tower");
+            CurrentPlayer.Money += tower.Cost;
+            CurrentPlayer.Towers.Remove(tower);
+            SelectedField.Placement = null;
+
+            
+            
         }
 
         /// <summary>
