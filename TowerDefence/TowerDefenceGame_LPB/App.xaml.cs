@@ -98,7 +98,7 @@ namespace TowerDefenceGame_LPB
 
         private void CloseGame(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence",MessageBoxButton.YesNoCancel);
+            MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence",MessageBoxButton.YesNo);
             switch (result)
             {
                 case MessageBoxResult.Yes:
