@@ -47,6 +47,7 @@ namespace TowerDefenceGame_LPB
             _mainMenu.Show();
 
 
+            
             // Creating view
             //_view = new MainWindow();
             //_view.DataContext = _viewModel;
@@ -76,6 +77,7 @@ namespace TowerDefenceGame_LPB
                 _view = new MainWindow();
                 _view.DataContext = _viewModel;
                 _view.Show();
+                _view.Closing += CloseGame;
             }
             else if(windowType == 2)
             {
@@ -92,6 +94,23 @@ namespace TowerDefenceGame_LPB
             _mainMenu.DataContext = this;
             _mainMenu.Show(); ;
             _view.Close();
+        }
+
+        private void CloseGame(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence",MessageBoxButton.YesNoCancel);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    System.Windows.Application.Current.Shutdown();
+                    break;
+                case MessageBoxResult.No:
+                    e.Cancel = true;
+                    break;
+                default:
+                    e.Cancel = true;
+                    break;
+            }
         }
     }
 }
