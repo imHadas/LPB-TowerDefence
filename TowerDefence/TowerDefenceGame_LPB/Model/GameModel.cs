@@ -39,6 +39,7 @@ namespace TowerDefenceGame_LPB.Model
         #region Events
 
         public event EventHandler<(ICollection<Unit> friendly, ICollection<Unit> enemy)> ShowUnits;
+        public event EventHandler NewGameCreated;
         public event EventHandler UnitMoved;
         public event EventHandler AttackEnded;
 
@@ -77,6 +78,8 @@ namespace TowerDefenceGame_LPB.Model
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
+            if(NewGameCreated != null)
+                NewGameCreated(this, EventArgs.Empty);
         }
 
         /// <summary>

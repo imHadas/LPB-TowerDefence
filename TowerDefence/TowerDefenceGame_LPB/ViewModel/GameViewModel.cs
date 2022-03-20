@@ -44,22 +44,13 @@ namespace TowerDefenceGame_LPB.ViewModel
             GridSizeX = model.Table.Size.Item1;
             GridSizeY = model.Table.Size.Item2;
             AdvanceCommand = new DelegateCommand(p => AdvanceGame());
-            model.AttackEnded += Model_AttackEnded;
-            model.UnitMoved += Model_UnitMoved;
+            model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
+            model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
-        }
-
-        private void Model_UnitMoved(object? sender, EventArgs e)
-        {
-            RefreshTable();
-        }
-
-        private void Model_AttackEnded(object? sender, EventArgs e)
-        {
-            AdvanceGame();
         }
 
         private void GenerateTable()
@@ -122,6 +113,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         {
             model.Advance();
             SetupText();
+            ButtonClick(SelectedField);
         }
         private void SetupText()
         {
