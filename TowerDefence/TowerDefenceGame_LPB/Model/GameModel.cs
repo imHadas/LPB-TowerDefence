@@ -91,6 +91,7 @@ namespace TowerDefenceGame_LPB.Model
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
                 Round++;
+                PlaceUnits();
                 Attack();
             }
             else if(Phase % 3 == 1)
@@ -102,6 +103,27 @@ namespace TowerDefenceGame_LPB.Model
             {
                 BuildEnabled = true;
                 CurrentPlayer = rp;
+            }
+        }
+
+        private void PlaceUnits()
+        {
+            foreach (var barrack in rp.Barracks)
+            {
+                barrack.NewPath(FindPath(barrack.Coords, bp.Castle.Coords));
+                while(barrack.UnitQueue.Count > 0)
+                {
+                    Table[barrack.WhereToPlace].Units.Add(barrack.UnitQueue.Dequeue());
+                }
+            }
+
+            foreach (var barrack in bp.Barracks)
+            {
+                barrack.NewPath(FindPath(barrack.Coords, rp.Castle.Coords));
+                while (barrack.UnitQueue.Count > 0)
+                {
+                    Table[barrack.WhereToPlace].Units.Add(barrack.UnitQueue.Dequeue());
+                }
             }
         }
 
@@ -138,7 +160,7 @@ namespace TowerDefenceGame_LPB.Model
                         if (bpTorp || rpTobp)
                         {
                             if (rpTobp)
-                                rpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
+                                rpPath = FindPath(Table[(uint)i, (uint)j].Coords, bp.Castle.Coords);
                             if (bpTorp)
                                 bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
                             foreach (Unit unit in Table[(uint)i, (uint)j].Units)
@@ -228,10 +250,10 @@ namespace TowerDefenceGame_LPB.Model
             switch (option)
             {
                 case MenuOption.TrainBasic:
-                    PlaceUnit(new BasicUnit(CurrentPlayer));
+                    TrainUnit(new BasicUnit(CurrentPlayer));
                     break;
                 case MenuOption.TrainTank:
-                    PlaceUnit(new TankUnit(CurrentPlayer));
+                    TrainUnit(new TankUnit(CurrentPlayer));
                     break;
                 case MenuOption.BuildSniper:
                     BuildTower(new SniperTower(CurrentPlayer, SelectedField.Coords));
@@ -256,19 +278,18 @@ namespace TowerDefenceGame_LPB.Model
                 
         }
 
-        private void PlaceUnit(Unit unit)
+        private void TrainUnit(Unit unit)
         {
-            var coords = CurrentPlayer.Barracks
-                    .ElementAt(new Random().Next(2)).WhereToPlace;
+            Barrack placeTo = CurrentPlayer.Barracks
+                    .ElementAt(new Random().Next(2));
 
-            if (Table[coords].Placement is not null) //empty field has type Placement
-                throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");
+            /*if (Table[coords].Placement is not null) //empty field has type Placement
+                throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");*/
 
             if (CurrentPlayer.Money < unit.Cost)
                 throw new NotEnoughMoneyException(CurrentPlayer.Money, unit.Cost, "Player does not have enough money to buy unit");
             
-            Table[coords].Units.Add(unit);
-            unit.NewPath(FindPath(coords, OtherPlayer.Castle.Coords));
+            placeTo.UnitQueue.Enqueue(unit);
             CurrentPlayer.Units.Add(unit);
             CurrentPlayer.Money -= unit.Cost;
         }

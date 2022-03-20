@@ -21,7 +21,7 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public int NumericType => (int)Type; // maybe unnecessary
 
-        public Terrain(Player owner, uint x, uint y, TerrainType type) : base((x, y), owner)
+        public Terrain(uint x, uint y, TerrainType type) : base((x, y))
         {
             Type = type;
         }
@@ -45,9 +45,12 @@ namespace TowerDefenceGame_LPB.Persistence
     {
         public (uint,uint) WhereToPlace { get; private set; }
 
+        public Queue<Unit> UnitQueue { get; set; }
+
         public Barrack(Player owner, uint x, uint y) : base((x, y), owner)
         {
             WhereToPlace = new(x + 1, y);
+            UnitQueue = new Queue<Unit>();
         }
 
         public void NewPath(IList<(uint,uint)> path)
@@ -59,5 +62,6 @@ namespace TowerDefenceGame_LPB.Persistence
         {
             WhereToPlace = tile;
         }
+
     }
 }
