@@ -12,6 +12,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         public string Type { get; set; }
         public DelegateCommand OptionsClickCommand { get; set; }
         public PlayerType Player { get; set; }
+        /*
         //Training Options
         public bool TrainBasic { get; set; }
         public bool TrainTank { get; set; }
@@ -22,6 +23,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         //Tower Options
         public bool UpgradeTower { get; set; }
         public bool DestroyTower { get; set; }
+        */
     }
 
     

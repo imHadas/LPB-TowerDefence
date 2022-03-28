@@ -17,14 +17,32 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int redBasic;
         private int redTank;
         private bool isUnits;
+        /*
         private bool isCastle;
         private bool isBarrack;
         private bool isBasicTower;
         private bool isSniperTower;
         private bool isBomberTower;
+        */
         private Brush isSelected;
         private PlayerType playerType;
         private Placement placement;
+        private string placementType;
+        private int isSelectedSize;
+
+        public int IsSelectedSize
+        {
+            get { return isSelectedSize; }
+            set { isSelectedSize = value; OnPropertyChanged(); }
+        }
+
+
+        public string PlacementType
+        {
+            get { return placementType; }
+            set { placementType = value; OnPropertyChanged();}
+        }
+
 
         public int Number { get; set; }
         public (int x, int y) Coords { get; set; }
@@ -38,14 +56,36 @@ namespace TowerDefenceGame_LPB.ViewModel
                 //OnPropertyChanged(); //kinda unnecessary
                 if (placement is null)
                 {
-                    IsBarrack = false; IsCastle = false; IsBasicTower = false; IsBomberTower = false; IsSniperTower = false; 
+                    placementType = "";
                     return;
                 }
+
+                switch (placement)
+                {
+                    case Barrack:
+                        PlacementType = "Barrack";
+                        break;
+                    case Castle:
+                        PlacementType = "Castle";
+                        break;
+                    case BasicTower:
+                        PlacementType = "BasicTower";
+                        break;
+                    case BomberTower:
+                        PlacementType = "BomberTower";
+                        break;
+                    case SniperTower:
+                        PlacementType = "SniperTower";
+                        break;
+                }
+                
+                /*
                 IsBarrack = placement.GetType() == typeof(Barrack) ? true : false;
                 IsCastle = placement.GetType() == typeof(Castle) ? true : false;
                 IsBasicTower = placement.GetType() == typeof(BasicTower) ? true : false;
                 IsBomberTower = placement.GetType() == typeof(BomberTower) ? true : false;
                 IsSniperTower = placement.GetType() == typeof(SniperTower) ? true : false;
+                 */
             }
         }
 
@@ -58,7 +98,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             } 
         }
-
+        /*
         public bool IsBasicTower
         {
             get { return isBasicTower; }
@@ -108,7 +148,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             }
         }
-
+        */
 
         public bool IsUnits
         {

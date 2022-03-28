@@ -12,6 +12,7 @@
     <None Remove="Images\BomberTower.png" />
     <None Remove="Images\Castle.png" />
     <None Remove="Images\SniperTower.png" />
+    <None Remove="Images\Terrain.png" />
     <None Remove="Images\Tower.png" />
   </ItemGroup>
 
@@ -20,6 +21,7 @@
     <Resource Include="Images\BomberTower.png" />
     <Resource Include="Images\Castle.png" />
     <Resource Include="Images\SniperTower.png" />
+    <Resource Include="Images\Terrain.png" />
     <Resource Include="Images\Tower.png" />
   </ItemGroup>
 
