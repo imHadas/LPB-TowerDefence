@@ -13,6 +13,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -31,8 +32,23 @@
 
             </MenuItem>
         </Menu>
-        
-        <ItemsControl Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Fields}">
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="1" Content="Magasság:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="2" Text="{Binding setGridSizeX}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Column="3" Content="Szélesség:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="4" Text="{Binding setGridSizeY}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Button Grid.Column="5" Content="Beállítás" Command="{Binding SetGameSizeCommand}"/>
+        </Grid>
+        <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding GridSizeX}" Columns="{Binding GridSizeY}"/>
@@ -85,6 +101,12 @@
                                                 <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
                                                     <Setter Property="Source" Value="..\Images\BomberTower.png"/>
                                                 </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
+                                                    <Setter Property="Source" Value="..\Images\Mountain.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
+                                                    <Setter Property="Source" Value="..\Images\Lake.png"/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Image.Style>
@@ -95,7 +117,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <ItemsControl Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OptionFields}">
+        <ItemsControl Grid.Column="1" Grid.Row="2" ItemsSource="{Binding OptionFields}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
@@ -118,8 +140,11 @@
                                         <DataTrigger Binding="{Binding Type}" Value="BuildBarrack">
                                             <Setter Property="Content" Value="BuildBarrack"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Type}" Value="BuildTerrain">
-                                            <Setter Property="Content" Value="BuildTerrain"/>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildMountain">
+                                            <Setter Property="Content" Value="BuildMountain"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildLake">
+                                            <Setter Property="Content" Value="BuildLake"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="DestroyPlacement">
                                             <Setter Property="Content" Value="Destroy"/>
@@ -132,7 +157,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Grid Grid.Column="1" Grid.Row="2">
+        <Grid Grid.Column="1" Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

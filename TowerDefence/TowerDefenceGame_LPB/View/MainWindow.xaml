@@ -99,6 +99,12 @@
                                                 <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
                                                     <Setter Property="Source" Value="..\Images\BomberTower.png"/>
                                                 </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
+                                                    <Setter Property="Source" Value="..\Images\Mountain.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
+                                                    <Setter Property="Source" Value="..\Images\Lake.png"/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Image.Style>

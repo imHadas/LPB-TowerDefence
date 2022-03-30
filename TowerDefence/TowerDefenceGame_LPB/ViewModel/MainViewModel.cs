@@ -10,8 +10,18 @@ namespace TowerDefenceGame_LPB.ViewModel
 {
     public abstract class MainViewModel : ViewModelBase
     {
-        public int GridSizeX { get; set; }
-        public int GridSizeY { get; set; }
+        private int gridSizeX;
+        private int gridSizeY;
+        public int GridSizeX
+        {
+            get { return gridSizeX;}
+            set { gridSizeX = value;OnPropertyChanged(); }
+        }
+        public int GridSizeY
+        {
+            get { return gridSizeY;}
+            set { gridSizeY = value;OnPropertyChanged(); }
+        }
         public ObservableCollection<FieldViewModel> Fields { get; set; }
         public ObservableCollection<OptionField> OptionFields { get; set; }
         public abstract void ButtonClick(int index);

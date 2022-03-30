@@ -56,7 +56,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 //OnPropertyChanged(); //kinda unnecessary
                 if (placement is null)
                 {
-                    placementType = "";
+                    PlacementType = "";
                     return;
                 }
 
@@ -76,6 +76,10 @@ namespace TowerDefenceGame_LPB.ViewModel
                         break;
                     case SniperTower:
                         PlacementType = "SniperTower";
+                        break;
+                    case Terrain:
+                        Terrain terrain = value as Terrain;
+                        PlacementType = terrain.Type.ToString(); //better way to reference Type from terrain?
                         break;
                 }
                 

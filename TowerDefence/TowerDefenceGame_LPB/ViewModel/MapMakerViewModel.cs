@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using TowerDefenceGame_LPB.Model;
 using TowerDefenceGame_LPB.Persistence;
 
@@ -17,6 +18,10 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int selectedField;
 
         public DelegateCommand SelectPlayerCommand { get; set; }
+        public DelegateCommand SetGameSizeCommand { get; set; }
+
+        public uint setGridSizeX { get; set; }
+        public uint setGridSizeY { get; set; }
 
         public Player SelectedPlayer
         {
@@ -24,7 +29,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             set
             {
                 selectedPlayer = value;
-                model.SelectedPlayer = selectedPlayer; OnPropertyChanged();
+                model.SelectedPlayer = selectedPlayer; OnPropertyChanged();ButtonClick(selectedField);
             }
         }
         public int SelectedField
@@ -45,9 +50,12 @@ namespace TowerDefenceGame_LPB.ViewModel
             this.model = model;
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
+            setGridSizeX = (uint)GridSizeX;
+            setGridSizeY = (uint)GridSizeY;
             OptionFields = new ObservableCollection<OptionField>();
             model.NewMapCreated += (sender, args) => RefreshTable();
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
+            SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
             GenerateTable();
             RefreshTable();
         }
@@ -90,15 +98,35 @@ namespace TowerDefenceGame_LPB.ViewModel
             if (field.Placement is null)
             {
                 OptionFields.Clear();
-                OptionFields.Add(new OptionField { Type = "BuildCastle", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                OptionFields.Add(new OptionField { Type = "BuildBarrack", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                OptionFields.Add(new OptionField { Type = "BuildTerrain", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                if (selectedPlayer is null)
+                {
+                    OptionFields.Add(new OptionField { Type = "BuildMountain", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                    OptionFields.Add(new OptionField{Type = "BuildLake",OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param))});
+                }
+                else
+                {
+                    OptionFields.Add(new OptionField { Type = "BuildCastle", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                    OptionFields.Add(new OptionField { Type = "BuildBarrack", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                }
+                
             }
             else if (field.Placement is not null)
             {
                 OptionFields.Clear();
                 OptionFields.Add(new OptionField { Type = "DestroyPlacement", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
+        }
+
+        public void SetGameSize()
+        {
+            SelectedField = 0;
+            model.ChangeTableSize(setGridSizeX,setGridSizeY);
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            GenerateTable();
+            RefreshTable();
+            OnPropertyChanged("Fields");
+            ButtonClick(selectedField);
         }
         public void OptionsButtonClick(string option)
         {
@@ -112,8 +140,11 @@ namespace TowerDefenceGame_LPB.ViewModel
                     case "BuildBarrack":
                         model.SelectOption(MenuOption.BuildBarrack);
                         break;
-                    case "BuildTerrain":
-                        model.SelectOption(MenuOption.BuildTerrain);
+                    case "BuildMountain":
+                        model.SelectOption(MenuOption.BuildMountain);
+                        break;
+                    case "BuildLake":
+                        model.SelectOption(MenuOption.BuildLake);
                         break;
                     case "DestroyPlacement":
                         model.SelectOption(MenuOption.DestroyPlacement);

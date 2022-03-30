@@ -23,7 +23,8 @@ namespace TowerDefenceGame_LPB.Model
         DestroyPlacement,
         BuildCastle,
         BuildBarrack,
-        BuildTerrain,
+        BuildMountain,
+        BuildLake,
         SetOwnerWhite,
         SetOwnerRed,
         SetOwnerBlue
