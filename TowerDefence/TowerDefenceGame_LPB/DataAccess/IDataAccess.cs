@@ -6,7 +6,7 @@ namespace TowerDefenceGame_LPB.DataAccess
 {
     public interface IDataAccess
     {
-        Task<Table> LoadAsync(String path);
-        Task SaveAsync(String path, Table table);
+        Task<(Table table, Player blue, Player red)> LoadAsync(string path);
+        Task SaveAsync(string path, Table table, Player bluePlayer, Player redPlayer);
     }
 }

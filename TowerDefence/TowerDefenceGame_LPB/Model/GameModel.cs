@@ -66,7 +66,7 @@ namespace TowerDefenceGame_LPB.Model
         {
             Phase = 1;
             Round = 1;
-            dataAccess = new DataAccess.DataAccess();
+            dataAccess = new DataAccess.JsonDataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
@@ -400,12 +400,12 @@ namespace TowerDefenceGame_LPB.Model
                 );
         }
 
-        public async Task SaveGameAsync(String path)
+        public async Task SaveGameAsync(string path)
         {
             if (dataAccess == null)
                 throw new InvalidOperationException("No data access is provided.");
 
-            await dataAccess.SaveAsync(path, Table);
+            await dataAccess.SaveAsync(path, Table, bp, rp);
         }
     }
 }

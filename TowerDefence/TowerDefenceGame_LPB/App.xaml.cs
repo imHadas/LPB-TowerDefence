@@ -34,7 +34,7 @@ namespace TowerDefenceGame_LPB
         private void App_Startup(object sender, StartupEventArgs e)
         {
             // Creating model
-            _model = new GameModel(new DataAccess.DataAccess());
+            _model = new GameModel(new DataAccess.JsonDataAccess());
             //_model.NewGame();
 
             // Creating viewmodel
@@ -136,8 +136,9 @@ namespace TowerDefenceGame_LPB
             //try
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
-                saveFileDialog.Title = "Tábla mentése";
-                saveFileDialog.Filter = "Tábla|*.txt";
+                saveFileDialog.Title = "Játék mentése";
+                saveFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
+                saveFileDialog.FileName = "TowerDefenceMentés";
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     //try
