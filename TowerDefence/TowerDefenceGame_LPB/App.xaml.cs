@@ -41,6 +41,7 @@ namespace TowerDefenceGame_LPB
             _viewModel = new GameViewModel(_model);
             _viewModel.ExitCommand = new DelegateCommand(p => ExitFromGame());
             _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
+            _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
 
             //Creating main menu
             _mainMenu = new MainMenu();
@@ -127,6 +128,32 @@ namespace TowerDefenceGame_LPB
                 default:
                     e.Cancel = true;
                     break;
+            }
+        }
+
+        private async void ViewModel_SaveGame(object sender, EventArgs e)
+        {
+            //try
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
+                saveFileDialog.Title = "Tábla mentése";
+                saveFileDialog.Filter = "Tábla|*.txt";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    //try
+                    {
+                        // játéktábla mentése
+                        await _model.SaveGameAsync(saveFileDialog.FileName);
+                    }
+                   // catch (Exception)
+                    {
+                       // MessageBox.Show("Játék mentése sikertelen!" + Environment.NewLine + "Hibás az elérési út, vagy a könyvtár nem írható.", "Hiba!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            //catch
+            {
+              //  MessageBox.Show("A fájl mentése sikertelen!", "Tower Defence", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

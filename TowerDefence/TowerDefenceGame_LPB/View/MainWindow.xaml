@@ -23,6 +23,7 @@
         </Grid.ColumnDefinitions>
         <Menu Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="Fájl">
+                <MenuItem Header="Mentés..." Command="{Binding SaveGameCommand}" IsEnabled="{Binding SaveEnabled}"/>
                 <MenuItem Header="Kilépés a menübe" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="Pálya">

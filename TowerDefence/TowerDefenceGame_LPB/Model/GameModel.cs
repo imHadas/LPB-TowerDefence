@@ -66,6 +66,7 @@ namespace TowerDefenceGame_LPB.Model
         {
             Phase = 1;
             Round = 1;
+            dataAccess = new DataAccess.DataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
@@ -75,11 +76,13 @@ namespace TowerDefenceGame_LPB.Model
             rp = new Player(PlayerType.RED, (9,5) ,rBarracks);
             bp = new Player(PlayerType.BLUE, (1,5), bBarracks);
             CurrentPlayer = bp;
+            SaveEnabled = true;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
             if(NewGameCreated != null)
                 NewGameCreated(this, EventArgs.Empty);
+            
         }
 
         /// <summary>
@@ -93,6 +96,7 @@ namespace TowerDefenceGame_LPB.Model
             if(Phase % 3 == 0)
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
+                SaveEnabled = false;
                 Round++;
                 PlaceUnits();
                 Attack();
@@ -100,11 +104,13 @@ namespace TowerDefenceGame_LPB.Model
             else if(Phase % 3 == 1)
             {
                 BuildEnabled=true;
+                SaveEnabled = true;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
                 BuildEnabled = true;
+                SaveEnabled = true;
                 CurrentPlayer = rp;
             }
         }
@@ -392,6 +398,14 @@ namespace TowerDefenceGame_LPB.Model
                 (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
                 SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
                 );
+        }
+
+        public async Task SaveGameAsync(String path)
+        {
+            if (dataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+
+            await dataAccess.SaveAsync(path, Table);
         }
     }
 }
