@@ -32,7 +32,7 @@ namespace TowerDefenceGame_LPB.Model
         public Player SelectedPlayer { get; set; }
         public event EventHandler NewMapCreated;
 
-        public MapMakerModel(IDataAccess dataAccess)
+        public MapMakerModel()
         {
             CreateNewMap();
         }

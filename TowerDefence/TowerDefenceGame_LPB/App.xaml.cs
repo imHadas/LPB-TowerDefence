@@ -36,6 +36,7 @@ namespace TowerDefenceGame_LPB
         {
             // Creating model
             _model = new GameModel(new JsonDataAccess());
+            _mapMakerModel = new MapMakerModel();
             //_model.NewGame();
 
             // Creating viewmodel
