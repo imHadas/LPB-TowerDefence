@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace TowerDefenceGame_LPB.DataAccess
 {
-    public class JsonDataAccess : IDataAccess
+    public class JsonDataAccess : IDataAccess<GameSaveObject>
     {
         private static readonly JsonSerializerOptions _options
         = new() 
@@ -16,7 +16,7 @@ namespace TowerDefenceGame_LPB.DataAccess
             WriteIndented = true,
         };
 
-        public async Task<(Table table, Player blue, Player red)> LoadAsync(string path)
+        public async Task<GameSaveObject> LoadAsync(string path)
         {
             GameSaveObject? gameSaveObject;
             using (FileStream fs = File.Create(path))
@@ -26,13 +26,11 @@ namespace TowerDefenceGame_LPB.DataAccess
 
             if (gameSaveObject == null) throw new Exception("Error reading file");
 
-            return (gameSaveObject.Table, gameSaveObject.BluePlayer, gameSaveObject.RedPlayer);
+            return gameSaveObject;
 
         }
-        public async Task SaveAsync(string path, Table table, Player bluePlayer, Player redPlayer)
+        public async Task SaveAsync(string path, GameSaveObject gameSaveObject)
         {
-            GameSaveObject gameSaveObject = new(table, bluePlayer, redPlayer);
-
             using (FileStream fs = File.Create(path))
             {
                 await JsonSerializer.SerializeAsync(fs, gameSaveObject, _options);

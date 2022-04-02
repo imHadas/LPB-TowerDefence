@@ -26,8 +26,8 @@ namespace TowerDefenceGame_LPB.Model
 
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
-        public int Round { get; set; }
-        public int Phase { get; set; }
+        public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
+        public uint Phase { get { return Table.PhaseCounter; } set { Table.PhaseCounter = value; } }
         public Player CurrentPlayer { get; private set; }
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
@@ -45,7 +45,7 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public GameModel(IDataAccess dataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
+        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
@@ -64,11 +64,10 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            Phase = 1;
-            Round = 1;
-            dataAccess = new DataAccess.JsonDataAccess();
+            gameDataAccess = new DataAccess.JsonDataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
+            Phase = 1;
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
@@ -97,7 +96,6 @@ namespace TowerDefenceGame_LPB.Model
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
                 SaveEnabled = false;
-                Round++;
                 PlaceUnits();
                 Attack();
             }
@@ -402,10 +400,10 @@ namespace TowerDefenceGame_LPB.Model
 
         public async Task SaveGameAsync(string path)
         {
-            if (dataAccess == null)
+            if (gameDataAccess == null)
                 throw new InvalidOperationException("No data access is provided.");
 
-            await dataAccess.SaveAsync(path, Table, bp, rp);
+            await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
         }
     }
 }

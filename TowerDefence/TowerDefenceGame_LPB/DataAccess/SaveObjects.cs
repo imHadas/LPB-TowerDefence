@@ -2,7 +2,11 @@
 
 namespace TowerDefenceGame_LPB.DataAccess
 {
-    internal class GameSaveObject
+    public abstract class SaveObject
+    {
+    }
+
+    public class GameSaveObject : SaveObject
     {
         public Table Table { get; private set; }
         public Player BluePlayer { get; private set; }

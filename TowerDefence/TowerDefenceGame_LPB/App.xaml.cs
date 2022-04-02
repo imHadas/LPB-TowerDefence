@@ -34,7 +34,7 @@ namespace TowerDefenceGame_LPB
         private void App_Startup(object sender, StartupEventArgs e)
         {
             // Creating model
-            _model = new GameModel(new DataAccess.JsonDataAccess());
+            _model = new GameModel(new JsonDataAccess());
             //_model.NewGame();
 
             // Creating viewmodel

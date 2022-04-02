@@ -129,7 +129,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private void SetupText()
         {
             Money = model.CurrentPlayer.Money;
-            Round = model.Round;
+            Round = (int)model.Round;
             if (model.Phase % 3 == 0)
             {
                 AdvanceEnable = false;
