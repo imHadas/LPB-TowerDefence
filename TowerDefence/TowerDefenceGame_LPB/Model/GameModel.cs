@@ -72,8 +72,8 @@ namespace TowerDefenceGame_LPB.Model
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, (9,5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, (1,5), bBarracks);
+            rp = new Player(PlayerType.RED, new Castle(rp,9,5) ,rBarracks);
+            bp = new Player(PlayerType.BLUE, new Castle(bp,1,5), bBarracks);
             CurrentPlayer = bp;
             SaveEnabled = true;
             SetupCastles();
@@ -263,9 +263,10 @@ namespace TowerDefenceGame_LPB.Model
         {
             foreach(Barrack barrack in player.Barracks)
             {
+                
                 uint x = barrack.Coords.x;
                 uint y = barrack.Coords.y;
-                Table[x, y].Placement = new Barrack(player, x, y);
+                Table[x, y].Placement = barrack;
             }
         }
 

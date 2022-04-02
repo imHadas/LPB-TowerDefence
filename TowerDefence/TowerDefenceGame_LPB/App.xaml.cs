@@ -20,6 +20,7 @@ namespace TowerDefenceGame_LPB
         private GameViewModel _viewModel;
         private MapMakerViewModel _mapMakerViewModel;
         private GameModel _model;
+        private MapMakerModel _mapMakerModel;
         private DialogBox _dialogBox;
         public DelegateCommand OpenNewWindowCommand { get; set; }
         public DelegateCommand OKCommand { get; set; }
@@ -43,13 +44,16 @@ namespace TowerDefenceGame_LPB
             _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
             _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
 
+            _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
+
+
             //Creating main menu
             _mainMenu = new MainMenu();
             OpenNewWindowCommand= new DelegateCommand(p => OpenNewWindow(Convert.ToInt32(p)));
             _mainMenu.DataContext = this;
             _mainMenu.Show();
 
-
+            
             
             // Creating view
             //_view = new MainWindow();
@@ -71,6 +75,7 @@ namespace TowerDefenceGame_LPB
             {
                 _mapMaker = new MapMaker();
                 _mapMaker.DataContext = _mapMakerViewModel;
+                _mapMakerModel.CreateNewMap();
                 _mapMaker.Show();
             }
             _mainMenu.Close();

@@ -22,7 +22,9 @@ namespace TowerDefenceGame_LPB.Model
         // for map maker only
         DestroyPlacement,
         BuildCastle,
-        BuildTerrain,
+        BuildBarrack,
+        BuildMountain,
+        BuildLake,
         SetOwnerWhite,
         SetOwnerRed,
         SetOwnerBlue

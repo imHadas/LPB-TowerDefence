@@ -13,6 +13,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -31,16 +32,46 @@
 
             </MenuItem>
         </Menu>
-        
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="1" Content="Magasság:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SetGridSizeX}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Row="0" Grid.Column="3" Content="{Binding GridSizeX}" FontWeight="ExtraBold" HorizontalAlignment="Center"/>
+            <Label Grid.Row="0" Grid.Column="4" Content="Szélesség:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="5" Text="{Binding SetGridSizeY}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Row="0" Grid.Column="6" Content="{Binding GridSizeY}" FontWeight="ExtraBold" HorizontalAlignment="Center"/>
+            <Button Grid.Row="0" Grid.Column="7" Content="Beállítás" Command="{Binding SetGameSizeCommand}"/>
+            <Label Grid.Column="1" Grid.Row="1" Content="Kék kezdőpénz:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding SetBlueMoney}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Column="3" Grid.Row="1" Content="{Binding BlueMoney}" FontWeight="ExtraBold" Foreground="Blue" HorizontalAlignment="Center"/>
+            <Label Grid.Column="4" Grid.Row="1" Content="Piros Kezdőpénz:" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="5" Grid.Row="1" Text="{Binding SetRedMoney}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Column="6" Grid.Row="1" Content="{Binding RedMoney}" FontWeight="ExtraBold" Foreground="Red" HorizontalAlignment="Center"/>
+            <Button Grid.Column="7" Grid.Row="1" Content="Beállítás" Command="{Binding SetStartingMoneyCommand}"/>
+        </Grid>
         <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Rows="{Binding GridSize}" Columns="{Binding GridSize}"/>
+                    <UniformGrid Rows="{Binding GridSizeX}" Columns="{Binding GridSizeY}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="3" BorderBrush="{Binding IsSelected}">
+                    <Border BorderThickness="{Binding IsSelectedSize}" BorderBrush="{Binding IsSelected}">
                         <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
@@ -70,30 +101,32 @@
                                     <Image.Style>
                                         <Style TargetType="Image">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCastle}" Value="true">
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Castle">
                                                     <Setter Property="Source" Value="..\Images\Castle.png"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsBarrack}" Value="true">
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Barrack">
                                                     <Setter Property="Source" Value="..\Images\Barrack.png"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsBasicTower}" Value="true">
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="BasicTower">
                                                     <Setter Property="Source" Value="..\Images\Tower.png"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsSniperTower}" Value="true">
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="SniperTower">
                                                     <Setter Property="Source" Value="..\Images\SniperTower.png"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsBomberTower}" Value="true">
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
                                                     <Setter Property="Source" Value="..\Images\BomberTower.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
+                                                    <Setter Property="Source" Value="..\Images\Mountain.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
+                                                    <Setter Property="Source" Value="..\Images\Lake.png"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Image.Style>
                                 </Image>
-                                <TextBox Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                <TextBox Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                <TextBox Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
-                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                            </Grid>
+                                </Grid>
                         </Button>
                     </Border>
                 </DataTemplate>
@@ -107,14 +140,29 @@
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Player}" Value="NEUTRAL">
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer}" Value="null">
                                             <Setter Property="Background" Value="white"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Player}" Value="RED">
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="RED">
                                             <Setter Property="Background" Value="red"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Player}" Value="BLUE">
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="BLUE">
                                             <Setter Property="Background" Value="blue"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildCastle">
+                                            <Setter Property="Content" Value="BuildCastle"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildBarrack">
+                                            <Setter Property="Content" Value="BuildBarrack"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildMountain">
+                                            <Setter Property="Content" Value="BuildMountain"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="BuildLake">
+                                            <Setter Property="Content" Value="BuildLake"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="DestroyPlacement">
+                                            <Setter Property="Content" Value="Destroy"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -124,5 +172,15 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <Grid Grid.Column="1" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Background="Blue" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Blue"/>
+            <Button Grid.Column="1" Background="Red" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Red"/>
+            <Button Grid.Column="2" Background="White" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Neutral"/>
+        </Grid>
     </Grid>
 </Window>
