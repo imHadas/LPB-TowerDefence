@@ -138,9 +138,14 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot build castle on non-empty field");
             if (SelectedPlayer.Castle is not null)
                 throw new InvalidPlacementException(SelectedField, "Cannot build more than one castle per player");
-
             SelectedPlayer.Castle = new Castle(SelectedPlayer, SelectedField.Coords.x, SelectedField.Coords.y);
             SelectedField.Placement = SelectedPlayer.Castle;
+            if (!ValidatePath())
+            {
+                SelectedPlayer.Castle = null;
+                SelectedField.Placement = null;
+                throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
+            }
         }
 
         private void BuildBarrack()
@@ -151,6 +156,7 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot build barrack on non-empty field");
             if (SelectedPlayer.Barracks.Count >= 2) //doesn't work currently with immutable set
                 throw new InvalidPlacementException(SelectedField, "Cannot build more than two barracks per player");
+            
             Barrack barrack = new Barrack(SelectedPlayer, SelectedField.Coords.x, SelectedField.Coords.y);
             switch (SelectedPlayer.Type) //temporary
             {
@@ -169,6 +175,15 @@ namespace TowerDefenceGame_LPB.Model
             }
             //SelectedPlayer.Barracks.Add(barrack); //Cannot add because its immutable
             SelectedField.Placement = barrack;
+            if (!ValidatePath())
+            {
+                if (SelectedPlayer == rp)
+                    rBarracks.Remove(barrack);
+                else if (SelectedPlayer == bp)
+                    bBarracks.Remove(barrack);
+                SelectedField.Placement = null;
+                throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
+            }
         }
         private void BuildTerrain(TerrainType type)
         {
@@ -177,6 +192,34 @@ namespace TowerDefenceGame_LPB.Model
             if (SelectedField.Placement is not null)
                 throw new InvalidPlacementException(SelectedField, "Cannot build terrain on non-empty field");
             SelectedField.Placement = new Terrain(SelectedField.Coords.x, SelectedField.Coords.y,type);
+            if (!ValidatePath())
+            {
+                SelectedField.Placement = null;
+                throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
+            }
+        }
+
+        private bool ValidatePath()
+        {
+            IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
+            foreach (Barrack barrack in rBarracks)
+            {
+                if(bp.Castle is null)
+                    return true;
+                path = FindPath(barrack.Coords, bp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != bp.Castle.Coords )
+                    return false;
+            }
+            foreach (Barrack barrack in bBarracks)
+            {
+                if (rp.Castle is null)
+                    return true;
+                path = FindPath(barrack.Coords, rp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != rp.Castle.Coords)
+                    return false;
+            }
+
+            return true;
         }
 
         private void DestroyPlacement()

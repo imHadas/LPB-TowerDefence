@@ -19,9 +19,23 @@ namespace TowerDefenceGame_LPB.ViewModel
 
         public DelegateCommand SelectPlayerCommand { get; set; }
         public DelegateCommand SetGameSizeCommand { get; set; }
+        public DelegateCommand SetStartingMoneyCommand { get; set; }
+        public uint SetGridSizeX { get; set; }
+        public uint SetGridSizeY { get; set; }
+        public uint SetBlueMoney { get; set; }
+        public uint SetRedMoney { get; set; }
 
-        public uint setGridSizeX { get; set; }
-        public uint setGridSizeY { get; set; }
+        public uint BlueMoney
+        {
+            get { return model.BP.Money; }
+            set { model.BP.Money = value; OnPropertyChanged();}
+        }
+
+        public uint RedMoney
+        {
+            get { return model.RP.Money; }
+            set { model.RP.Money = value; OnPropertyChanged(); }
+        }
 
         public Player SelectedPlayer
         {
@@ -50,12 +64,15 @@ namespace TowerDefenceGame_LPB.ViewModel
             this.model = model;
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
-            setGridSizeX = (uint)GridSizeX;
-            setGridSizeY = (uint)GridSizeY;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
+            SetBlueMoney = model.BP.Money;
+            SetRedMoney = model.RP.Money;
             OptionFields = new ObservableCollection<OptionField>();
             model.NewMapCreated += (sender, args) => RefreshTable();
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
+            SetStartingMoneyCommand = new DelegateCommand(p => SetStartingMoney());
             GenerateTable();
             RefreshTable();
         }
@@ -120,13 +137,19 @@ namespace TowerDefenceGame_LPB.ViewModel
         public void SetGameSize()
         {
             SelectedField = 0;
-            model.ChangeTableSize(setGridSizeX,setGridSizeY);
+            model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
             GenerateTable();
             RefreshTable();
             OnPropertyChanged("Fields");
             ButtonClick(selectedField);
+        }
+
+        public void SetStartingMoney()
+        {
+            BlueMoney = SetBlueMoney;
+            RedMoney = SetRedMoney;
         }
         public void OptionsButtonClick(string option)
         {
