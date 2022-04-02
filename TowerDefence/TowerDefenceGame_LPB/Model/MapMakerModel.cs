@@ -229,7 +229,7 @@ namespace TowerDefenceGame_LPB.Model
             switch (SelectedField.Placement)
             {
                 case Castle:
-                    SelectedPlayer.Castle = null;
+                    SelectedField.Owner.Castle = null;
                     SelectedField.Placement = null;
                     break;
                 case Barrack:
