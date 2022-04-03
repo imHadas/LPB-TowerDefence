@@ -47,14 +47,11 @@ namespace TowerDefenceGame_LPB
 
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
 
-
             //Creating main menu
             _mainMenu = new MainMenu();
             OpenNewWindowCommand= new DelegateCommand(p => OpenNewWindow(Convert.ToInt32(p)));
             _mainMenu.DataContext = this;
-            _mainMenu.Show();
-
-            
+            _mainMenu.Show();            
             
             // Creating view
             //_view = new MainWindow();
@@ -66,11 +63,20 @@ namespace TowerDefenceGame_LPB
         {
             if (windowType == 1)
             {
-                _view = new MainWindow();
-                _view.DataContext = _viewModel;
-                _model.NewGame();
-                _view.Show();
-                _view.Closing += CloseGame;
+                if(_view==null)
+                {
+                    _view = new MainWindow();
+                    _view.DataContext = _viewModel;
+                    _model.NewGame();
+                    _view.Show();
+                    _view.Closing += CloseGame;
+                }
+                else
+                {
+                    _model.NewGame();
+                    _view.Show();
+                }
+                
             }
             else if (windowType == 2)
             {
@@ -117,7 +123,7 @@ namespace TowerDefenceGame_LPB
             _mainMenu = new MainMenu();
             _mainMenu.DataContext = this;
             _mainMenu.Show(); ;
-            _view.Close();
+            _view.Hide();
         }
 
         private void CloseGame(object sender, System.ComponentModel.CancelEventArgs e)
