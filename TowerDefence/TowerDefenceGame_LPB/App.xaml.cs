@@ -46,6 +46,8 @@ namespace TowerDefenceGame_LPB
             _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
 
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
+            _mapMakerViewModel.CloseMapMakerCommand = new DelegateCommand(p => _mapMaker.Close());
+            _mapMakerViewModel.ExitCommand = new DelegateCommand(p => ExitFromMapMaker());
 
             //Creating main menu
             _mainMenu = new MainMenu();
@@ -84,6 +86,7 @@ namespace TowerDefenceGame_LPB
                 _mapMaker.DataContext = _mapMakerViewModel;
                 _mapMakerModel.CreateNewMap();
                 _mapMaker.Show();
+                _mapMaker.Closing += CloseMapMaker;
             }
             _mainMenu.Close();
             /*
@@ -105,14 +108,21 @@ namespace TowerDefenceGame_LPB
             //can use _dialogBox.Rows.Text and _dialogBox.Columns.Text with converting
             if(windowType == 1)
             {
-                _view = new MainWindow();
-                _view.DataContext = _viewModel;
+                if(_view == null)
+                {
+                    _view = new MainWindow();
+                    _view.DataContext = _viewModel;
+                }
+                    
                 _view.Show();
             }
             else if(windowType == 2)
             {
-                _mapMaker = new MapMaker();
-                _mapMaker.DataContext = _mapMakerViewModel;
+                if(_mapMaker == null)
+                {
+                    _mapMaker = new MapMaker();
+                    _mapMaker.DataContext = _mapMakerViewModel;
+                }
                 _mapMaker.Show();
             }
             _dialogBox.Close();
@@ -122,24 +132,59 @@ namespace TowerDefenceGame_LPB
         {
             _mainMenu = new MainMenu();
             _mainMenu.DataContext = this;
-            _mainMenu.Show(); ;
+            _mainMenu.Show();
             _view.Hide();
+        }
+
+        private void ExitFromMapMaker()
+        {
+            _mainMenu = new MainMenu();
+            _mainMenu.DataContext = this;
+            _mainMenu.Show();
+            _mapMaker.Hide();
         }
 
         private void CloseGame(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence",MessageBoxButton.YesNo);
-            switch (result)
+            if (_view.IsVisible)
             {
-                case MessageBoxResult.Yes:
-                    System.Windows.Application.Current.Shutdown();
-                    break;
-                case MessageBoxResult.No:
-                    e.Cancel = true;
-                    break;
-                default:
-                    e.Cancel = true;
-                    break;
+                MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence", MessageBoxButton.YesNo);
+
+                switch (result)
+                {
+                    case MessageBoxResult.Yes:
+                        System.Windows.Application.Current.Shutdown();
+                        break;
+                    case MessageBoxResult.No:
+                        e.Cancel = true;
+                        break;
+                    default:
+                        e.Cancel = true;
+                        break;
+                }
+                return;
+            }
+        }
+
+        private void CloseMapMaker(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (_mapMaker.IsVisible)
+            {
+                MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence", MessageBoxButton.YesNo);
+
+                switch (result)
+                {
+                    case MessageBoxResult.Yes:
+                        System.Windows.Application.Current.Shutdown();
+                        break;
+                    case MessageBoxResult.No:
+                        e.Cancel = true;
+                        break;
+                    default:
+                        e.Cancel = true;
+                        break;
+                }
+                return;
             }
         }
 

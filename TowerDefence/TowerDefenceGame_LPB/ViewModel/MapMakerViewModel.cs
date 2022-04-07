@@ -20,6 +20,8 @@ namespace TowerDefenceGame_LPB.ViewModel
         public DelegateCommand SelectPlayerCommand { get; set; }
         public DelegateCommand SetGameSizeCommand { get; set; }
         public DelegateCommand SetStartingMoneyCommand { get; set; }
+        public DelegateCommand ExitCommand { get; set; }
+        public DelegateCommand CloseMapMakerCommand { get; set; }
         public uint SetGridSizeX { get; set; }
         public uint SetGridSizeY { get; set; }
         public uint SetBlueMoney { get; set; }
