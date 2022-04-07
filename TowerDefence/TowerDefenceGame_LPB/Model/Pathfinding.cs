@@ -4,14 +4,14 @@ using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.Model
 {
-    internal abstract class IPathfinder
+    public abstract class IPathfinder
     {
         public abstract IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to);
         public abstract IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to, ICollection<Field> except);
         public abstract void ChangeState(Field changedField);
     }
 
-    internal class AStar : IPathfinder
+    public class AStar : IPathfinder
     {
         private HashSet<Node> allNodes;
 
