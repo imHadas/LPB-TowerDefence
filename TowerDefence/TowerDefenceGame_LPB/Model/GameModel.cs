@@ -43,6 +43,8 @@ namespace TowerDefenceGame_LPB.Model
         public event EventHandler UnitMoved;
         public event EventHandler AttackEnded;
 
+        public event EventHandler GameLoaded;
+
         #endregion
 
         public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
@@ -405,6 +407,29 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidOperationException("No data access is provided.");
 
             await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
+        }
+
+        
+
+        private void OnGameLoaded()
+        {
+            GameLoaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        public async Task LoadGameAsync(string path)
+        {
+            if (gameDataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+            try
+            {
+                GameSaveObject save = await gameDataAccess.LoadAsync(path);
+                (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
+                OnGameLoaded();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }
