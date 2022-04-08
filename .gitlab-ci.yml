@@ -17,5 +17,6 @@ build_job:
 # Test
 test_model:
   stage: test
+  tags: [windows]
   script:
-    - dotnet test TowerDefence/TowerDefence_Test # We don't have this yet
+    - dotnet test TowerDefence/TowerDefence_Test
