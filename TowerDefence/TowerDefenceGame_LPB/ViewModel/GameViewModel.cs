@@ -212,6 +212,9 @@ namespace TowerDefenceGame_LPB.ViewModel
                     model.SelectOption(MenuOption.DestroyTower);
                     //model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y].Placement = new Placement(((uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y));
                     break;
+                case "UpgradeTower":
+                    model.SelectOption(MenuOption.UpgradeTower);
+                    break;
             }
             Money = model.CurrentPlayer.Money;
             RefreshTable();

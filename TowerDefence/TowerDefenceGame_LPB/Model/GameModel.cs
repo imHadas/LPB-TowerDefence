@@ -195,9 +195,19 @@ namespace TowerDefenceGame_LPB.Model
                 await MoveUnits();
                 RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
                 await FireTower();
+                RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
             }
 
-            if(AttackEnded != null)
+            foreach (Tower tower in bp.Towers)
+            {
+                tower.ResetSpeed();
+            }
+            foreach (Tower tower in rp.Towers)
+            {
+                tower.ResetSpeed();
+            }
+
+            if (AttackEnded != null)
                 AttackEnded(this, EventArgs.Empty);
         }
 
@@ -250,7 +260,75 @@ namespace TowerDefenceGame_LPB.Model
 
         private async Task FireTower()
         {
+            await Task.Delay(500);
 
+            foreach (Tower tower in rp.Towers)
+            {
+                for (int i = (int)tower.Coords.x-(int)tower.Range > 0 ? ((int)tower.Coords.x-(int)tower.Range) : 0; 
+                    tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    {
+                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        {
+                            foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                if(unit.Owner != rp)
+                                {
+                                    Table[(uint)i, (uint)j]?.Units?.First().Damage(tower.Damage);
+                                }
+                                if (unit.Health == 0)
+                                {
+                                    if (unit.GetType() == typeof(TankUnit))
+                                        rp.Money += 10;
+                                    else
+                                        rp.Money += 5;
+                                    unit.Owner.Units.Remove(unit);
+                                    Table[(uint)i, (uint)j].Units.Remove(unit);
+                                    tower.Fire();
+                                    break;
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
+            foreach (Tower tower in bp.Towers)
+            {
+                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    {
+                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        {
+                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                if(tower.Speed > 0)
+                                {
+                                    if (unit.Owner != bp)
+                                    {
+                                        unit.Damage(tower.Damage);
+                                    }
+                                    if (unit.Health == 0)
+                                    {
+                                        if (unit.GetType() == typeof(TankUnit))
+                                            bp.Money += 10;
+                                        else
+                                            bp.Money += 5;
+                                        unit.Owner.Units.Remove(unit);
+                                        Table[(uint)i, (uint)j].Units.Remove(unit);
+                                        tower.Fire();
+                                        break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void SetupCastles()
@@ -290,6 +368,7 @@ namespace TowerDefenceGame_LPB.Model
                     BuildTower(new BomberTower(CurrentPlayer, SelectedField.Coords));
                     break;
                 case MenuOption.UpgradeTower:
+                    UpgradeTower((Tower)SelectedField.Placement);
                     break;
                 case MenuOption.DestroyTower:
                     DestroyTower((Tower)SelectedField.Placement);
@@ -334,6 +413,13 @@ namespace TowerDefenceGame_LPB.Model
             pathfinder.ChangeState(SelectedField);
             CurrentPlayer.Towers.Add(tower);
             CurrentPlayer.Money -= tower.Cost;
+        }
+
+        private void UpgradeTower(Tower tower)
+        {
+            if (!(SelectedField.Placement.GetType() != typeof(BasicTower) || SelectedField.Placement.GetType() != typeof(SniperTower) || SelectedField.Placement.GetType() != typeof(BomberTower)))
+                throw new InvalidPlacementException(SelectedField, "Cannot destroy Placement that is not a tower");
+            tower.LevelUp();
         }
 
         private void DestroyTower(Tower tower)

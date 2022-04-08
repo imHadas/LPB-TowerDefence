@@ -22,7 +22,13 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public void ResetStamina() => Stamina = Speed;
 
-        public void Damage(uint amount = 1) => Health -= amount;
+        public void Damage(uint amount = 1)
+        {
+            if (amount > Health)
+                Health = 0;
+            else
+                Health -= amount;
+        }
 
         public void Moved()
         {
