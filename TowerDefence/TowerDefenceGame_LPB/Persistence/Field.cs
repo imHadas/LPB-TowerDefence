@@ -5,8 +5,8 @@ namespace TowerDefenceGame_LPB.Persistence
     public class Field
     {
         public (uint x, uint y) Coords { get; private set; }
-        public Placement? Placement;
-        public ISet<Unit> Units;
+        public Placement? Placement { get; set; }
+        public ISet<Unit> Units { get; set; }
 
         public Player? Owner => Placement is null || Placement is Terrain ? null : Placement.Owner;
         public PlayerType OwnerType => Owner is null ? PlayerType.NEUTRAL : Owner.Type;
