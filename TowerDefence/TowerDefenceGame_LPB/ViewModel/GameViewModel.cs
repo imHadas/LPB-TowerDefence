@@ -48,10 +48,16 @@ namespace TowerDefenceGame_LPB.ViewModel
             model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.GameOver += Model_GameOver;
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
+        }
+
+        private void Model_GameOver(object? sender, GameModel.GameOverType e)
+        {
+            AdvanceEnable = false;
         }
 
         private void GenerateTable()

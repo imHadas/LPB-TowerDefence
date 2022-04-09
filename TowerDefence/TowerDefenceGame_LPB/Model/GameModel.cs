@@ -42,6 +42,7 @@ namespace TowerDefenceGame_LPB.Model
         public event EventHandler NewGameCreated;
         public event EventHandler UnitMoved;
         public event EventHandler AttackEnded;
+        public event EventHandler<GameOverType> GameOver;
 
         #endregion
 
@@ -195,6 +196,10 @@ namespace TowerDefenceGame_LPB.Model
 
             if(AttackEnded != null)
                 AttackEnded(this, EventArgs.Empty);
+
+            if (rp.Castle.Health <= 0 && bp.Castle.Health <= 0) OnGameOver(GameOverType.DRAW);
+            else if (rp.Castle.Health <= 0) OnGameOver(GameOverType.BLUEWIN);
+            else if (bp.Castle.Health <= 0) OnGameOver(GameOverType.REDWIN);
         }
 
         private void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
@@ -392,6 +397,13 @@ namespace TowerDefenceGame_LPB.Model
                 (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
                 SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
                 );
+        }
+
+        public enum GameOverType { DRAW, REDWIN, BLUEWIN }
+
+        private void OnGameOver(GameOverType gameOverType)
+        {
+            GameOver?.Invoke(this, gameOverType);
         }
     }
 }
