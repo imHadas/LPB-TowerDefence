@@ -24,9 +24,11 @@ namespace TowerDefenceGame_LPB.ViewModel
         public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public event EventHandler SaveGame;
+        public event EventHandler LoadGame;
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseGameCommand { get; set; }
         public DelegateCommand SaveGameCommand { get; set; }
+        public DelegateCommand LoadGameCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
         public int SelectedField 
         { 
@@ -48,6 +50,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             GridSizeY = model.Table.Size.Item2;
             AdvanceCommand = new DelegateCommand(p => AdvanceGame());
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
+            LoadGameCommand = new DelegateCommand(param => OnLoadGame());
             model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
@@ -55,6 +58,11 @@ namespace TowerDefenceGame_LPB.ViewModel
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
+        }
+
+        private void OnLoadGame()
+        {
+            LoadGame?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnSaveGame()

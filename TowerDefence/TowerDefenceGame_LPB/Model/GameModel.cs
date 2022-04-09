@@ -420,16 +420,9 @@ namespace TowerDefenceGame_LPB.Model
         {
             if (gameDataAccess == null)
                 throw new InvalidOperationException("No data access is provided.");
-            try
-            {
-                GameSaveObject save = await gameDataAccess.LoadAsync(path);
-                (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
-                OnGameLoaded();
-            }
-            catch (Exception ex)
-            {
-
-            }
+            GameSaveObject save = await gameDataAccess.LoadAsync(path);
+            (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
+            OnGameLoaded();
         }
     }
 }

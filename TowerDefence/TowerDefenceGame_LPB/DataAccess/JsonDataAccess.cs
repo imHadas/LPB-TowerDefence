@@ -19,7 +19,7 @@ namespace TowerDefenceGame_LPB.DataAccess
         public async Task<GameSaveObject> LoadAsync(string path)
         {
             GameSaveObject? gameSaveObject;
-            using (FileStream fs = File.Create(path))
+            using (FileStream fs = File.OpenRead(path))
             {
                 gameSaveObject = (GameSaveObject?)await JsonSerializer.DeserializeAsync(fs, typeof(GameSaveObject), _options);
             }

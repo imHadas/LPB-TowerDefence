@@ -44,6 +44,7 @@ namespace TowerDefenceGame_LPB
             _viewModel.ExitCommand = new DelegateCommand(p => ExitFromGame());
             _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
             _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
+            _viewModel.LoadGame += ViewModel_LoadGame;
 
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
             _mapMakerViewModel.CloseMapMakerCommand = new DelegateCommand(p => _mapMaker.Close());
@@ -61,6 +62,21 @@ namespace TowerDefenceGame_LPB
             //_view.Show();
 
         }
+
+        private async void ViewModel_LoadGame(object? sender, EventArgs e)
+        {
+            {
+                OpenFileDialog openFileDialog = new (); // dialógablak
+                openFileDialog.Title = "Játék Betöltése";
+                openFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
+                openFileDialog.FileName = "TowerDefenceMentés";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    await _model.LoadGameAsync(openFileDialog.FileName);
+                }
+            }
+        }
+
         private void OpenNewWindow(int windowType)
         {
             if (windowType == 1)
