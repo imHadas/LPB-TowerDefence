@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace TowerDefenceGame_LPB.Persistence
@@ -22,9 +22,9 @@ namespace TowerDefenceGame_LPB.Persistence
         public ISet<Unit> Units { get; set; }
         public ISet<Barrack> Barracks { get; set; }
 
-        public Player(PlayerType type, Castle castle, ICollection<Barrack> barracks)
+        public Player(PlayerType type, (uint, uint) castleCoords, ICollection<Barrack> barracks)
         {
-            Castle = castle;
+            Castle = new(this, castleCoords.Item1, castleCoords.Item2);
             Type = type;
             Money = Constants.PLAYER_STARTING_MONEY;
             Towers = new HashSet<Tower>();
