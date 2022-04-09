@@ -26,8 +26,8 @@ namespace TowerDefenceGame_LPB.Model
 
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
-        public int Round { get; set; }
-        public int Phase { get; set; }
+        public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
+        public uint Phase { get { return Table.PhaseCounter; } set { Table.PhaseCounter = value; } }
         public Player CurrentPlayer { get; private set; }
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
@@ -45,7 +45,7 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public GameModel(IDataAccess dataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
+        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
@@ -64,22 +64,24 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            Phase = 1;
-            Round = 1;
+            gameDataAccess = new DataAccess.JsonDataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
+            Phase = 1;
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, (9,5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, (1,5), bBarracks);
+            rp = new Player(PlayerType.RED, new Castle(rp,9,5) ,rBarracks);
+            bp = new Player(PlayerType.BLUE, new Castle(bp,1,5), bBarracks);
             CurrentPlayer = bp;
+            SaveEnabled = true;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
             if(NewGameCreated != null)
                 NewGameCreated(this, EventArgs.Empty);
+            
         }
 
         /// <summary>
@@ -93,18 +95,20 @@ namespace TowerDefenceGame_LPB.Model
             if(Phase % 3 == 0)
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
-                Round++;
+                SaveEnabled = false;
                 PlaceUnits();
                 Attack();
             }
             else if(Phase % 3 == 1)
             {
                 BuildEnabled=true;
+                SaveEnabled = true;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
                 BuildEnabled = true;
+                SaveEnabled = true;
                 CurrentPlayer = rp;
             }
         }
@@ -191,9 +195,19 @@ namespace TowerDefenceGame_LPB.Model
                 await MoveUnits();
                 RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
                 await FireTower();
+                RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
             }
 
-            if(AttackEnded != null)
+            foreach (Tower tower in bp.Towers)
+            {
+                tower.ResetSpeed();
+            }
+            foreach (Tower tower in rp.Towers)
+            {
+                tower.ResetSpeed();
+            }
+
+            if (AttackEnded != null)
                 AttackEnded(this, EventArgs.Empty);
         }
 
@@ -246,7 +260,75 @@ namespace TowerDefenceGame_LPB.Model
 
         private async Task FireTower()
         {
+            await Task.Delay(500);
 
+            foreach (Tower tower in rp.Towers)
+            {
+                for (int i = (int)tower.Coords.x-(int)tower.Range > 0 ? ((int)tower.Coords.x-(int)tower.Range) : 0; 
+                    tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    {
+                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        {
+                            foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                if(unit.Owner != rp)
+                                {
+                                    Table[(uint)i, (uint)j]?.Units?.First().Damage(tower.Damage);
+                                }
+                                if (unit.Health == 0)
+                                {
+                                    if (unit.GetType() == typeof(TankUnit))
+                                        rp.Money += 10;
+                                    else
+                                        rp.Money += 5;
+                                    unit.Owner.Units.Remove(unit);
+                                    Table[(uint)i, (uint)j].Units.Remove(unit);
+                                    tower.Fire();
+                                    break;
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
+            foreach (Tower tower in bp.Towers)
+            {
+                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    {
+                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        {
+                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                            {
+                                if(tower.Speed > 0)
+                                {
+                                    if (unit.Owner != bp)
+                                    {
+                                        unit.Damage(tower.Damage);
+                                    }
+                                    if (unit.Health == 0)
+                                    {
+                                        if (unit.GetType() == typeof(TankUnit))
+                                            bp.Money += 10;
+                                        else
+                                            bp.Money += 5;
+                                        unit.Owner.Units.Remove(unit);
+                                        Table[(uint)i, (uint)j].Units.Remove(unit);
+                                        tower.Fire();
+                                        break;
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void SetupCastles()
@@ -259,9 +341,10 @@ namespace TowerDefenceGame_LPB.Model
         {
             foreach(Barrack barrack in player.Barracks)
             {
+                
                 uint x = barrack.Coords.x;
                 uint y = barrack.Coords.y;
-                Table[x, y].Placement = new Barrack(player, x, y);
+                Table[x, y].Placement = barrack;
             }
         }
 
@@ -285,6 +368,7 @@ namespace TowerDefenceGame_LPB.Model
                     BuildTower(new BomberTower(CurrentPlayer, SelectedField.Coords));
                     break;
                 case MenuOption.UpgradeTower:
+                    UpgradeTower((Tower)SelectedField.Placement);
                     break;
                 case MenuOption.DestroyTower:
                     DestroyTower((Tower)SelectedField.Placement);
@@ -329,6 +413,13 @@ namespace TowerDefenceGame_LPB.Model
             pathfinder.ChangeState(SelectedField);
             CurrentPlayer.Towers.Add(tower);
             CurrentPlayer.Money -= tower.Cost;
+        }
+
+        private void UpgradeTower(Tower tower)
+        {
+            if (!(SelectedField.Placement.GetType() != typeof(BasicTower) || SelectedField.Placement.GetType() != typeof(SniperTower) || SelectedField.Placement.GetType() != typeof(BomberTower)))
+                throw new InvalidPlacementException(SelectedField, "Cannot destroy Placement that is not a tower");
+            tower.LevelUp();
         }
 
         private void DestroyTower(Tower tower)
@@ -392,6 +483,14 @@ namespace TowerDefenceGame_LPB.Model
                 (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
                 SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
                 );
+        }
+
+        public async Task SaveGameAsync(string path)
+        {
+            if (gameDataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+
+            await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
         }
     }
 }

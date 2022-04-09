@@ -25,6 +25,7 @@ namespace TowerDefenceGame_LPB.Persistence
         public Table(uint height, uint width)
         {
             fields = new Field[height, width];
+            PhaseCounter = 0;
         }
 
         public IEnumerator GetEnumerator()  // make it easier to iterate through all fields

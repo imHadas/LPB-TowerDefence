@@ -22,7 +22,9 @@ namespace TowerDefenceGame_LPB.Model
         // for map maker only
         DestroyPlacement,
         BuildCastle,
-        BuildTerrain,
+        BuildBarrack,
+        BuildMountain,
+        BuildLake,
         SetOwnerWhite,
         SetOwnerRed,
         SetOwnerBlue
@@ -31,7 +33,7 @@ namespace TowerDefenceGame_LPB.Model
     {
         #region Variables
 
-        protected IDataAccess dataAccess;
+        protected IDataAccess<GameSaveObject> gameDataAccess;
 
         protected HashSet<(uint, uint)> allCoords = new HashSet<(uint, uint)>();
 
