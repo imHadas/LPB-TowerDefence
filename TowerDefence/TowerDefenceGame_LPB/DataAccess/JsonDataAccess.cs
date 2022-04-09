@@ -263,6 +263,9 @@ namespace TowerDefenceGame_LPB.DataAccess
                 }
             }
 
+            bp.Money = sgso.BPMoney;
+            rp.Money = sgso.RPMoney;
+
             return new GameSaveObject(table, bp, rp);
         }
 
