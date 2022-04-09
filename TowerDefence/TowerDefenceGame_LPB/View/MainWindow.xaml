@@ -166,6 +166,51 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <ItemsControl Grid.Column="1" Grid.Row="2" ItemsSource="{Binding UnitFields}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="0" Content="{Binding Health}">
+                                <Label.Style>
+                                    <Style TargetType="{x:Type Label}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Owner.Type}" Value="RED">
+                                                <Setter Property="Background" Value="red"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Owner.Type}" Value="BLUE">
+                                                <Setter Property="Background" Value="blue"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                            <Label Grid.Column="1" Content="{Binding Speed}">
+                                <Label.Style>
+                                    <Style TargetType="{x:Type Label}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Owner.Type}" Value="RED">
+                                                <Setter Property="Background" Value="red"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Owner.Type}" Value="BLUE">
+                                                <Setter Property="Background" Value="blue"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <StatusBar Grid.Row="3">
             <TextBlock Text="Kör: "/>
             <TextBlock Text="{Binding Round}"/>

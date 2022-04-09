@@ -24,6 +24,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public event EventHandler SaveGame;
+        public ObservableCollection<Unit> UnitFields { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseGameCommand { get; set; }
         public DelegateCommand SaveGameCommand { get; set; }
@@ -53,6 +54,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
+            UnitFields = new ObservableCollection<Unit>();
             GenerateTable();
             RefreshTable();
         }
@@ -152,25 +154,25 @@ namespace TowerDefenceGame_LPB.ViewModel
         {
             SelectedField = index;
             FieldViewModel field = Fields[index];
+            OptionFields.Clear();
+            UnitFields.Clear();
             if (field.PlayerType == model.OtherPlayer.Type)
             {
-                OptionFields.Clear();
                 return;
             }
                 
             if (field.Placement is Barrack || field.Placement is Castle)
             {
-                OptionFields.Clear();
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainBasic", OptionsClickCommand = new DelegateCommand(param=>OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainTank", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
             else if (field.IsUnits)
             {
-                OptionFields.Clear();
+                foreach (Unit _unit in model.SelectedField.Units)
+                    UnitFields.Add(_unit);
             }
             else if (field.Placement is BasicTower ||field.Placement is BomberTower ||field.Placement is SniperTower)
             {
-                OptionFields.Clear();
                 //Check if path blocked
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "UpgradeTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "DestroyTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
@@ -178,7 +180,6 @@ namespace TowerDefenceGame_LPB.ViewModel
            
             else
             {
-                OptionFields.Clear();
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type="BuildBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildBomber", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildSniper", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
