@@ -26,8 +26,12 @@ namespace TowerDefenceGame_LPB.Model
 
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
-        public int Round { get; set; }
-        public int Phase { get; set; }
+        public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
+        public uint Phase
+        {
+            get { return Table.PhaseCounter; }
+            set { Table.PhaseCounter = value; }
+        }
         public Player CurrentPlayer { get; private set; }
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
@@ -64,10 +68,9 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            Phase = 1;
-            Round = 1;
             //Table = new Table(11, 11);
             SetupTable(10,15);
+            Phase = 1;
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
@@ -93,7 +96,6 @@ namespace TowerDefenceGame_LPB.Model
             if(Phase % 3 == 0)
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
-                Round++;
                 PlaceUnits();
                 Attack();
             }
