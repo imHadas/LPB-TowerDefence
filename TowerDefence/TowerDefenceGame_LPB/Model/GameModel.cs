@@ -329,8 +329,16 @@ namespace TowerDefenceGame_LPB.Model
             if (CurrentPlayer.Money < tower.Cost)
                 return;
             //throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
+            
 
             SelectedField.Placement = tower;
+            
+            if (!ValidatePath())
+            {
+                SelectedField.Placement = null;
+                
+                return;
+            }
             pathfinder.ChangeState(SelectedField);
             CurrentPlayer.Towers.Add(tower);
             CurrentPlayer.Money -= tower.Cost;
@@ -389,6 +397,25 @@ namespace TowerDefenceGame_LPB.Model
                 
 
             return options;
+        }
+
+        private bool ValidatePath()
+        {
+            IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
+            foreach (Barrack barrack in rp.Barracks)
+            {
+                path = FindPath(barrack.Coords, bp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != bp.Castle.Coords)
+                    return false;
+            }
+            foreach (Barrack barrack in bp.Barracks)
+            {
+                path = FindPath(barrack.Coords, rp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != rp.Castle.Coords)
+                    return false;
+            }
+
+            return true;
         }
 
         private void OnShowUnit()
