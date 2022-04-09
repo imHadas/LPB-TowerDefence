@@ -10,10 +10,10 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -47,7 +47,7 @@
             <Button Grid.Column="2" Command="{Binding AdvanceCommand}" Content="{Binding NextTurnText}" IsEnabled="{Binding AdvanceEnable}"/>
 
         </Grid>
-        <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
+        <ItemsControl Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" ItemsSource="{Binding Fields}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding GridSizeX}" Columns="{Binding GridSizeY}"/>
@@ -166,7 +166,35 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <ItemsControl Grid.Column="1" Grid.Row="2" ItemsSource="{Binding UnitFields}">
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsTower, Converter={StaticResource BoolToVis}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Content="Szint:"/>
+            <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedTower.Level}"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="Sebzés:"/>
+            <Label Grid.Row="1" Grid.Column="1" Content="{Binding SelectedTower.Damage}"/>
+            <Label Grid.Row="2" Grid.Column="0" Content="Sebesség:"/>
+            <Label Grid.Row="2" Grid.Column="1" Content="{Binding SelectedTower.Speed}"/>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsCastle, Converter={StaticResource BoolToVis}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" Content="HP:"/>
+            <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedCastle.Health}"/>
+        </Grid>
+        <ItemsControl Grid.Column="1" Grid.Row="3" ItemsSource="{Binding UnitFields}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
@@ -211,10 +239,10 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <StatusBar Grid.Row="3">
+        <StatusBar Grid.Row="4">
             <TextBlock Text="Kör: "/>
             <TextBlock Text="{Binding Round}"/>
         </StatusBar>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Money}" IsEnabled="False"/>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Money}" IsEnabled="False"/>
     </Grid>
 </Window>

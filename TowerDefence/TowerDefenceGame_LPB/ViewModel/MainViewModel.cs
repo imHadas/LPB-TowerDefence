@@ -24,6 +24,6 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public ObservableCollection<FieldViewModel> Fields { get; set; }
         public ObservableCollection<OptionField> OptionFields { get; set; }
-        public abstract void ButtonClick(int index);
+        public abstract void ButtonClick();
     }
 }

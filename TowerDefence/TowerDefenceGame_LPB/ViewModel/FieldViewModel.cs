@@ -17,10 +17,10 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int redBasic;
         private int redTank;
         private bool isUnits;
+        private bool isTower; // wanna find another way for this
+        private bool isCastle; // guess who's back
         /*
-        private bool isCastle;
         private bool isBarrack;
-        private bool isBasicTower;
         private bool isSniperTower;
         private bool isBomberTower;
         */
@@ -53,6 +53,8 @@ namespace TowerDefenceGame_LPB.ViewModel
             set 
             {
                 placement = value;
+                IsTower = false;
+                IsCastle = false;
                 //OnPropertyChanged(); //kinda unnecessary
                 if (placement is null)
                 {
@@ -67,15 +69,19 @@ namespace TowerDefenceGame_LPB.ViewModel
                         break;
                     case Castle:
                         PlacementType = "Castle";
+                        IsCastle = true;
                         break;
                     case BasicTower:
                         PlacementType = "BasicTower";
+                        IsTower = true;
                         break;
                     case BomberTower:
                         PlacementType = "BomberTower";
+                        IsTower = true;
                         break;
                     case SniperTower:
                         PlacementType = "SniperTower";
+                        IsTower = true;
                         break;
                     case Terrain:
                         Terrain terrain = value as Terrain;
@@ -102,16 +108,17 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             } 
         }
-        /*
-        public bool IsBasicTower
+        
+        public bool IsTower
         {
-            get { return isBasicTower; }
+            get { return isTower; }
             set 
             {
-                isBasicTower = value;
+                isTower = value;
                 OnPropertyChanged();
             }
         }
+        /*
         public bool IsSniperTower
         {
             get { return isSniperTower; }
@@ -141,8 +148,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             }
         }
-
-
+        */
         public bool IsCastle
         {
             get { return isCastle; }
@@ -152,7 +158,6 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             }
         }
-        */
 
         public bool IsUnits
         {
