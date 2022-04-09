@@ -13,6 +13,11 @@ namespace TowerDefenceGame_LPB.DataAccess
         public string Type { get; set; }
         public uint Health { get; set; }
 
+        public StringifiedUnit()
+        {
+
+        }
+
         public StringifiedUnit(Unit unit)
         {
             Type = unit is TankUnit ? "TankUnit" : "BasicUnit";
@@ -26,6 +31,11 @@ namespace TowerDefenceGame_LPB.DataAccess
         public string Owner { get; set; }
         public uint Level { get; set; }
 
+        public StringifiedPlacement()
+        {
+
+        }
+
         public StringifiedPlacement(Placement placement)
         {
             Type = placement.GetType().Name;
@@ -38,9 +48,14 @@ namespace TowerDefenceGame_LPB.DataAccess
 
     internal class StringifiedField
     {
-        public (uint, uint) Coords { get; set; }
+        public (uint x, uint y) Coords { get; set; }
         public StringifiedPlacement? Placement { get; set; }
         public (ICollection<StringifiedUnit> red, ICollection<StringifiedUnit> blue) Units { get; set; }
+
+        public StringifiedField()
+        {
+
+        }
 
         public StringifiedField(Field field)
         {
@@ -74,10 +89,15 @@ namespace TowerDefenceGame_LPB.DataAccess
     /// </summary>
     internal class StringifiedTable
     {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width { get; init; }
+        public int Height { get; init; }
 
         public StringifiedField[] Fields { get; set; }
+
+        public StringifiedTable()
+        {
+
+        }
 
         public StringifiedTable(int width, int height)
         {
@@ -87,8 +107,8 @@ namespace TowerDefenceGame_LPB.DataAccess
         }
         public StringifiedField this[uint x, uint y]
         {
-            get => Fields[IndexFromCoords(y, x)];
-            set => Fields[IndexFromCoords(y, x)] = value;
+            get => Fields[IndexFromCoords(x, y)];
+            set => Fields[IndexFromCoords(x, y)] = value;
         }
 
         public StringifiedField this[int x, int y]
@@ -121,10 +141,16 @@ namespace TowerDefenceGame_LPB.DataAccess
         public StringifiedTable Table { get; set; }
         public uint BPMoney { get; set; }
         public uint RPMoney { get; set; }
+        public uint PhaseCounter { get; set; }
+
+        public StringifiedGSO()
+        {
+
+        }
 
         public StringifiedGSO(Table table, Player blueplayer, Player redplayer)
         {
-            Table = new (table.Size.x, table.Size.y);
+            Table = new (table.Size.y, table.Size.x);
             for (uint i = 0; i < table.Size.x; i++)
             {
                 for(uint j = 0; j < table.Size.y; j++)
@@ -134,16 +160,19 @@ namespace TowerDefenceGame_LPB.DataAccess
             }
             BPMoney = blueplayer.Money;
             RPMoney = redplayer.Money;
+            PhaseCounter = table.PhaseCounter;
         }
     }
 
     public class JsonDataAccess : IDataAccess<GameSaveObject>
     {
         private static readonly JsonSerializerOptions _options
-        = new() 
-        { 
+        = new()
+        {
             //ReferenceHandler = ReferenceHandler.Preserve,
+            PropertyNameCaseInsensitive = false,
             WriteIndented = true,
+            IncludeFields = true,
         };
 
         public async Task<GameSaveObject> LoadAsync(string path)
@@ -210,6 +239,7 @@ namespace TowerDefenceGame_LPB.DataAccess
                     if (sf.Placement.Type != "Terrain") throw new Exception($"Placement of type {sf.Placement.Type} must have owner");
                     output.Placement = new Terrain(sf.Coords.Item1, sf.Coords.Item2, (TerrainType)sf.Placement.Level);
                 }
+
                 else switch(sf.Placement.Type)
                 {
                     case "Castle":
@@ -226,7 +256,7 @@ namespace TowerDefenceGame_LPB.DataAccess
                             }
                             catch (ArgumentException)
                             {
-                                throw new Exception($"{owner.Type} would has more than 2 barracks");
+                                throw new Exception($"{owner.Type} would have more than 2 barracks");
                             }
                         break;
                     case "BasicTower":
@@ -265,6 +295,8 @@ namespace TowerDefenceGame_LPB.DataAccess
 
             bp.Money = sgso.BPMoney;
             rp.Money = sgso.RPMoney;
+            table.PhaseCounter = sgso.PhaseCounter;
+            if (bp.Castle == null || rp.Castle == null || bp.Barracks.Count < 2 || rp.Barracks.Count < 2) throw new Exception("Read table was invalid");
 
             return new GameSaveObject(table, bp, rp);
         }

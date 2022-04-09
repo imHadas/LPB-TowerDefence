@@ -54,10 +54,21 @@ namespace TowerDefenceGame_LPB.ViewModel
             model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.GameLoaded += Model_GameLoaded;
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             GenerateTable();
             RefreshTable();
+        }
+
+        private void Model_GameLoaded(object? sender, EventArgs e)
+        {
+            GridSizeX = model.Table.Size.Item1;
+            GridSizeY = model.Table.Size.Item2;
+            GenerateTable();
+            RefreshTable();
+            SetupText();
+            OnPropertyChanged(nameof(Fields));
         }
 
         private void OnLoadGame()

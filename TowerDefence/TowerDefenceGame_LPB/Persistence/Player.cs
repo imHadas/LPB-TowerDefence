@@ -37,7 +37,7 @@ namespace TowerDefenceGame_LPB.Persistence
 
         public void AddBarrack(Barrack barrack)
         {
-            if (Barracks.Count <= 2) throw new ArgumentException("Player can't have more than 2 barracks");
+            if (Barracks.Count >= 2) throw new ArgumentException("Player can't have more than 2 barracks");
             Barracks.Add(barrack);
         }
     }
