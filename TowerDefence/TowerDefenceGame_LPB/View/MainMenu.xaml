@@ -17,11 +17,13 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="1" Grid.Column="1" Content="Tower Defence" FontSize="56" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
         <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="1"  Grid.Column="1" Grid.Row="2" Content="New Game" FontSize="34" FontWeight="Bold"/>
-        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="2" Grid.Column="1" Grid.Row="3" Content="Map Editor" FontSize="34" FontWeight="Bold"/>
+        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="2"  Grid.Column="1" Grid.Row="3" Content="Load Game" FontSize="34" FontWeight="Bold"/>
+        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="3" Grid.Column="1" Grid.Row="4" Content="Map Editor" FontSize="34" FontWeight="Bold"/>
         
     </Grid>
 </Window>

@@ -37,10 +37,12 @@ namespace TowerDefenceGame_LPB.ViewModel
         public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public event EventHandler SaveGame;
+        public event EventHandler LoadGame;
         public ObservableCollection<Unit> UnitFields { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseGameCommand { get; set; }
         public DelegateCommand SaveGameCommand { get; set; }
+        public DelegateCommand LoadGameCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
         public FieldViewModel SelectedField 
         { 
@@ -70,9 +72,11 @@ namespace TowerDefenceGame_LPB.ViewModel
             GridSizeY = model.Table.Size.Item2;
             AdvanceCommand = new DelegateCommand(p => AdvanceGame());
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
+            LoadGameCommand = new DelegateCommand(param => OnLoadGame());
             model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.GameLoaded += Model_GameLoaded;
             model.UnitMoved += new EventHandler((object o, EventArgs e) => ButtonClick());
             model.GameOver += Model_GameOver;
             SetupText();
@@ -83,6 +87,21 @@ namespace TowerDefenceGame_LPB.ViewModel
             SelectedField = null;
             SelectedTower = null;
             SelectedCastle = null;
+        }
+
+        private void Model_GameLoaded(object? sender, EventArgs e)
+        {
+            GridSizeX = model.Table.Size.Item1;
+            GridSizeY = model.Table.Size.Item2;
+            GenerateTable();
+            RefreshTable();
+            SetupText();
+            OnPropertyChanged(nameof(Fields));
+        }
+
+        private void OnLoadGame()
+        {
+            LoadGame?.Invoke(this, EventArgs.Empty);
         }
 
         private void Model_GameOver(object? sender, GameModel.GameOverType e)

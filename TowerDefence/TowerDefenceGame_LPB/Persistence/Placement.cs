@@ -9,6 +9,8 @@ namespace TowerDefenceGame_LPB.Persistence
         public Player? Owner { get; private set; }
         public (uint x, uint y) Coords { get; private set; }
 
+        public PlayerType OwnerType => Owner?.Type ?? PlayerType.NEUTRAL;
+
         protected Placement((uint x, uint y) coords, Player? player = null)
         {
             Owner = player;

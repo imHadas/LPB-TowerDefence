@@ -45,6 +45,7 @@ namespace TowerDefenceGame_LPB
             _viewModel.ExitCommand = new DelegateCommand(p => ExitFromGame());
             _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
             _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
+            _viewModel.LoadGame += ViewModel_LoadGame;
 
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
             _mapMakerViewModel.CloseMapMakerCommand = new DelegateCommand(p => _mapMaker.Close());
@@ -62,6 +63,21 @@ namespace TowerDefenceGame_LPB
             //_view.Show();
 
         }
+
+        private async void ViewModel_LoadGame(object? sender, EventArgs e)
+        {
+            {
+                OpenFileDialog openFileDialog = new (); // dialógablak
+                openFileDialog.Title = "Játék Betöltése";
+                openFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
+                openFileDialog.FileName = "TowerDefenceMentés";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    await _model.LoadGameAsync(openFileDialog.FileName);
+                }
+            }
+        }
+
 
         private void _model_GameOver(object? sender, GameModel.GameOverType e)
         {
@@ -101,7 +117,23 @@ namespace TowerDefenceGame_LPB
                 }
                 
             }
-            else if (windowType == 2)
+            else if(windowType == 2)
+            {
+                if (_view == null)
+                {
+                    ViewModel_LoadGame(this,EventArgs.Empty);
+                    _view = new MainWindow();
+                    _view.DataContext = _viewModel;
+                    _view.Show();
+                    _view.Closing += CloseGame;
+                }
+                else
+                {
+                    ViewModel_LoadGame(this, EventArgs.Empty);
+                    _view.Show();
+                }
+            }
+            else if (windowType == 3)
             {
                 _mapMaker = new MapMaker();
                 _mapMaker.DataContext = _mapMakerViewModel;
@@ -123,6 +155,9 @@ namespace TowerDefenceGame_LPB
             _mainMenu.Close();
             */
         }
+
+        
+
         private void SetupNewWindow(int windowType)
         {
             //use values from dialogBox for gridSize
