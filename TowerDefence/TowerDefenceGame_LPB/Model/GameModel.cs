@@ -422,6 +422,12 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidOperationException("No data access is provided.");
             GameSaveObject save = await gameDataAccess.LoadAsync(path);
             (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
+            switch((Table.PhaseCounter - 1) % 3 )
+            {
+                case 0: CurrentPlayer = bp; break;
+                case 1: CurrentPlayer = rp; break;
+                case 2: CurrentPlayer = null; break;
+            }
             OnGameLoaded();
         }
     }
