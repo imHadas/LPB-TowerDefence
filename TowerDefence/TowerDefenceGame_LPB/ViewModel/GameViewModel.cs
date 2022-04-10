@@ -14,7 +14,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int round;
         private uint money;
 
-        private FieldViewModel selectedField;
+        private FieldViewModel? selectedField;
         private ICollection<MenuOption> menuOptions;
         private GameModel model;
         private Tower selectedTower; //I want to get rid of this
@@ -46,7 +46,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         public DelegateCommand SaveGameCommand { get; set; }
         public DelegateCommand LoadGameCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
-        public FieldViewModel SelectedField 
+        public FieldViewModel? SelectedField 
         { 
             get { return selectedField; } 
             set 
@@ -69,17 +69,23 @@ namespace TowerDefenceGame_LPB.ViewModel
         public GameViewModel(GameModel model)
         {
             this.model = model;
-            GridSizeX = model.Table.Size.Item1;
-            GridSizeY = model.Table.Size.Item2;
             AdvanceCommand = new DelegateCommand(p => AdvanceGame());
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
             LoadGameCommand = new DelegateCommand(param => OnLoadGame());
-            model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.NewGameCreated += new EventHandler((object? o, EventArgs e) => NewGame());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.GameLoaded += Model_GameLoaded;
             model.UnitMoved += new EventHandler((object o, EventArgs e) => ButtonClick());
             model.GameOver += Model_GameOver;
+
+            NewGame();
+        }
+
+        public void NewGame()
+        {
+            GridSizeX = model.Table.Size.Item1;
+            GridSizeY = model.Table.Size.Item2;
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
             UnitFields = new ObservableCollection<Unit>();
@@ -173,11 +179,14 @@ namespace TowerDefenceGame_LPB.ViewModel
                     }
                 }
             }
+            OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(OptionFields));
         }
         private void AdvanceGame()
         {
             model.Advance();
             SetupText();
+            RefreshTable();
             ButtonClick();
         }
         private void SetupText()
@@ -205,6 +214,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public override void ButtonClick()
         {
+            if (selectedField is null) return;
             menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
             SelectedTower = null;
             SelectedCastle = null;

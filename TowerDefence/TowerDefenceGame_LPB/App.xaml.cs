@@ -60,6 +60,7 @@ namespace TowerDefenceGame_LPB
             _mainMenu = new MainMenu();
             OpenNewWindowCommand= new DelegateCommand(p => OpenNewWindow(Convert.ToInt32(p)));
             _mainMenu.DataContext = this;
+            _mainMenu.Closing += CloseWindow;
             _mainMenu.Show();            
             
             // Creating view
@@ -77,7 +78,14 @@ namespace TowerDefenceGame_LPB
             openFileDialog.FileName = "TowerDefenceMentés.json";
             if (openFileDialog.ShowDialog() == true)
             {
-                await _mapMakerModel.LoadGameAsync(openFileDialog.FileName);
+                try
+                {
+                    await _mapMakerModel.LoadGameAsync(openFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Hiba", MessageBoxButton.OK);
+                }
             }
         }
 
@@ -88,7 +96,14 @@ namespace TowerDefenceGame_LPB
             saveFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
             saveFileDialog.FileName = "TowerDefenceMentés";
             if (saveFileDialog.ShowDialog() == true)
-                await _mapMakerModel.SaveGameAsync(saveFileDialog.FileName);
+                try 
+                { 
+                    await _mapMakerModel.SaveGameAsync(saveFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Hiba", MessageBoxButton.OK);
+                }
         }
 
         private async void ViewModel_LoadGame(object? sender, EventArgs e)
@@ -135,7 +150,7 @@ namespace TowerDefenceGame_LPB
                     _view.DataContext = _viewModel;
                     _model.NewGame();
                     _view.Show();
-                    _view.Closing += CloseGame;
+                    _view.Closing += CloseWindow;
                 }
                 else
                 {
@@ -152,7 +167,7 @@ namespace TowerDefenceGame_LPB
                     _view = new MainWindow();
                     _view.DataContext = _viewModel;
                     _view.Show();
-                    _view.Closing += CloseGame;
+                    _view.Closing += CloseWindow;
                 }
                 else
                 {
@@ -166,9 +181,9 @@ namespace TowerDefenceGame_LPB
                 _mapMaker.DataContext = _mapMakerViewModel;
                 _mapMakerModel.CreateNewMap();
                 _mapMaker.Show();
-                _mapMaker.Closing += CloseMapMaker;
+                _mapMaker.Closing += CloseWindow;
             }
-            _mainMenu.Close();
+            _mainMenu.Hide();
             /*
             _dialogBox = new DialogBox();
             _dialogBox.DataContext = this;
@@ -209,27 +224,27 @@ namespace TowerDefenceGame_LPB
                 _mapMaker.Show();
             }
             _dialogBox.Close();
-            _mainMenu.Close();
+            _mainMenu.Hide();
         }
         private void ExitFromGame()
         {
-            _mainMenu = new MainMenu();
-            _mainMenu.DataContext = this;
+            /*_mainMenu = new MainMenu();
+            _mainMenu.DataContext = this;*/
             _mainMenu.Show();
             _view.Hide();
         }
 
         private void ExitFromMapMaker()
         {
-            _mainMenu = new MainMenu();
-            _mainMenu.DataContext = this;
+            /*_mainMenu = new MainMenu();
+            _mainMenu.DataContext = this;*/
             _mainMenu.Show();
             _mapMaker.Hide();
         }
 
-        private void CloseGame(object sender, System.ComponentModel.CancelEventArgs e)
+        private void CloseWindow(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (_view.IsVisible)
+            if ((_view is null && _mapMaker is null) || (_view is not null && _view.IsVisible) || (_mapMaker is not null && _mapMaker.IsVisible) || (_mainMenu is not null && _mainMenu.IsVisible))
             {
                 MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence", MessageBoxButton.YesNo);
 
@@ -247,27 +262,9 @@ namespace TowerDefenceGame_LPB
                 }
                 return;
             }
-        }
-
-        private void CloseMapMaker(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (_mapMaker.IsVisible)
+            else
             {
-                MessageBoxResult result = MessageBox.Show("Biztos ki akarsz lépni a játékból?", "Tower Defence", MessageBoxButton.YesNo);
-
-                switch (result)
-                {
-                    case MessageBoxResult.Yes:
-                        System.Windows.Application.Current.Shutdown();
-                        break;
-                    case MessageBoxResult.No:
-                        e.Cancel = true;
-                        break;
-                    default:
-                        e.Cancel = true;
-                        break;
-                }
-                return;
+                System.Windows.Application.Current.Shutdown();
             }
         }
 
