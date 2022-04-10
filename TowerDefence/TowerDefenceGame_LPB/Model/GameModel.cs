@@ -413,6 +413,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private void OnGameLoaded()
         {
+            pathfinder = new AStar(Table);
             GameLoaded?.Invoke(this, EventArgs.Empty);
         }
 
