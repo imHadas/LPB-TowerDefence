@@ -96,7 +96,23 @@ namespace TowerDefenceGame_LPB
                 }
                 
             }
-            else if (windowType == 2)
+            else if(windowType == 2)
+            {
+                if (_view == null)
+                {
+                    ViewModel_LoadGame(this,EventArgs.Empty);
+                    _view = new MainWindow();
+                    _view.DataContext = _viewModel;
+                    _view.Show();
+                    _view.Closing += CloseGame;
+                }
+                else
+                {
+                    ViewModel_LoadGame(this, EventArgs.Empty);
+                    _view.Show();
+                }
+            }
+            else if (windowType == 3)
             {
                 _mapMaker = new MapMaker();
                 _mapMaker.DataContext = _mapMakerViewModel;
@@ -118,6 +134,9 @@ namespace TowerDefenceGame_LPB
             _mainMenu.Close();
             */
         }
+
+        
+
         private void SetupNewWindow(int windowType)
         {
             //use values from dialogBox for gridSize
