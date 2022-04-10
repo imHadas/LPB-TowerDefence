@@ -25,7 +25,7 @@ namespace TowerDefenceGame_LPB.Model
         #region Properties
 
         public bool SaveEnabled { get; private set; }
-        public bool BuildEnabled { get; set; }
+        public bool BuildEnabled { get; private set; }
         public int Round { get; set; }
         public int Phase { get; set; }
         public Player CurrentPlayer { get; private set; }
@@ -100,12 +100,12 @@ namespace TowerDefenceGame_LPB.Model
             }
             else if(Phase % 3 == 1)
             {
-                BuildEnabled=true;
+                BuildEnabled = !IsGameOver;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
-                BuildEnabled = true;
+                BuildEnabled = !IsGameOver;
                 CurrentPlayer = rp;
             }
         }
@@ -359,19 +359,15 @@ namespace TowerDefenceGame_LPB.Model
             {
                 if (SelectedField.Units.Count != 0)
                     OnShowUnit();
-                else
+                else if(BuildEnabled)
                 {
-                    if (!BuildEnabled)  // you can still view units but can't build
-                        return options;
                     options.Add(MenuOption.BuildBasic);
                     options.Add(MenuOption.BuildBomber);
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(SelectedField.Placement.Owner == CurrentPlayer)
+            else if(BuildEnabled && SelectedField.Placement.Owner == CurrentPlayer)
             {
-                if (!BuildEnabled)  // you can still view units but can't upgrade, or destroy towers, or place units
-                    return options;
                 switch (SelectedField.Placement)
                 {
                     case Tower:
@@ -403,6 +399,7 @@ namespace TowerDefenceGame_LPB.Model
 
         private void OnGameOver(GameOverType gameOverType)
         {
+            BuildEnabled = false;
             GameOver?.Invoke(this, gameOverType);
         }
     }
