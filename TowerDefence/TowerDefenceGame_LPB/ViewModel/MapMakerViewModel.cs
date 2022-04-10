@@ -17,11 +17,18 @@ namespace TowerDefenceGame_LPB.ViewModel
         private Player selectedPlayer;
         private FieldViewModel selectedField;
 
+        public event EventHandler SaveGame;
+        public event EventHandler LoadGame;
+
         public DelegateCommand SelectPlayerCommand { get; set; }
         public DelegateCommand SetGameSizeCommand { get; set; }
         public DelegateCommand SetStartingMoneyCommand { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseMapMakerCommand { get; set; }
+
+        public DelegateCommand SaveGameCommand { get; set; }
+        public DelegateCommand LoadGameCommand { get; set; }
+
         public uint SetGridSizeX { get; set; }
         public uint SetGridSizeY { get; set; }
         public uint SetBlueMoney { get; set; }
@@ -79,12 +86,25 @@ namespace TowerDefenceGame_LPB.ViewModel
             SetRedMoney = model.RP.Money;
             OptionFields = new ObservableCollection<OptionField>();
             model.NewMapCreated += (sender, args) => RefreshTable();
+            model.GameLoaded += Model_GameLoaded;
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
             SetStartingMoneyCommand = new DelegateCommand(p => SetStartingMoney());
+
+            SaveGameCommand = new(p => OnSaveGame());
+            LoadGameCommand = new(p => OnLoadGame());
+
             GenerateTable();
             RefreshTable();
         }
+
+        private void Model_GameLoaded(object? sender, EventArgs e)
+        {
+            GenerateTable();
+            RefreshTable();
+            OnPropertyChanged(nameof(Fields));
+        }
+
         private void GenerateTable()
         {
             Fields = new ObservableCollection<FieldViewModel>();
@@ -205,6 +225,16 @@ namespace TowerDefenceGame_LPB.ViewModel
                     SelectedPlayer = null;
                     break;
             }
+        }
+
+        private void OnSaveGame()
+        {
+            SaveGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnLoadGame()
+        {
+            LoadGame?.Invoke(this, EventArgs.Empty);
         }
     }
 }

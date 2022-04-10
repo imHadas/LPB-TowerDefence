@@ -22,6 +22,9 @@ namespace TowerDefenceGame_LPB
         private GameModel _model;
         private MapMakerModel _mapMakerModel;
         private DialogBox _dialogBox;
+
+        private JsonDataAccess dataAccess = new();
+
         public DelegateCommand OpenNewWindowCommand { get; set; }
         public DelegateCommand OKCommand { get; set; }
         public DelegateCommand DialogCloseCommand { get; set; }
@@ -35,8 +38,8 @@ namespace TowerDefenceGame_LPB
         private void App_Startup(object sender, StartupEventArgs e)
         {
             // Creating model
-            _model = new GameModel(new JsonDataAccess());
-            _mapMakerModel = new MapMakerModel();
+            _model = new GameModel(dataAccess);
+            _mapMakerModel = new MapMakerModel(dataAccess);
             _model.GameOver += _model_GameOver;
             //_model.NewGame();
 
@@ -50,6 +53,8 @@ namespace TowerDefenceGame_LPB
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
             _mapMakerViewModel.CloseMapMakerCommand = new DelegateCommand(p => _mapMaker.Close());
             _mapMakerViewModel.ExitCommand = new DelegateCommand(p => ExitFromMapMaker());
+            _mapMakerViewModel.SaveGame += _mapMakerViewModel_SaveGame;
+            _mapMakerViewModel.LoadGame += _mapMakerViewModel_LoadGame;
 
             //Creating main menu
             _mainMenu = new MainMenu();
@@ -62,6 +67,28 @@ namespace TowerDefenceGame_LPB
             //_view.DataContext = _viewModel;
             //_view.Show();
 
+        }
+
+        private async void _mapMakerViewModel_LoadGame(object? sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new(); // dialógablak
+            openFileDialog.Title = "Pálya Betöltése";
+            openFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefenceMentés.json";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                await _mapMakerModel.LoadGameAsync(openFileDialog.FileName);
+            }
+        }
+
+        private async void _mapMakerViewModel_SaveGame(object? sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
+            saveFileDialog.Title = "Pálya mentése";
+            saveFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
+            saveFileDialog.FileName = "TowerDefenceMentés";
+            if (saveFileDialog.ShowDialog() == true)
+                await _mapMakerModel.SaveGameAsync(saveFileDialog.FileName);
         }
 
         private async void ViewModel_LoadGame(object? sender, EventArgs e)
