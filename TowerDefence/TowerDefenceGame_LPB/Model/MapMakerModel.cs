@@ -77,6 +77,7 @@ namespace TowerDefenceGame_LPB.Model
                     field.Owner.Barracks.Add((Barrack) field.Placement);
                 }
             }
+
             pathfinder = new AStar(Table);
 
         }
@@ -252,6 +253,9 @@ namespace TowerDefenceGame_LPB.Model
             if (!ValidatePath()) throw new Exception("Path is blocked between barracks and castles");
             if (rp.Castle == null || bp.Castle == null || rp.Barracks.Count != 2 || bp.Barracks.Count != 2)
                 throw new Exception("Map contains invalid amount of castles and/or barracks");
+
+
+            Table.PhaseCounter = 1;
 
             await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
         }
