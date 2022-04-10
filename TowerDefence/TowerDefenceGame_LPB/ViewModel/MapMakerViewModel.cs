@@ -17,6 +17,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private Player selectedPlayer;
         private FieldViewModel selectedField;
 
+        private ICollection<MenuOption> menuOptions;
         public event EventHandler SaveGame;
         public event EventHandler LoadGame;
 
@@ -68,7 +69,6 @@ namespace TowerDefenceGame_LPB.ViewModel
                 selectedField = value;
                 if(selectedField is not null)
                 {
-                    model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
                     selectedField.IsSelected = System.Windows.Media.Brushes.Red;
                     selectedField.IsSelectedSize = 3;
                 }
@@ -139,25 +139,11 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public override void ButtonClick()
         {
+            menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
             OptionFields.Clear();
-            if (selectedField is null) return;
-            if (selectedField.Placement is null)
+            foreach (MenuOption menuOption in menuOptions)
             {
-                if (selectedPlayer is null)
-                {
-                    OptionFields.Add(new OptionField { Type = "BuildMountain", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                    OptionFields.Add(new OptionField{Type = "BuildLake",OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param))});
-                }
-                else
-                {
-                    OptionFields.Add(new OptionField { Type = "BuildCastle", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                    OptionFields.Add(new OptionField { Type = "BuildBarrack", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                }
-                
-            }
-            else if (selectedField.Placement is not null)
-            {
-                OptionFields.Add(new OptionField { Type = "DestroyPlacement", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Type = menuOption.ToString(), OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
         }
 

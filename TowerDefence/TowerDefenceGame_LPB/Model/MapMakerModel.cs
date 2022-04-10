@@ -87,11 +87,16 @@ namespace TowerDefenceGame_LPB.Model
             ICollection<MenuOption> options = new List<MenuOption>();
             if (SelectedField.Placement is null) //can expand to depend on selected player
             {
-                options.Add(MenuOption.BuildCastle);
-                options.Add(MenuOption.BuildBarrack);
-                options.Add(MenuOption.BuildMountain);
-                options.Add(MenuOption.BuildLake);
-
+                if (SelectedPlayer is null)
+                {
+                    options.Add(MenuOption.BuildMountain);
+                    options.Add(MenuOption.BuildLake);
+                }
+                else
+                {
+                    options.Add(MenuOption.BuildCastle);
+                    options.Add(MenuOption.BuildBarrack);
+                }
             }
             else if (SelectedField.Placement is not null)
             {

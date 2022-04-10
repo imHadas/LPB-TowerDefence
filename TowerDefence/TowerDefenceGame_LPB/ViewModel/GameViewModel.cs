@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TowerDefenceGame_LPB.Persistence;
 using TowerDefenceGame_LPB.Model;
@@ -14,6 +15,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private uint money;
 
         private FieldViewModel selectedField;
+        private ICollection<MenuOption> menuOptions;
         private GameModel model;
         private Tower selectedTower; //I want to get rid of this
         private Castle selectedCastle; // it's just bloat at this point
@@ -57,7 +59,6 @@ namespace TowerDefenceGame_LPB.ViewModel
                 selectedField = value;
                 if (selectedField is not null)
                 {
-                    model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
                     selectedField.IsSelected = System.Windows.Media.Brushes.Red;
                     selectedField.IsSelectedSize = 3;
                     ButtonClick();
@@ -204,20 +205,34 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public override void ButtonClick()
         {
+            menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
             SelectedTower = null;
+            SelectedCastle = null;
             OptionFields.Clear();
             UnitFields.Clear();
-            if (selectedField.PlayerType == model.OtherPlayer.Type)
-            {
-                if(selectedField.Placement is Castle)
-                    SelectedCastle = (Castle)selectedField.Placement;
-                return;
-            }
+            if(selectedField.Placement is Castle)
+                SelectedCastle = (Castle)selectedField.Placement;
             if (selectedField.IsUnits)
             {
                 foreach (Unit _unit in model.SelectedField.Units)
                     UnitFields.Add(_unit);
             }
+
+            if (selectedField.Placement is BasicTower || selectedField.Placement is SniperTower ||
+                selectedField.Placement is BomberTower)
+                SelectedTower = (Tower) SelectedField.Placement;
+            if(SelectedField.Placement is Barrack)
+            {
+                Barrack selectedBarrack = (Barrack) SelectedField.Placement;
+                foreach (Unit unit in selectedBarrack.UnitQueue)
+                    UnitFields.Add(unit);
+            }
+            foreach (MenuOption menuOption in menuOptions)
+            {
+                OptionFields.Add(new OptionField{Player = model.CurrentPlayer.Type, Type = menuOption.ToString(), OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+            }
+            
+            /*
             else if (!model.BuildEnabled)
                 return;
             else if (selectedField.Placement is Barrack)
@@ -242,13 +257,13 @@ namespace TowerDefenceGame_LPB.ViewModel
                 SelectedTower = (Tower)model.SelectedField.Placement;
             }
 
-            else
+            else if(SelectedField.Placement is not null)
             {
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type="BuildBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildBomber", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildSniper", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
-
+            */
         }
         public void OptionsButtonClick(string option)
         {
