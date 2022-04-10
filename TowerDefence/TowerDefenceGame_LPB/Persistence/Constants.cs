@@ -21,5 +21,7 @@
         public const uint BASIC_TOWER_COST = 50;
         public const uint SNIPER_TOWER_COST = 100;
         public const uint BOMBER_TOWER_COST = 120;
+
+        public const uint PASSIVE_INCOME = 100;
     }
 }

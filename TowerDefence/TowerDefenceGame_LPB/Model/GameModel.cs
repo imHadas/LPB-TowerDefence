@@ -102,6 +102,8 @@ namespace TowerDefenceGame_LPB.Model
             }
             else if(Phase % 3 == 1)
             {
+                bp.Money += Constants.PASSIVE_INCOME;
+                rp.Money += Constants.PASSIVE_INCOME;
                 BuildEnabled=true;
                 CurrentPlayer = bp;
             }
