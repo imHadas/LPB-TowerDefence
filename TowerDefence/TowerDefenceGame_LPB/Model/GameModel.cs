@@ -42,6 +42,7 @@ namespace TowerDefenceGame_LPB.Model
         public event EventHandler NewGameCreated;
         public event EventHandler UnitMoved;
         public event EventHandler AttackEnded;
+        public event EventHandler<GameOverType> GameOver;
 
         #endregion
 
@@ -102,13 +103,11 @@ namespace TowerDefenceGame_LPB.Model
             else if(Phase % 3 == 1)
             {
                 BuildEnabled=true;
-                SaveEnabled = true;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
                 BuildEnabled = true;
-                SaveEnabled = true;
                 CurrentPlayer = rp;
             }
         }
@@ -209,6 +208,10 @@ namespace TowerDefenceGame_LPB.Model
 
             if (AttackEnded != null)
                 AttackEnded(this, EventArgs.Empty);
+
+            if (rp.Castle.Health <= 0 && bp.Castle.Health <= 0) OnGameOver(GameOverType.DRAW);
+            else if (rp.Castle.Health <= 0) OnGameOver(GameOverType.BLUEWIN);
+            else if (bp.Castle.Health <= 0) OnGameOver(GameOverType.REDWIN);
         }
 
         private void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
@@ -445,19 +448,15 @@ namespace TowerDefenceGame_LPB.Model
             {
                 if (SelectedField.Units.Count != 0)
                     OnShowUnit();
-                else
+                else if(BuildEnabled)
                 {
-                    if (!BuildEnabled)  // you can still view units but can't build
-                        return options;
                     options.Add(MenuOption.BuildBasic);
                     options.Add(MenuOption.BuildBomber);
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(SelectedField.Placement.Owner == CurrentPlayer)
+            else if(BuildEnabled && SelectedField.Placement.Owner == CurrentPlayer)
             {
-                if (!BuildEnabled)  // you can still view units but can't upgrade, or destroy towers, or place units
-                    return options;
                 switch (SelectedField.Placement)
                 {
                     case Tower:
@@ -483,6 +482,14 @@ namespace TowerDefenceGame_LPB.Model
                 (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
                 SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
                 );
+        }
+
+        public enum GameOverType { DRAW, REDWIN, BLUEWIN }
+
+        private void OnGameOver(GameOverType gameOverType)
+        {
+            BuildEnabled = false;
+            GameOver?.Invoke(this, gameOverType);
         }
 
         public async Task SaveGameAsync(string path)

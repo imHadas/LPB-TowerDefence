@@ -37,6 +37,7 @@ namespace TowerDefenceGame_LPB
             // Creating model
             _model = new GameModel(new JsonDataAccess());
             _mapMakerModel = new MapMakerModel();
+            _model.GameOver += _model_GameOver;
             //_model.NewGame();
 
             // Creating viewmodel
@@ -61,6 +62,26 @@ namespace TowerDefenceGame_LPB
             //_view.Show();
 
         }
+
+        private void _model_GameOver(object? sender, GameModel.GameOverType e)
+        {
+            string msg;
+            switch (e)
+            {
+                case GameModel.GameOverType.DRAW:
+                    msg = "A játék döntetlen!";
+                    break;
+                case GameModel.GameOverType.REDWIN:
+                    msg = "A piros játékos nyert!";
+                    break;
+                case GameModel.GameOverType.BLUEWIN:
+                    msg = "A kék játékos nyert!";
+                    break;
+                default: throw new ArgumentException("what");
+            }
+            MessageBox.Show(msg, "Játék vége", MessageBoxButton.OK);
+        }
+
         private void OpenNewWindow(int windowType)
         {
             if (windowType == 1)

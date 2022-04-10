@@ -15,7 +15,7 @@ namespace TowerDefenceGame_LPB.ViewModel
     {
         private MapMakerModel model;
         private Player selectedPlayer;
-        private int selectedField;
+        private FieldViewModel selectedField;
 
         public DelegateCommand SelectPlayerCommand { get; set; }
         public DelegateCommand SetGameSizeCommand { get; set; }
@@ -45,20 +45,27 @@ namespace TowerDefenceGame_LPB.ViewModel
             set
             {
                 selectedPlayer = value;
-                model.SelectedPlayer = selectedPlayer; OnPropertyChanged();ButtonClick(selectedField);
+                model.SelectedPlayer = selectedPlayer; OnPropertyChanged();ButtonClick();
             }
         }
-        public int SelectedField
+        public FieldViewModel SelectedField
         {
             get { return selectedField; }
             set
             {
-                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Black;
-                Fields[selectedField].IsSelectedSize = 1;
+                if (selectedField is not null)
+                {
+                    selectedField.IsSelected = System.Windows.Media.Brushes.Black;
+                    selectedField.IsSelectedSize = 1;
+                }
                 selectedField = value;
-                model.SelectField(model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y]);
-                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Red;
-                Fields[selectedField].IsSelectedSize = 3;
+                if(selectedField is not null)
+                {
+                    model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
+                    selectedField.IsSelected = System.Windows.Media.Brushes.Red;
+                    selectedField.IsSelectedSize = 3;
+                }
+                ButtonClick();
             }
         }
         public MapMakerViewModel(MapMakerModel model)
@@ -97,7 +104,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                         Placement = model.Table[(uint)i, (uint)j].Placement,
                         IsSelected =  System.Windows.Media.Brushes.Black,
                         IsSelectedSize = 1,
-                        ClickCommand = new DelegateCommand(param => ButtonClick(Convert.ToInt32(param)))
+                        ClickCommand = new DelegateCommand(param => SelectedField = Fields[(int)param])
                     });
                 }
             }
@@ -110,13 +117,12 @@ namespace TowerDefenceGame_LPB.ViewModel
                 field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement?.Owner?.Type ?? PlayerType.NEUTRAL;
             }
         }
-        public override void ButtonClick(int index)
+        public override void ButtonClick()
         {
-            SelectedField = index;
-            FieldViewModel field = Fields[index];
-            if (field.Placement is null)
+            OptionFields.Clear();
+            if (selectedField is null) return;
+            if (selectedField.Placement is null)
             {
-                OptionFields.Clear();
                 if (selectedPlayer is null)
                 {
                     OptionFields.Add(new OptionField { Type = "BuildMountain", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
@@ -129,23 +135,22 @@ namespace TowerDefenceGame_LPB.ViewModel
                 }
                 
             }
-            else if (field.Placement is not null)
+            else if (selectedField.Placement is not null)
             {
-                OptionFields.Clear();
                 OptionFields.Add(new OptionField { Type = "DestroyPlacement", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
         }
 
         public void SetGameSize()
         {
-            SelectedField = 0;
+            SelectedField = null;
             model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
             GenerateTable();
             RefreshTable();
             OnPropertyChanged("Fields");
-            ButtonClick(selectedField);
+            ButtonClick();
         }
 
         public void SetStartingMoney()
@@ -178,7 +183,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 }
 
                 RefreshTable();
-                ButtonClick(selectedField);
+                ButtonClick();
             }
             catch (Exception ex)
             {

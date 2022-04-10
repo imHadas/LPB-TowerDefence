@@ -13,10 +13,23 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int round;
         private uint money;
 
-        private int selectedField;
+        private FieldViewModel selectedField;
         private GameModel model;
-        
-        
+        private Tower selectedTower; //I want to get rid of this
+        private Castle selectedCastle; // it's just bloat at this point
+
+        public Castle SelectedCastle
+        {
+            get { return selectedCastle; }
+            set { selectedCastle = value; OnPropertyChanged(); }
+        }
+
+        public Tower SelectedTower
+        {
+            get { return selectedTower; }
+            set { selectedTower = value; OnPropertyChanged(); }
+        }
+
         public string TurnText { get { return turnText; } set { turnText = value; OnPropertyChanged(); } }
         public string NextTurnText { get { return nextTurnText; } set { nextTurnText = value; OnPropertyChanged(); } }
         public bool AdvanceEnable { get { return advanceEnable; } set { advanceEnable = value; OnPropertyChanged(); } }
@@ -24,21 +37,30 @@ namespace TowerDefenceGame_LPB.ViewModel
         public int Round { get { return round; } set { round = value; OnPropertyChanged(); } }
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public event EventHandler SaveGame;
+        public ObservableCollection<Unit> UnitFields { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseGameCommand { get; set; }
         public DelegateCommand SaveGameCommand { get; set; }
         public DelegateCommand AdvanceCommand { get; set; }
-        public int SelectedField 
+        public FieldViewModel SelectedField 
         { 
             get { return selectedField; } 
             set 
             {
-                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Black;
-                Fields[selectedField].IsSelectedSize = 1;
+                if(selectedField is not null)
+                {
+                    selectedField.IsSelected = System.Windows.Media.Brushes.Black;
+                    selectedField.IsSelectedSize = 1;
+                }
                 selectedField = value;
-                model.SelectField(model.Table[(uint)Fields[selectedField].Coords.x, (uint)Fields[selectedField].Coords.y]);
-                Fields[selectedField].IsSelected = System.Windows.Media.Brushes.Red;
-                Fields[selectedField].IsSelectedSize = 3;
+                if (selectedField is not null)
+                {
+                    model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
+                    selectedField.IsSelected = System.Windows.Media.Brushes.Red;
+                    selectedField.IsSelectedSize = 3;
+                    ButtonClick();
+                }
+                OnPropertyChanged();
             }
         }
         public GameViewModel(GameModel model)
@@ -51,10 +73,21 @@ namespace TowerDefenceGame_LPB.ViewModel
             model.NewGameCreated += new EventHandler((object o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
             model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.UnitMoved += new EventHandler((object o, EventArgs e) => ButtonClick());
+            model.GameOver += Model_GameOver;
             SetupText();
             OptionFields = new ObservableCollection<OptionField>();
+            UnitFields = new ObservableCollection<Unit>();
             GenerateTable();
             RefreshTable();
+            SelectedField = null;
+            SelectedTower = null;
+            SelectedCastle = null;
+        }
+
+        private void Model_GameOver(object? sender, GameModel.GameOverType e)
+        {
+            AdvanceEnable = false;
         }
 
         private void OnSaveGame()
@@ -82,7 +115,9 @@ namespace TowerDefenceGame_LPB.ViewModel
                         Placement = model.Table[(uint)i, (uint)j].Placement,
                         IsSelected =  System.Windows.Media.Brushes.Black,
                         IsSelectedSize = 1,
-                        ClickCommand = new DelegateCommand(param => ButtonClick(Convert.ToInt32(param)))
+                        IsCastle = false,
+                        IsTower = false,
+                        ClickCommand = new DelegateCommand(param => SelectedField = Fields[(int)param])
                     });
                 }
             }
@@ -123,7 +158,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         {
             model.Advance();
             SetupText();
-            ButtonClick(SelectedField);
+            ButtonClick();
         }
         private void SetupText()
         {
@@ -148,37 +183,48 @@ namespace TowerDefenceGame_LPB.ViewModel
                 TurnText = "Kék Építés";
             }
         }
-        public override void ButtonClick(int index)
+        public override void ButtonClick()
         {
-            SelectedField = index;
-            FieldViewModel field = Fields[index];
-            if (field.PlayerType == model.OtherPlayer.Type)
+            SelectedTower = null;
+            OptionFields.Clear();
+            UnitFields.Clear();
+            if (selectedField.PlayerType == model.OtherPlayer.Type)
             {
-                OptionFields.Clear();
+                if(selectedField.Placement is Castle)
+                    SelectedCastle = (Castle)selectedField.Placement;
                 return;
             }
-                
-            if (field.Placement is Barrack || field.Placement is Castle)
+            if (selectedField.IsUnits)
             {
-                OptionFields.Clear();
-                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainBasic", OptionsClickCommand = new DelegateCommand(param=>OptionsButtonClick((string)param)) });
+                foreach (Unit _unit in model.SelectedField.Units)
+                    UnitFields.Add(_unit);
+            }
+            else if (model.Phase % 3 == 0)
+                return;
+            else if (selectedField.Placement is Barrack)
+            {
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainTank", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                Barrack selectedBarrack = (Barrack)SelectedField.Placement;
+                foreach(Unit unit in selectedBarrack.UnitQueue)
+                    UnitFields.Add(unit);
             }
-            else if (field.IsUnits)
+            else if (selectedField.Placement is Castle)
             {
-                OptionFields.Clear();
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "TrainTank", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                SelectedCastle = (Castle)selectedField.Placement;
             }
-            else if (field.Placement is BasicTower ||field.Placement is BomberTower ||field.Placement is SniperTower)
+            else if (selectedField.Placement is BasicTower ||selectedField.Placement is BomberTower ||selectedField.Placement is SniperTower)
             {
-                OptionFields.Clear();
                 //Check if path blocked
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "UpgradeTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "DestroyTower", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                SelectedTower = (Tower)model.SelectedField.Placement;
             }
-           
+
             else
             {
-                OptionFields.Clear();
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type="BuildBasic", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildBomber", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
                 OptionFields.Add(new OptionField { Player = model.CurrentPlayer.Type, Type = "BuildSniper", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
@@ -218,7 +264,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             }
             Money = model.CurrentPlayer.Money;
             RefreshTable();
-            ButtonClick(selectedField);
+            ButtonClick();
         }
     }
 }
