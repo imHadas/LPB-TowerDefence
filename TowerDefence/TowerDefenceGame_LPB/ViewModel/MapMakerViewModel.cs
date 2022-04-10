@@ -90,7 +90,7 @@ namespace TowerDefenceGame_LPB.ViewModel
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
             SetStartingMoneyCommand = new DelegateCommand(p => SetStartingMoney());
-
+            menuOptions = new List<MenuOption>();
             SaveGameCommand = new(p => OnSaveGame());
             LoadGameCommand = new(p => OnLoadGame());
 
@@ -139,7 +139,10 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public override void ButtonClick()
         {
-            menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
+            if(selectedField is not null)
+                menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
+            else
+                menuOptions?.Clear();
             OptionFields.Clear();
             foreach (MenuOption menuOption in menuOptions)
             {
