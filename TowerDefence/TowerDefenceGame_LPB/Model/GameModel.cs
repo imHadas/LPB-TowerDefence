@@ -27,7 +27,11 @@ namespace TowerDefenceGame_LPB.Model
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
         public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
-        public uint Phase { get { return Table.PhaseCounter; } set { Table.PhaseCounter = value; } }
+        public uint Phase
+        {
+            get { return Table.PhaseCounter; }
+            set { Table.PhaseCounter = value; }
+        }
         public Player CurrentPlayer { get; private set; }
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
@@ -50,6 +54,8 @@ namespace TowerDefenceGame_LPB.Model
 
         public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
+            this.gameDataAccess = gameDataAccess;
+
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
             /*Table = new Table(11, 11);
@@ -67,7 +73,6 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            gameDataAccess = new DataAccess.JsonDataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
             Phase = 1;
@@ -79,6 +84,7 @@ namespace TowerDefenceGame_LPB.Model
             bp = new Player(PlayerType.BLUE, new Castle(bp,1,5), bBarracks);
             CurrentPlayer = bp;
             SaveEnabled = true;
+            BuildEnabled = true;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
@@ -106,11 +112,13 @@ namespace TowerDefenceGame_LPB.Model
             {
                 bp.Money += Constants.PASSIVE_INCOME;
                 rp.Money += Constants.PASSIVE_INCOME;
-                BuildEnabled=true;
+                BuildEnabled = true;
+                SaveEnabled = true;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
+                SaveEnabled = true;
                 BuildEnabled = true;
                 CurrentPlayer = rp;
             }
@@ -520,6 +528,7 @@ namespace TowerDefenceGame_LPB.Model
         private void OnGameOver(GameOverType gameOverType)
         {
             BuildEnabled = false;
+            SaveEnabled = false;
             GameOver?.Invoke(this, gameOverType);
         }
 

@@ -218,7 +218,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 foreach (Unit _unit in model.SelectedField.Units)
                     UnitFields.Add(_unit);
             }
-            else if (model.Phase % 3 == 0)
+            else if (!model.BuildEnabled)
                 return;
             else if (selectedField.Placement is Barrack)
             {
