@@ -17,11 +17,19 @@ namespace TowerDefenceGame_LPB.ViewModel
         private Player selectedPlayer;
         private FieldViewModel selectedField;
 
+        private ICollection<MenuOption> menuOptions;
+        public event EventHandler SaveGame;
+        public event EventHandler LoadGame;
+
         public DelegateCommand SelectPlayerCommand { get; set; }
         public DelegateCommand SetGameSizeCommand { get; set; }
         public DelegateCommand SetStartingMoneyCommand { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseMapMakerCommand { get; set; }
+
+        public DelegateCommand SaveGameCommand { get; set; }
+        public DelegateCommand LoadGameCommand { get; set; }
+
         public uint SetGridSizeX { get; set; }
         public uint SetGridSizeY { get; set; }
         public uint SetBlueMoney { get; set; }
@@ -61,7 +69,6 @@ namespace TowerDefenceGame_LPB.ViewModel
                 selectedField = value;
                 if(selectedField is not null)
                 {
-                    model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
                     selectedField.IsSelected = System.Windows.Media.Brushes.Red;
                     selectedField.IsSelectedSize = 3;
                 }
@@ -79,12 +86,25 @@ namespace TowerDefenceGame_LPB.ViewModel
             SetRedMoney = model.RP.Money;
             OptionFields = new ObservableCollection<OptionField>();
             model.NewMapCreated += (sender, args) => RefreshTable();
+            model.GameLoaded += Model_GameLoaded;
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
             SetStartingMoneyCommand = new DelegateCommand(p => SetStartingMoney());
+            menuOptions = new List<MenuOption>();
+            SaveGameCommand = new(p => OnSaveGame());
+            LoadGameCommand = new(p => OnLoadGame());
+
             GenerateTable();
             RefreshTable();
         }
+
+        private void Model_GameLoaded(object? sender, EventArgs e)
+        {
+            GenerateTable();
+            RefreshTable();
+            OnPropertyChanged(nameof(Fields));
+        }
+
         private void GenerateTable()
         {
             Fields = new ObservableCollection<FieldViewModel>();
@@ -119,25 +139,14 @@ namespace TowerDefenceGame_LPB.ViewModel
         }
         public override void ButtonClick()
         {
+            if(selectedField is not null)
+                menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
+            else
+                menuOptions?.Clear();
             OptionFields.Clear();
-            if (selectedField is null) return;
-            if (selectedField.Placement is null)
+            foreach (MenuOption menuOption in menuOptions)
             {
-                if (selectedPlayer is null)
-                {
-                    OptionFields.Add(new OptionField { Type = "BuildMountain", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                    OptionFields.Add(new OptionField{Type = "BuildLake",OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param))});
-                }
-                else
-                {
-                    OptionFields.Add(new OptionField { Type = "BuildCastle", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                    OptionFields.Add(new OptionField { Type = "BuildBarrack", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
-                }
-                
-            }
-            else if (selectedField.Placement is not null)
-            {
-                OptionFields.Add(new OptionField { Type = "DestroyPlacement", OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
+                OptionFields.Add(new OptionField { Type = menuOption.ToString(), OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
         }
 
@@ -205,6 +214,16 @@ namespace TowerDefenceGame_LPB.ViewModel
                     SelectedPlayer = null;
                     break;
             }
+        }
+
+        private void OnSaveGame()
+        {
+            SaveGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnLoadGame()
+        {
+            LoadGame?.Invoke(this, EventArgs.Empty);
         }
     }
 }

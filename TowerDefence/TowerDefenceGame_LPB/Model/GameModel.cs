@@ -475,7 +475,7 @@ namespace TowerDefenceGame_LPB.Model
                     options.Add(MenuOption.BuildSniper);
                 }
             }
-            else if(BuildEnabled && SelectedField.Placement.Owner == CurrentPlayer)
+            else if(BuildEnabled && SelectedField.Placement.OwnerType == CurrentPlayer.Type)
             {
                 switch (SelectedField.Placement)
                 {

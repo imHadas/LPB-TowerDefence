@@ -13,8 +13,6 @@ namespace TowerDefenceGame_LPB.Model
     {
         private Player rp;
         private Player bp;
-        private ICollection<Barrack> rBarracks;
-        private ICollection<Barrack> bBarracks;
 
 
         public Player RP
@@ -32,19 +30,17 @@ namespace TowerDefenceGame_LPB.Model
         public Player SelectedPlayer { get; set; }
         public event EventHandler NewMapCreated;
 
-        public MapMakerModel()
+        public MapMakerModel(IDataAccess<GameSaveObject> dataAccess)
         {
+            this.gameDataAccess = dataAccess;
             CreateNewMap();
         }
 
         public void CreateNewMap()
         {
             SetupTable(11, 11);
-            rBarracks = new HashSet<Barrack>();
-            bBarracks = new HashSet<Barrack>();
-            Castle rCastle = null, bCastle = null;
-            rp = new Player(PlayerType.RED, rCastle, rBarracks);
-            bp = new Player(PlayerType.BLUE, bCastle, bBarracks);
+            rp = new Player(PlayerType.RED);
+            bp = new Player(PlayerType.BLUE);
             SelectedPlayer = null;
             if (NewMapCreated != null)
                 NewMapCreated(this, EventArgs.Empty);
@@ -59,7 +55,7 @@ namespace TowerDefenceGame_LPB.Model
                 for (uint j = 0; j < width; j++)
                 {
                     if (Table.Size.x > i && Table.Size.y > j)
-                        newTable[i,j] = Table[i,j];
+                        newTable[i, j] = Table[i, j];
                     else
                         newTable[i, j] = new Field(i, j);
                     allCoords.Add((i, j));
@@ -69,8 +65,8 @@ namespace TowerDefenceGame_LPB.Model
             //nulling everything, re checking if item has been cut off of map
             rp.Castle = null;
             bp.Castle = null;
-            rBarracks = new HashSet<Barrack>();
-            bBarracks = new HashSet<Barrack>();
+            rp.Barracks = new HashSet<Barrack>();
+            bp.Barracks = new HashSet<Barrack>();
             //re checking
             foreach (Field field in Table)
             {
@@ -78,10 +74,7 @@ namespace TowerDefenceGame_LPB.Model
                     field.Owner.Castle = (Castle)field.Placement;
                 if (field.Placement is Barrack)
                 {
-                    if(field.Owner == rp)
-                        rBarracks.Add((Barrack)field.Placement);
-                    else if(field.Owner == bp)
-                        bBarracks.Add((Barrack)field.Placement);
+                    field.Owner.Barracks.Add((Barrack) field.Placement);
                 }
             }
             pathfinder = new AStar(Table);
@@ -94,11 +87,16 @@ namespace TowerDefenceGame_LPB.Model
             ICollection<MenuOption> options = new List<MenuOption>();
             if (SelectedField.Placement is null) //can expand to depend on selected player
             {
-                options.Add(MenuOption.BuildCastle);
-                options.Add(MenuOption.BuildBarrack);
-                options.Add(MenuOption.BuildMountain);
-                options.Add(MenuOption.BuildLake);
-
+                if (SelectedPlayer is null)
+                {
+                    options.Add(MenuOption.BuildMountain);
+                    options.Add(MenuOption.BuildLake);
+                }
+                else
+                {
+                    options.Add(MenuOption.BuildCastle);
+                    options.Add(MenuOption.BuildBarrack);
+                }
             }
             else if (SelectedField.Placement is not null)
             {
@@ -156,21 +154,21 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot build barrack on non-empty field");
             if (SelectedPlayer.Barracks.Count >= 2) //doesn't work currently with immutable set
                 throw new InvalidPlacementException(SelectedField, "Cannot build more than two barracks per player");
-            
+
             Barrack barrack = new Barrack(SelectedPlayer, SelectedField.Coords.x, SelectedField.Coords.y);
             switch (SelectedPlayer.Type) //temporary
             {
                 case (PlayerType.BLUE):
-                    if (bBarracks.Count >= 2)
+                    if (bp.Barracks.Count >= 2)
                         throw new InvalidPlacementException(SelectedField,
                             "Cannot build more than two barracks per player");
-                    bBarracks.Add(barrack);
+                    bp.Barracks.Add(barrack);
                     break;
                 case (PlayerType.RED):
-                    if(rBarracks.Count >=2)
+                    if (rp.Barracks.Count >= 2)
                         throw new InvalidPlacementException(SelectedField,
                             "Cannot build more than two barracks per player");
-                    rBarracks.Add(barrack);
+                    rp.Barracks.Add(barrack);
                     break;
             }
             //SelectedPlayer.Barracks.Add(barrack); //Cannot add because its immutable
@@ -178,9 +176,9 @@ namespace TowerDefenceGame_LPB.Model
             if (!ValidatePath())
             {
                 if (SelectedPlayer == rp)
-                    rBarracks.Remove(barrack);
+                    rp.Barracks.Remove(barrack);
                 else if (SelectedPlayer == bp)
-                    bBarracks.Remove(barrack);
+                    bp.Barracks.Remove(barrack);
                 SelectedField.Placement = null;
                 throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
             }
@@ -191,7 +189,7 @@ namespace TowerDefenceGame_LPB.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot build barrack for players");
             if (SelectedField.Placement is not null)
                 throw new InvalidPlacementException(SelectedField, "Cannot build terrain on non-empty field");
-            SelectedField.Placement = new Terrain(SelectedField.Coords.x, SelectedField.Coords.y,type);
+            SelectedField.Placement = new Terrain(SelectedField.Coords.x, SelectedField.Coords.y, type);
             if (!ValidatePath())
             {
                 SelectedField.Placement = null;
@@ -202,15 +200,15 @@ namespace TowerDefenceGame_LPB.Model
         private bool ValidatePath()
         {
             IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
-            foreach (Barrack barrack in rBarracks)
+            foreach (Barrack barrack in rp.Barracks)
             {
-                if(bp.Castle is null)
+                if (bp.Castle is null)
                     return true;
                 path = FindPath(barrack.Coords, bp.Castle.Coords);
-                if (path.Count == 0 || path.Last() != bp.Castle.Coords )
+                if (path.Count == 0 || path.Last() != bp.Castle.Coords)
                     return false;
             }
-            foreach (Barrack barrack in bBarracks)
+            foreach (Barrack barrack in bp.Barracks)
             {
                 if (rp.Castle is null)
                     return true;
@@ -234,16 +232,46 @@ namespace TowerDefenceGame_LPB.Model
                     break;
                 case Barrack:
                     if (SelectedField.Owner == bp)
-                        bBarracks.Remove((Barrack)SelectedField.Placement);
+                        bp.Barracks.Remove((Barrack)SelectedField.Placement);
                     else if (SelectedField.Owner == rp)
-                        rBarracks.Remove((Barrack) SelectedField.Placement);
+                        rp.Barracks.Remove((Barrack)SelectedField.Placement);
                     SelectedField.Placement = null;
                     break;
                 case Terrain:
                     SelectedField.Placement = null;
                     break;
             }
-            
+
+        }
+
+        public async Task SaveGameAsync(string path)
+        {
+            if (gameDataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+
+            if (!ValidatePath()) throw new Exception("Path is blocked between barracks and castles");
+            if (rp.Castle == null || bp.Castle == null || rp.Barracks.Count != 2 || bp.Barracks.Count != 2)
+                throw new Exception("Map contains invalid amount of castles and/or barracks");
+
+            await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
+        }
+
+        public async Task LoadGameAsync(string path)
+        {
+            if (gameDataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+
+            GameSaveObject save = await gameDataAccess.LoadAsync(path);
+            (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
+
+            OnGameLoaded();
+        }
+
+        public event EventHandler GameLoaded;
+        
+        private void OnGameLoaded()
+        {
+            GameLoaded?.Invoke(this, EventArgs.Empty);
         }
     }
 }
