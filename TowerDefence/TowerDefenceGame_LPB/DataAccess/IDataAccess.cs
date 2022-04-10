@@ -4,9 +4,9 @@ using TowerDefenceGame_LPB.Persistence;
 
 namespace TowerDefenceGame_LPB.DataAccess
 {
-    public interface IDataAccess
+    public interface IDataAccess<TSaveObject> where TSaveObject : SaveObject
     {
-        Task<Table> LoadAsync(String path);
-        Task SaveAsync(String path, Table table);
+        Task<TSaveObject> LoadAsync(string path);
+        Task SaveAsync(string path, TSaveObject saveObject);
     }
 }

@@ -25,9 +25,9 @@ namespace TowerDefenceGame_LPB.Model
         #region Properties
 
         public bool SaveEnabled { get; private set; }
-        public bool BuildEnabled { get; private set; }
-        public int Round { get; set; }
-        public int Phase { get; set; }
+        public bool BuildEnabled { get; set; }
+        public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
+        public uint Phase { get { return Table.PhaseCounter; } set { Table.PhaseCounter = value; } }
         public Player CurrentPlayer { get; private set; }
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
@@ -46,7 +46,7 @@ namespace TowerDefenceGame_LPB.Model
 
         #endregion
 
-        public GameModel(IDataAccess dataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
+        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
         {
             //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
 
@@ -65,22 +65,24 @@ namespace TowerDefenceGame_LPB.Model
 
         public void NewGame()
         {
-            Phase = 1;
-            Round = 1;
+            gameDataAccess = new DataAccess.JsonDataAccess();
             //Table = new Table(11, 11);
             SetupTable(10,15);
+            Phase = 1;
             ICollection<Barrack> rBarracks = new HashSet<Barrack>();
             ICollection<Barrack> bBarracks = new HashSet<Barrack>();
             rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
             bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, (9,5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, (1,5), bBarracks);
+            rp = new Player(PlayerType.RED, new Castle(rp,9,5) ,rBarracks);
+            bp = new Player(PlayerType.BLUE, new Castle(bp,1,5), bBarracks);
             CurrentPlayer = bp;
+            SaveEnabled = true;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
             if(NewGameCreated != null)
                 NewGameCreated(this, EventArgs.Empty);
+            
         }
 
         /// <summary>
@@ -94,18 +96,18 @@ namespace TowerDefenceGame_LPB.Model
             if(Phase % 3 == 0)
             {
                 BuildEnabled = false; // in attack phase you can't build, or place units
-                Round++;
+                SaveEnabled = false;
                 PlaceUnits();
                 Attack();
             }
             else if(Phase % 3 == 1)
             {
-                BuildEnabled = !IsGameOver;
+                BuildEnabled=true;
                 CurrentPlayer = bp;
             }
             else if(Phase % 3 == 2)
             {
-                BuildEnabled = !IsGameOver;
+                BuildEnabled = true;
                 CurrentPlayer = rp;
             }
         }
@@ -264,9 +266,10 @@ namespace TowerDefenceGame_LPB.Model
         {
             foreach(Barrack barrack in player.Barracks)
             {
+                
                 uint x = barrack.Coords.x;
                 uint y = barrack.Coords.y;
-                Table[x, y].Placement = new Barrack(player, x, y);
+                Table[x, y].Placement = barrack;
             }
         }
 
@@ -401,6 +404,14 @@ namespace TowerDefenceGame_LPB.Model
         {
             BuildEnabled = false;
             GameOver?.Invoke(this, gameOverType);
+        }
+
+        public async Task SaveGameAsync(string path)
+        {
+            if (gameDataAccess == null)
+                throw new InvalidOperationException("No data access is provided.");
+
+            await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
         }
     }
 }

@@ -17,14 +17,32 @@ namespace TowerDefenceGame_LPB.ViewModel
         private int redBasic;
         private int redTank;
         private bool isUnits;
-        private bool isCastle;
+        private bool isTower; // wanna find another way for this
+        private bool isCastle; // guess who's back
+        /*
         private bool isBarrack;
-        private bool isBasicTower;
         private bool isSniperTower;
         private bool isBomberTower;
+        */
         private Brush isSelected;
         private PlayerType playerType;
         private Placement placement;
+        private string placementType;
+        private int isSelectedSize;
+
+        public int IsSelectedSize
+        {
+            get { return isSelectedSize; }
+            set { isSelectedSize = value; OnPropertyChanged(); }
+        }
+
+
+        public string PlacementType
+        {
+            get { return placementType; }
+            set { placementType = value; OnPropertyChanged();}
+        }
+
 
         public int Number { get; set; }
         public (int x, int y) Coords { get; set; }
@@ -35,17 +53,49 @@ namespace TowerDefenceGame_LPB.ViewModel
             set 
             {
                 placement = value;
+                IsTower = false;
+                IsCastle = false;
                 //OnPropertyChanged(); //kinda unnecessary
                 if (placement is null)
                 {
-                    IsBarrack = false; IsCastle = false; IsBasicTower = false; IsBomberTower = false; IsSniperTower = false; 
+                    PlacementType = "";
                     return;
                 }
+
+                switch (placement)
+                {
+                    case Barrack:
+                        PlacementType = "Barrack";
+                        break;
+                    case Castle:
+                        PlacementType = "Castle";
+                        IsCastle = true;
+                        break;
+                    case BasicTower:
+                        PlacementType = "BasicTower";
+                        IsTower = true;
+                        break;
+                    case BomberTower:
+                        PlacementType = "BomberTower";
+                        IsTower = true;
+                        break;
+                    case SniperTower:
+                        PlacementType = "SniperTower";
+                        IsTower = true;
+                        break;
+                    case Terrain:
+                        Terrain terrain = value as Terrain;
+                        PlacementType = terrain.Type.ToString(); //better way to reference Type from terrain?
+                        break;
+                }
+                
+                /*
                 IsBarrack = placement.GetType() == typeof(Barrack) ? true : false;
                 IsCastle = placement.GetType() == typeof(Castle) ? true : false;
                 IsBasicTower = placement.GetType() == typeof(BasicTower) ? true : false;
                 IsBomberTower = placement.GetType() == typeof(BomberTower) ? true : false;
                 IsSniperTower = placement.GetType() == typeof(SniperTower) ? true : false;
+                 */
             }
         }
 
@@ -58,16 +108,17 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             } 
         }
-
-        public bool IsBasicTower
+        
+        public bool IsTower
         {
-            get { return isBasicTower; }
+            get { return isTower; }
             set 
             {
-                isBasicTower = value;
+                isTower = value;
                 OnPropertyChanged();
             }
         }
+        /*
         public bool IsSniperTower
         {
             get { return isSniperTower; }
@@ -97,8 +148,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             }
         }
-
-
+        */
         public bool IsCastle
         {
             get { return isCastle; }
@@ -108,7 +158,6 @@ namespace TowerDefenceGame_LPB.ViewModel
                 OnPropertyChanged();
             }
         }
-
 
         public bool IsUnits
         {
