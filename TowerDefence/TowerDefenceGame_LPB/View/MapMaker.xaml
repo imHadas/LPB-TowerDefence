@@ -65,7 +65,8 @@
             <Label Grid.Column="6" Grid.Row="1" Content="{Binding RedMoney}" FontWeight="ExtraBold" Foreground="Red" HorizontalAlignment="Center"/>
             <Button Grid.Column="7" Grid.Row="1" Content="Beállítás" Command="{Binding SetStartingMoneyCommand}"/>
         </Grid>
-        <ItemsControl Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Fields}">
+        <Viewbox Grid.Column="0" Grid.Row="2" Stretch="Uniform">
+        <ItemsControl ItemsSource="{Binding Fields}" HorizontalAlignment="Center" VerticalAlignment="Center">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding GridSizeX}" Columns="{Binding GridSizeY}"/>
@@ -73,8 +74,8 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="{Binding IsSelectedSize}" BorderBrush="{Binding IsSelected}">
-                        <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
+                        <Border BorderThickness="{Binding IsSelectedSize}" BorderBrush="{Binding IsSelected}">
+                            <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" MinWidth="44" MinHeight="44">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
@@ -130,10 +131,11 @@
                                 </Image>
                                 </Grid>
                         </Button>
-                    </Border>
-                </DataTemplate>
+                        </Border>
+                    </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        </Viewbox>
         <ItemsControl Grid.Column="1" Grid.Row="2" ItemsSource="{Binding OptionFields}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
