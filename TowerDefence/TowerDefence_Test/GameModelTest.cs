@@ -4,6 +4,7 @@ using TowerDefenceGame_LPB.Persistence;
 using TowerDefenceGame_LPB.Model;
 using TowerDefenceGame_LPB.DataAccess;
 using System;
+using System.Threading.Tasks;
 
 namespace TowerDefence_Test
 {
@@ -56,7 +57,7 @@ namespace TowerDefence_Test
         }
 
         [TestMethod]
-        public void NewGame()
+        public void NewGameTest()
         {
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
@@ -228,6 +229,64 @@ namespace TowerDefence_Test
             Model.SelectOption(MenuOption.DestroyTower);
             Assert.IsNull(Model.Table[0, 0].Placement);
             Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY );
+        }
+
+        [TestMethod, TestCategory("FireTower")]
+        public async Task FireTowerTest()
+        {
+            Model = MakeGameModel();
+            Assert.IsNotNull(Model);
+
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
+
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
+
+            uint X = 0, Y = 0;
+
+            foreach(Barrack barrack in Model.CurrentPlayer.Barracks)
+            {
+                if(barrack.UnitQueue.Count == 1)
+                {
+                    X = barrack.Coords.x;
+                    Y = barrack.Coords.y;
+                }
+            }
+
+            if (X < Model.Table.Size.x - 1)
+            {
+                X++;
+            }
+            else
+            {
+                X--;
+            }
+
+            Assert.IsTrue(Model.Phase == 1);
+            Model.Advance();
+            Assert.IsTrue(Model.Phase == 2);
+
+            Model.SelectField(Model.Table[X, Y]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[X, Y].Placement);
+            Assert.IsTrue(Model.Table[X, Y]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+            Assert.IsTrue(((Tower)Model.Table[X, Y]?.Placement)?.Speed == 3);
+
+            Model.Advance();
+            await Task.Delay(1200);
+            Assert.IsTrue(Model.Phase == 3);
+            Assert.IsTrue(((Tower)Model.Table[X, Y]?.Placement)?.Speed == 3);
+            Model.Advance();
+            Assert.IsTrue(Model.Phase == 4);
+
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.OtherPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
+
         }
     }
 }

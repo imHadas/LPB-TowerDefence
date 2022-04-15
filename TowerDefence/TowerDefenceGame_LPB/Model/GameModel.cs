@@ -294,10 +294,7 @@ namespace TowerDefenceGame_LPB.Model
                                 }
                                 if (unit.Health == 0)
                                 {
-                                    if (unit.GetType() == typeof(TankUnit))
-                                        rp.Money += 10;
-                                    else
-                                        rp.Money += 5;
+                                    rp.Money += unit.Cost / 2;
                                     unit.Owner.Units.Remove(unit);
                                     Table[(uint)i, (uint)j].Units.Remove(unit);
                                     tower.Fire();
@@ -328,10 +325,7 @@ namespace TowerDefenceGame_LPB.Model
                                     }
                                     if (unit.Health == 0)
                                     {
-                                        if (unit.GetType() == typeof(TankUnit))
-                                            bp.Money += 10;
-                                        else
-                                            bp.Money += 5;
+                                        bp.Money += unit.Cost / 2;
                                         unit.Owner.Units.Remove(unit);
                                         Table[(uint)i, (uint)j].Units.Remove(unit);
                                         tower.Fire();
