@@ -274,12 +274,10 @@ namespace TowerDefence_Test
             Assert.IsNotNull(Model.Table[X, Y].Placement);
             Assert.IsTrue(Model.Table[X, Y]?.Placement?.GetType() == typeof(BasicTower));
             Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
-            Assert.IsTrue(((Tower)Model.Table[X, Y]?.Placement)?.Speed == 3);
 
             Model.Advance();
             await Task.Delay(1200);
             Assert.IsTrue(Model.Phase == 3);
-            Assert.IsTrue(((Tower)Model.Table[X, Y]?.Placement)?.Speed == 3);
             Model.Advance();
             Assert.IsTrue(Model.Phase == 4);
 
@@ -287,6 +285,106 @@ namespace TowerDefence_Test
             Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
             Assert.IsTrue(Model.OtherPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
 
+        }
+
+
+        [TestMethod, TestCategory("UpgradeTower"), TestCategory("Level two")]
+        public void UpgradeTowerLvl2()
+        {
+            Model = MakeGameModel();
+            Assert.IsNotNull(Model);
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+
+            uint damage = ((Tower)Model.Table[0, 0]?.Placement).Damage;
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(damage == ((Tower)Model.Table[0, 0]?.Placement).Damage);
+            Assert.IsTrue(((Tower)Model.Table[0, 0]?.Placement).Level == 2);
+        }
+
+        [TestMethod, TestCategory("UpgradeTower"), TestCategory("Level max")]
+        public void UpgradeTowerLvlMax()
+        {
+            Model = MakeGameModel();
+            Assert.IsNotNull(Model);
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+
+            uint damage = ((Tower)Model.Table[0, 0]?.Placement).Damage;
+            uint speed = ((Tower)Model.Table[0, 0]?.Placement).Speed;
+            uint range = ((Tower)Model.Table[0, 0]?.Placement).Range;
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(damage == ((Tower)Model.Table[0, 0]?.Placement).Damage);
+            Assert.IsTrue(((Tower)Model.Table[0, 0]?.Placement).Level == 2);
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(speed == ((Tower)Model.Table[0, 0]?.Placement).Speed);
+            Assert.IsTrue(((Tower)Model.Table[0, 0]?.Placement).Level == 3);
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(range == ((Tower)Model.Table[0, 0]?.Placement).Range);
+            Assert.IsTrue(((Tower)Model.Table[0, 0]?.Placement).Level == 4);
+        }
+
+        [TestMethod]
+        public async Task GameOverTest()
+        {
+            Model = MakeGameModel();
+            Assert.IsNotNull(Model);
+
+            while (Model.CurrentPlayer.Money != 0)
+            {
+                Model.SelectOption(MenuOption.TrainBasic);
+            }
+
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
+            await Task.Delay(3000);
+
+            Assert.IsTrue(Model.Round == 2);
+            Assert.IsFalse(Model.GameOverProp);
+
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
+            await Task.Delay(3000);
+
+            Assert.IsTrue(Model.Round == 3);
+            Assert.IsFalse(Model.GameOverProp);
+
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
+            await Task.Delay(3000);
+
+            Assert.IsTrue(Model.Round == 4);
+            Assert.IsFalse(Model.GameOverProp);
+
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
+            await Task.Delay(3200);
+
+            Assert.IsTrue(Model.Round == 5);
+            Assert.IsTrue(Model.GameOverProp);
+            Assert.IsFalse(Model.SaveEnabled);
+            Assert.IsFalse(Model.BuildEnabled);
+            
         }
     }
 }

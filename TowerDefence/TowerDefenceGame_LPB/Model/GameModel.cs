@@ -26,6 +26,7 @@ namespace TowerDefenceGame_LPB.Model
 
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
+        public bool GameOverProp { get; private set; }
         public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
         public uint Phase
         {
@@ -85,6 +86,7 @@ namespace TowerDefenceGame_LPB.Model
             CurrentPlayer = bp;
             SaveEnabled = true;
             BuildEnabled = true;
+            GameOverProp = false;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
@@ -523,6 +525,7 @@ namespace TowerDefenceGame_LPB.Model
         {
             BuildEnabled = false;
             SaveEnabled = false;
+            GameOverProp = true;
             GameOver?.Invoke(this, gameOverType);
         }
 
