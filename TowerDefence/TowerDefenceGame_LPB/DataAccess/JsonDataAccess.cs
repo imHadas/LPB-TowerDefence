@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceBackend.Persistence;
 using System.IO;
 using System.Text.Json;  //use the .NET 6 serializer
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
-namespace TowerDefenceGame_LPB.DataAccess
+namespace TowerDefenceBackend.DataAccess
 {
     internal class StringifiedUnit
     {

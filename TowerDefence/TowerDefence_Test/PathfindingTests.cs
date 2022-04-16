@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using TowerDefenceGame_LPB.Persistence;
-using TowerDefenceGame_LPB.Model;
+using TowerDefenceBackend.Persistence;
+using TowerDefenceBackend.Model;
 using System;
 
 namespace TowerDefence_Test

@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace TowerDefenceGame_LPB.View
+namespace TowerDefenceWPF.View
 {
     /// <summary>
-    /// Interaction logic for DialogBox.xaml
+    /// Interaction logic for MapMaker.xaml
     /// </summary>
-    public partial class DialogBox : Window
+    public partial class MapMaker : Window
     {
-        public DialogBox()
+        public MapMaker()
         {
             InitializeComponent();
         }

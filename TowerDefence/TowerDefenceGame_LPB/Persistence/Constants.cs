@@ -1,4 +1,4 @@
-﻿namespace TowerDefenceGame_LPB.Persistence
+﻿namespace TowerDefenceBackend.Persistence
 {
     /// <summary>
     /// We could store all constants here, up for debate

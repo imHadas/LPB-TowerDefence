@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using TowerDefenceGame_LPB.Model;
-using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceBackend.Model;
+using TowerDefenceBackend.Persistence;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
-    internal class MapMakerViewModel : MainViewModel
+    public class MapMakerViewModel : MainViewModel
     {
         private MapMakerModel model;
         private Player selectedPlayer;
@@ -63,13 +58,13 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 if (selectedField is not null)
                 {
-                    selectedField.IsSelected = System.Windows.Media.Brushes.Black;
+                    selectedField.IsSelected = false;
                     selectedField.IsSelectedSize = 1;
                 }
                 selectedField = value;
                 if(selectedField is not null)
                 {
-                    selectedField.IsSelected = System.Windows.Media.Brushes.Red;
+                    selectedField.IsSelected = true;
                     selectedField.IsSelectedSize = 3;
                 }
                 ButtonClick();
@@ -122,7 +117,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                         RedTank = 0,
                         PlayerType = model.Table[(uint)i, (uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
                         Placement = model.Table[(uint)i, (uint)j].Placement,
-                        IsSelected =  System.Windows.Media.Brushes.Black,
+                        IsSelected =  false,
                         IsSelectedSize = 1,
                         ClickCommand = new DelegateCommand(param => SelectedField = Fields[(int)param])
                     });
@@ -196,8 +191,15 @@ namespace TowerDefenceGame_LPB.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                OnSendMessage(ex.Message);
             }
+        }
+
+        public event EventHandler<string> MessageSender;
+
+        private void OnSendMessage(string msg)
+        {
+            MessageSender?.Invoke(this, msg);
         }
 
         public void SelectPlayer(string type)

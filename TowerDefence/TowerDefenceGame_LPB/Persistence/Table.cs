@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace TowerDefenceGame_LPB.Persistence
+namespace TowerDefenceBackend.Persistence
 {
     public class Table : IEnumerable
     {

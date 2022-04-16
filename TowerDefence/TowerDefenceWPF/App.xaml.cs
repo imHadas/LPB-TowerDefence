@@ -2,12 +2,12 @@
 using System.Windows;
 using Microsoft.Win32;
 using System.Windows.Threading;
-using TowerDefenceGame_LPB.ViewModel;
-using TowerDefenceGame_LPB.Model;
-using TowerDefenceGame_LPB.DataAccess;
-using TowerDefenceGame_LPB.View;
+using TowerDefenceBackend.ViewModel;
+using TowerDefenceBackend.Model;
+using TowerDefenceBackend.DataAccess;
+using TowerDefenceWPF.View;
 
-namespace TowerDefenceGame_LPB
+namespace TowerDefenceWPF
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -55,6 +55,7 @@ namespace TowerDefenceGame_LPB
             _mapMakerViewModel.ExitCommand = new DelegateCommand(p => ExitFromMapMaker());
             _mapMakerViewModel.SaveGame += _mapMakerViewModel_SaveGame;
             _mapMakerViewModel.LoadGame += _mapMakerViewModel_LoadGame;
+            _mapMakerViewModel.MessageSender += _mapMakerViewModel_MessageSender;
 
             //Creating main menu
             _mainMenu = new MainMenu();
@@ -68,6 +69,11 @@ namespace TowerDefenceGame_LPB
             //_view.DataContext = _viewModel;
             //_view.Show();
 
+        }
+
+        private void _mapMakerViewModel_MessageSender(object? sender, string e)
+        {
+            MessageBox.Show(e);
         }
 
         private async void _mapMakerViewModel_LoadGame(object? sender, EventArgs e)

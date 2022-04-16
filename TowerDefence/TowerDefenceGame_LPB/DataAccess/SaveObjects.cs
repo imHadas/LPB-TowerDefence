@@ -1,6 +1,6 @@
-﻿using TowerDefenceGame_LPB.Persistence;
+﻿using TowerDefenceBackend.Persistence;
 
-namespace TowerDefenceGame_LPB.DataAccess
+namespace TowerDefenceBackend.DataAccess
 {
     public abstract class SaveObject
     {

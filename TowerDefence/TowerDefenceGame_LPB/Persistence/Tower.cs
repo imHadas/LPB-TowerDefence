@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TowerDefenceGame_LPB.Persistence
+namespace TowerDefenceBackend.Persistence
 {
     public abstract class Tower : Placement
     {

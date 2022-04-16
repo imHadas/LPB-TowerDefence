@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TowerDefenceGame_LPB", "TowerDefenceGame_LPB\TowerDefenceGame_LPB.csproj", "{5008EE0F-356D-4A87-9B6E-304DF4FD1795}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TowerDefenceBackend", "TowerDefenceGame_LPB\TowerDefenceBackend.csproj", "{5008EE0F-356D-4A87-9B6E-304DF4FD1795}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TowerDefence_Test", "TowerDefence_Test\TowerDefence_Test.csproj", "{BEF13C96-5E6E-49B9-9D3A-1EA7CCB755BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TowerDefence_Test", "TowerDefence_Test\TowerDefence_Test.csproj", "{BEF13C96-5E6E-49B9-9D3A-1EA7CCB755BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TowerDefenceWPF", "TowerDefenceWPF\TowerDefenceWPF.csproj", "{3C6EFEA0-6EC0-4CF8-9D68-1EC7D5B1713B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{BEF13C96-5E6E-49B9-9D3A-1EA7CCB755BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEF13C96-5E6E-49B9-9D3A-1EA7CCB755BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEF13C96-5E6E-49B9-9D3A-1EA7CCB755BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C6EFEA0-6EC0-4CF8-9D68-1EC7D5B1713B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C6EFEA0-6EC0-4CF8-9D68-1EC7D5B1713B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C6EFEA0-6EC0-4CF8-9D68-1EC7D5B1713B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C6EFEA0-6EC0-4CF8-9D68-1EC7D5B1713B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

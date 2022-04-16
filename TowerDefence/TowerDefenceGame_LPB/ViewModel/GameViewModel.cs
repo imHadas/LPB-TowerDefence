@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using TowerDefenceGame_LPB.Persistence;
-using TowerDefenceGame_LPB.Model;
+using TowerDefenceBackend.Persistence;
+using TowerDefenceBackend.Model;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
     public class GameViewModel : MainViewModel
     {
@@ -53,13 +53,13 @@ namespace TowerDefenceGame_LPB.ViewModel
             {
                 if(selectedField is not null)
                 {
-                    selectedField.IsSelected = System.Windows.Media.Brushes.Black;
+                    selectedField.IsSelected = false;
                     selectedField.IsSelectedSize = 1;
                 }
                 selectedField = value;
                 if (selectedField is not null)
                 {
-                    selectedField.IsSelected = System.Windows.Media.Brushes.Red;
+                    selectedField.IsSelected = true;
                     selectedField.IsSelectedSize = 3;
                     ButtonClick();
                 }
@@ -139,7 +139,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                         RedTank = 0,
                         PlayerType = model.Table[(uint)i, (uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
                         Placement = model.Table[(uint)i, (uint)j].Placement,
-                        IsSelected =  System.Windows.Media.Brushes.Black,
+                        IsSelected =  false,
                         IsSelectedSize = 1,
                         IsCastle = false,
                         IsTower = false,
