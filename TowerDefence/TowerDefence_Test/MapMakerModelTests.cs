@@ -132,5 +132,64 @@ namespace TowerDefence_Test
             Assert.IsTrue(Model.Table[0, 2].Placement.GetType() == typeof(Barrack));
             Assert.IsTrue(Model.Table[0, 2].Placement.Owner == Model.RP);
         }
+
+        [TestMethod]
+        public void DestroyPlacementTest()
+        {
+            Model = MakeMapMakerModel();
+            Assert.IsNotNull(Model);
+
+            Model.SelectedPlayer = Model.BP;
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBarrack);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Barrack));
+            Assert.IsTrue(Model.Table[0, 0].Placement.Owner == Model.BP);
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.DestroyPlacement);
+            Assert.IsNull(Model.Table[0, 0].Placement);
+        }
+
+        [TestMethod]
+        public void ObstructedPathForBarrack()
+        {
+            Model = MakeMapMakerModel();
+            Assert.IsNotNull(Model);
+
+            Model.SelectedPlayer = Model.BP;
+
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBarrack);
+            Assert.IsTrue(Model?.Table[1, 0]?.Placement?.GetType() == typeof(Barrack));
+
+            Model.SelectedPlayer = null;
+
+            Model.SelectField(Model.Table[0, 1]);
+            Model.SelectOption(MenuOption.BuildMountain);
+            Assert.IsTrue(((Terrain)Model.Table[1, 0].Placement).Type == TerrainType.Mountain);
+
+            Model.SelectedPlayer = Model.RP;
+
+            Model.SelectField(Model.Table[0, 2]);
+            Model.SelectOption(MenuOption.BuildCastle);
+            Assert.IsTrue(Model?.Table[1, 0]?.Placement?.GetType() == typeof(Castle));
+
+            Model.SelectedPlayer = null;
+
+            try
+            {
+                Model.SelectField(Model.Table[1, 0]);
+                Model.SelectOption(MenuOption.BuildMountain);
+            }
+            catch (InvalidPlacementException ex)
+            {
+                Assert.IsTrue(Model.Table[1, 0].Placement == null);
+            }
+
+        }
+
+
     }
 }
