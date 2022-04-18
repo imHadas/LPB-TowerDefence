@@ -10,11 +10,12 @@ stages:
 build_backend:
   stage: build
   script:
-    - 'dotnet build TowerDefence\TowerDefenceGame_LPB -c Release'
+    - 'dotnet restore TowerDefence/TowerDefenceGame_LPB'
+    - 'dotnet build TowerDefence/TowerDefenceGame_LPB -c Release'
   artifacts:
     expire_in: 2 days
     paths:
-      - 'TowerDefence\TowerDefenceGame_LPB\bin\Release'
+      - 'TowerDefence/TowerDefenceGame_LPB/bin/Release'
 
 build_view:
   stage: build
@@ -23,17 +24,19 @@ build_view:
   dependencies:
     - build_backend
   script:
-    - 'dotnet build TowerDefence\TowerDefenceWPF -c Release'
+    - 'dotnet restore TowerDefence/TowerDefenceWPF'
+    - 'dotnet build TowerDefence/TowerDefenceWPF -c Release'
   
 
 build_test:
   stage: build
   script:
-    - 'dotnet build TowerDefence\TowerDefence_Test'
+    - 'dotnet restore TowerDefence/TowerDefence_Test'
+    - 'dotnet build TowerDefence/TowerDefence_Test'
   artifacts:
     expire_in: 2 days
     paths:
-      - 'TowerDefence\TowerDefence_Test\'
+      - 'TowerDefence/TowerDefence_Test/'
 
 # Test
 test_model:
@@ -42,8 +45,8 @@ test_model:
     - build_backend
     - build_test
   script:
-    - 'dotnet test TowerDefence\TowerDefence_Test'
+    - 'dotnet test TowerDefence/TowerDefence_Test'
   artifacts:
     expire_in: 1 week
     paths:
-      - '.\TestResult.xml'
+      - './TestResults'
