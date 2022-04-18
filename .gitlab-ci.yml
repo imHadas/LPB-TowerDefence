@@ -6,17 +6,18 @@ stages:
   - test
 #  - deploy
 
-# Build
+# Build Backend
 build_backend:
   stage: build
   script:
-    - 'dotnet restore TowerDefence/TowerDefenceGame_LPB'
     - 'dotnet build TowerDefence/TowerDefenceGame_LPB -c Release'
   artifacts:
     expire_in: 2 days
     paths:
       - 'TowerDefence/TowerDefenceGame_LPB/bin/Release'
+      - 'TowerDefence/TowerDefenceGame_LPB/obj/Release'
 
+#Build WPF View
 build_view:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
@@ -24,29 +25,30 @@ build_view:
   dependencies:
     - build_backend
   script:
-    - 'dotnet restore TowerDefence/TowerDefenceWPF'
     - 'dotnet build TowerDefence/TowerDefenceWPF -c Release'
   
-
+# Build Test
+# Will recompile Backend because it needs Debug build
 build_test:
   stage: build
+  dependencies:
   script:
-    - 'dotnet restore TowerDefence/TowerDefence_Test'
     - 'dotnet build TowerDefence/TowerDefence_Test'
   artifacts:
     expire_in: 2 days
     paths:
+      - 'TowerDefence/TowerDefenceGame_LPB/bin/Debug'
+      - 'TowerDefence/TowerDefenceGame_LPB/obj/Debug'
       - 'TowerDefence/TowerDefence_Test/'
 
 # Test
 test_model:
   stage: test
   dependencies:
-    - build_backend
     - build_test
   script:
     - 'dotnet test TowerDefence/TowerDefence_Test'
   artifacts:
     expire_in: 1 week
     paths:
-      - './TestResults'
+      - 'TowerDefence/TowerDefence_Test/TestResults'
