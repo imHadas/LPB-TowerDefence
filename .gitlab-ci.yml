@@ -6,14 +6,11 @@ stages:
   - test
 #  - deploy
 
-default:
-  before_script:
-    - 'dotnet restore'
-
 # Build
 build_backend:
   stage: build
   script:
+    - 'dotnet restore TowerDefence\TowerDefenceGame_LPB'
     - 'dotnet build TowerDefence\TowerDefenceGame_LPB -c Release'
   artifacts:
     expire_in: 2 days
@@ -27,12 +24,14 @@ build_view:
   dependencies:
     - build_backend
   script:
+    - 'dotnet restore TowerDefence\TowerDefenceWPF'
     - 'dotnet build TowerDefence\TowerDefenceWPF -c Release'
   
 
 build_test:
   stage: build
   script:
+    - 'dotnet restore TowerDefence\TowerDefence_Test'
     - 'dotnet build TowerDefence\TowerDefence_Test'
   artifacts:
     expire_in: 2 days
