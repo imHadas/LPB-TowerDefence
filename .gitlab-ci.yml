@@ -1,22 +1,53 @@
 # Default image (https://hub.docker.com/_/microsoft-dotnet-sdk)
-#image: mcr.microsoft.com/dotnet/sdk:6.0
-image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
+image: mcr.microsoft.com/dotnet/sdk:6.0
 
 stages:
   - build
   - test
 #  - deploy
 
+default:
+  before_script:
+    - 'dotnet restore'
+
 # Build
-build_job:
+build_backend:
   stage: build
-  tags: [windows]
   script:
-    - dotnet build TowerDefence/TowerDefence.sln
+    - 'dotnet build TowerDefence\TowerDefenceGame_LPB -c Release'
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - 'TowerDefence\TowerDefenceGame_LPB\bin\Release'
+
+build_view:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
+  tags: [windows]
+  dependencies:
+    - build_backend
+  script:
+    - 'dotnet build TowerDefence\TowerDefenceWPF -c Release'
+  
+
+build_test:
+  stage: build
+  script:
+    - 'dotnet build TowerDefence\TowerDefence_Test'
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - 'TowerDefence\TowerDefence_Test\'
 
 # Test
 test_model:
   stage: test
-  tags: [windows]
+  dependencies:
+    - build_backend
+    - build_test
   script:
-    - dotnet test TowerDefence/TowerDefence_Test
+    - 'dotnet test TowerDefence\TowerDefence_Test'
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - '.\TestResult.xml'
