@@ -14,8 +14,8 @@ build_backend:
   artifacts:
     expire_in: 2 days
     paths:
-      - 'TowerDefence/TowerDefenceGame_LPB/bin/net6.0/Release'
-      - 'TowerDefence/TowerDefenceGame_LPB/obj/net6.0/Release'
+      - 'TowerDefence/TowerDefenceGame_LPB/bin/Release/net6.0'
+      - 'TowerDefence/TowerDefenceGame_LPB/obj/Release/net6.0'
 
 #Build WPF View
 build_view:
@@ -37,8 +37,8 @@ build_test:
   artifacts:
     expire_in: 2 days
     paths:
-      - 'TowerDefence/TowerDefenceGame_LPB/bin/net6.0/Debug'
-      - 'TowerDefence/TowerDefenceGame_LPB/obj/net6.0/Debug'
+      - 'TowerDefence/TowerDefenceGame_LPB/bin/Debug/net6.0'
+      - 'TowerDefence/TowerDefenceGame_LPB/obj/Debug/net6.0'
       - 'TowerDefence/TowerDefence_Test/'
 
 # Test
