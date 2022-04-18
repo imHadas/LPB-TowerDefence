@@ -2,34 +2,41 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Images\Barrack.png" />
-    <None Remove="Images\BomberTower.png" />
-    <None Remove="Images\Castle.png" />
-    <None Remove="Images\Lake.png" />
-    <None Remove="Images\Mountain.png" />
-    <None Remove="Images\SniperTower.png" />
-    <None Remove="Images\Tower.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Images\barrack.png" />
+		<None Remove="Images\bomber.png" />
+		<None Remove="Images\castle.png" />
+		<None Remove="Images\destroy.png" />
+		<None Remove="Images\pond.png" />
+		<None Remove="Images\mountain.png" />
+		<None Remove="Images\sniper.png" />
+		<None Remove="Images\basic.png" />
+		<None Remove="Images\soldier.png" />
+		<None Remove="Images\tank.png" />
+		<None Remove="Images\upgrade.png" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TowerDefenceGame_LPB\TowerDefenceBackend.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Images\Barrack.png" />
-    <Resource Include="Images\BomberTower.png" />
-    <Resource Include="Images\Castle.png" />
-    <Resource Include="Images\Lake.png" />
-    <Resource Include="Images\Mountain.png" />
-    <Resource Include="Images\SniperTower.png" />
-    <Resource Include="Images\Tower.png" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<Resource Include="Images\barrack.png" />
+		<Resource Include="Images\bomber.png" />
+		<Resource Include="Images\castle.png" />
+		<Resource Include="Images\destroy.png" />
+		<Resource Include="Images\pond.png" />
+		<Resource Include="Images\mountain.png" />
+		<Resource Include="Images\sniper.png" />
+		<Resource Include="Images\basic.png" />
+		<Resource Include="Images\soldier.png" />
+		<Resource Include="Images\tank.png" />
+		<Resource Include="Images\upgrade.png" />
+	</ItemGroup>
+	
 </Project>

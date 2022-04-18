@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
         mc:Ignorable="d"
-        Title="TowerDefence" Height="800" Width="800">
+        Title="TowerDefence" Height="800" Width="800" MinHeight="768" MinWidth="768">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
@@ -70,18 +70,18 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" MinHeight="44" MinWidth="44">
+                            <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" MinHeight="256" MinWidth="256" MaxHeight="256" MaxWidth="256">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding PlayerType}" Value="NEUTRAL">
-                                                <Setter Property="Background" Value="white"/>
+                                                <Setter Property="Background" Value="White"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding PlayerType}" Value="RED">
-                                                <Setter Property="Background" Value="red"/>
+                                                <Setter Property="Background" Value="IndianRed"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding PlayerType}" Value="BLUE">
-                                                <Setter Property="Background" Value="blue"/>
+                                                <Setter Property="Background" Value="LightBlue"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -95,39 +95,39 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Image Grid.ColumnSpan="2" Grid.RowSpan="2">
+                                    <Image Grid.ColumnSpan="2" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                                         <Image.Style>
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Castle">
-                                                        <Setter Property="Source" Value="\Images\Castle.png"/>
+                                                        <Setter Property="Source" Value="/Images/castle.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Barrack">
-                                                        <Setter Property="Source" Value="\Images\Barrack.png"/>
+                                                        <Setter Property="Source" Value="/Images/barrack.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="BasicTower">
-                                                        <Setter Property="Source" Value="\Images\Tower.png"/>
+                                                        <Setter Property="Source" Value="/Images/basic.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="SniperTower">
-                                                        <Setter Property="Source" Value="\Images\SniperTower.png"/>
+                                                        <Setter Property="Source" Value="/Images/sniper.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
-                                                        <Setter Property="Source" Value="\Images\BomberTower.png"/>
+                                                        <Setter Property="Source" Value="/Images/bomber.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
-                                                        <Setter Property="Source" Value="\Images\Mountain.png"/>
+                                                        <Setter Property="Source" Value="/Images/mountain.png"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
-                                                        <Setter Property="Source" Value="\Images\Lake.png"/>
+                                                        <Setter Property="Source" Value="/Images/pond.png"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Image.Style>
                                     </Image>
-                                    <TextBox Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                    <TextBox Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
+                                    <TextBox FontSize="96" Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
                                 </Grid>
                             </Button>
                         </Border>
@@ -139,7 +139,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
-                        <Button Command="{Binding OptionsClickCommand}" CommandParameter="{Binding Type}">
+                        <Button Command="{Binding OptionsClickCommand}" CommandParameter="{Binding Type}" MinWidth="72" MinHeight="72" MaxWidth="72" MaxHeight="72">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
@@ -147,31 +147,59 @@
                                             <Setter Property="Background" Value="white"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Player}" Value="RED">
-                                            <Setter Property="Background" Value="red"/>
+                                            <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Player}" Value="BLUE">
-                                            <Setter Property="Background" Value="blue"/>
+                                            <Setter Property="Background" Value="LightBlue"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="TrainBasic">
-                                            <Setter Property="Content" Value="TB"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/soldier.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="TrainTank">
-                                            <Setter Property="Content" Value="TT"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/tank.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildBasic">
-                                            <Setter Property="Content" Value="BBa"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/basic.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildBomber">
-                                            <Setter Property="Content" Value="BBo"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/bomber.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildSniper">
-                                            <Setter Property="Content" Value="BS"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/sniper.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="UpgradeTower">
-                                            <Setter Property="Content" Value="Upgrade"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/upgrade.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="DestroyTower">
-                                            <Setter Property="Content" Value="Destroy"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/destroy.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

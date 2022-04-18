@@ -480,9 +480,9 @@ namespace TowerDefenceBackend.Model
                 switch (SelectedField.Placement)
                 {
                     case Tower:
-                        options.Add(MenuOption.DestroyTower);
                         if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
                             options.Add(MenuOption.UpgradeTower);
+                        options.Add(MenuOption.DestroyTower);
                         break;
                     case Castle: /*FALLTHROUGH*/
                     case Barrack:
