@@ -98,7 +98,7 @@
                                             <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding PlayerType}" Value="BLUE">
-                                            <Setter Property="Background" Value="LightBlue"/>
+                                            <Setter Property="Background" Value="SteelBlue"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -157,13 +157,13 @@
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer}" Value="null">
-                                            <Setter Property="Background" Value="white"/>
+                                            <Setter Property="Background" Value="White"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="RED">
-                                            <Setter Property="Background" Value="red"/>
+                                            <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="BLUE">
-                                            <Setter Property="Background" Value="blue"/>
+                                            <Setter Property="Background" Value="SteelBlue"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildCastle">
                                             <Setter Property="Content">
@@ -214,8 +214,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Background="Blue" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Blue"/>
-            <Button Grid.Column="1" Background="Red" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Red"/>
+            <Button Grid.Column="0" Background="SteelBlue" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Blue"/>
+            <Button Grid.Column="1" Background="IndianRed" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Red"/>
             <Button Grid.Column="2" Background="White" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Neutral"/>
         </Grid>
     </Grid>

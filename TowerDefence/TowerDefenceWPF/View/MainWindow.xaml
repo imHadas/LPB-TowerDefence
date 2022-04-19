@@ -81,7 +81,7 @@
                                                 <Setter Property="Background" Value="IndianRed"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding PlayerType}" Value="BLUE">
-                                                <Setter Property="Background" Value="LightBlue"/>
+                                                <Setter Property="Background" Value="SteelBlue"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -124,10 +124,10 @@
                                             </Style>
                                         </Image.Style>
                                     </Image>
-                                    <TextBox FontSize="96" Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                    <TextBox FontSize="96" Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
-                                    <TextBox FontSize="96" Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
-                                    <TextBox FontSize="96" Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" MinWidth="128" Text="{Binding BlueBasic}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" MinWidth="128" Grid.Column="1" Text="{Binding BlueTank}" Foreground="Blue" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
+                                    <TextBox FontSize="96" MinWidth="128" Grid.Row="1" Text="{Binding RedBasic}" Foreground="Red" IsEnabled="False" Background="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}" />
+                                    <TextBox FontSize="96" MinWidth="128" Grid.Row="1" Grid.Column="1" Text="{Binding RedTank}" Foreground="Red" Background="White" IsEnabled="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="{Binding IsUnits, Converter={StaticResource BoolToVis}}"/>
                                 </Grid>
                             </Button>
                         </Border>
@@ -150,7 +150,7 @@
                                             <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Player}" Value="BLUE">
-                                            <Setter Property="Background" Value="LightBlue"/>
+                                            <Setter Property="Background" Value="SteelBlue"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="TrainBasic">
                                             <Setter Property="Content">
@@ -254,10 +254,10 @@
                                     <Style TargetType="{x:Type Label}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Owner.Type}" Value="RED">
-                                                <Setter Property="Background" Value="red"/>
+                                                <Setter Property="Background" Value="IndianRed"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Owner.Type}" Value="BLUE">
-                                                <Setter Property="Background" Value="blue"/>
+                                                <Setter Property="Background" Value="SteelBlue"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -268,10 +268,10 @@
                                     <Style TargetType="{x:Type Label}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Owner.Type}" Value="RED">
-                                                <Setter Property="Background" Value="red"/>
+                                                <Setter Property="Background" Value="IndianRed"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Owner.Type}" Value="BLUE">
-                                                <Setter Property="Background" Value="blue"/>
+                                                <Setter Property="Background" Value="SteelBlue"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
