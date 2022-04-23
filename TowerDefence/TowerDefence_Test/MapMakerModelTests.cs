@@ -4,6 +4,7 @@ using TowerDefenceGame_LPB.Persistence;
 using TowerDefenceGame_LPB.Model;
 using TowerDefenceGame_LPB.DataAccess;
 using System;
+using Moq;
 using System.Threading.Tasks;
 
 namespace TowerDefence_Test
@@ -11,181 +12,208 @@ namespace TowerDefence_Test
     [TestClass]
     public class MapMakerModelTests
     {
+        private GameSaveObject? _mockedGameSaveObject;
+        private Table? _mockedTable;
+        private Player? _mockedRedPlayer;
+        private Player? _mockedBluePlayer;
+        private MapMakerModel? _mapMakerModel;
+        private Mock<IDataAccess<GameSaveObject>>? _mock;
         private IDataAccess<GameSaveObject>? _dataAccess;
-        public MapMakerModel? Model { get; set; }
 
         [TestInitialize]
         public void Init()
         {
+            _mockedTable = MakeTable(10, 15);
+            _mockedRedPlayer = new Player(PlayerType.RED);
+            _mockedBluePlayer = new Player(PlayerType.BLUE);
+            _mockedGameSaveObject = new GameSaveObject(_mockedTable, _mockedBluePlayer, _mockedRedPlayer);
+
+            _mock = new Mock<IDataAccess<GameSaveObject>>();
+            _mock.Setup(mock => mock.LoadAsync(It.IsAny<String>())).Returns(() => Task.FromResult(_mockedGameSaveObject));
+
+            _mapMakerModel = new MapMakerModel(_mock.Object);
+
             _dataAccess = new JsonDataAccess();
         }
 
-        private MapMakerModel MakeMapMakerModel()
+        private Table MakeTable(uint width, uint height)
         {
-            return new MapMakerModel(_dataAccess);
+            Table output = new(height, width);
+            for (uint i = 0; i < height; i++)
+            {
+                for (uint j = 0; j < width; j++)
+                {
+                    output[i, j] = new(i, j);
+                }
+            }
+
+            return output;
         }
 
         [TestMethod]
         public void MapMakerModelInit()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
-            Assert.IsNotNull(Model.BP);
-            Assert.IsNotNull(Model.RP);
-            Assert.IsNotNull(Model.Table);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
+            Assert.IsNotNull(_mapMakerModel.BP);
+            Assert.IsNotNull(_mapMakerModel.RP);
+            Assert.IsNotNull(_mapMakerModel.Table);
         }
 
         [TestMethod]
         public void ChangeTableSizeSmallToLargeTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.ChangeTableSize(12, 15);
-            Assert.IsTrue(Model.Table.Size.x==12);
-            Assert.IsTrue(Model.Table.Size.y==15);
+            _mapMakerModel.ChangeTableSize(12, 15);
+            Assert.IsTrue(_mapMakerModel.Table.Size.x==12);
+            Assert.IsTrue(_mapMakerModel.Table.Size.y==15);
         }
 
         [TestMethod]
         public void ChangeTableSizeLargeToSmall()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.ChangeTableSize(15, 15);
-            Assert.IsTrue(Model.Table.Size.x == 15);
-            Assert.IsTrue(Model.Table.Size.y == 15);
+            _mapMakerModel.ChangeTableSize(15, 15);
+            Assert.IsTrue(_mapMakerModel.Table.Size.x == 15);
+            Assert.IsTrue(_mapMakerModel.Table.Size.y == 15);
 
-            Model.ChangeTableSize(5, 5);
-            Assert.IsTrue(Model.Table.Size.x == 5);
-            Assert.IsTrue(Model.Table.Size.y == 5);
+            _mapMakerModel.ChangeTableSize(5, 5);
+            Assert.IsTrue(_mapMakerModel.Table.Size.x == 5);
+            Assert.IsTrue(_mapMakerModel.Table.Size.y == 5);
         }
 
         [TestMethod]
         public void BuildMountainTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildMountain);
-            Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Terrain));
-            Assert.IsTrue(((Terrain)Model.Table[0, 0].Placement).Type == TerrainType.Mountain);
+            _mapMakerModel.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel.SelectOption(MenuOption.BuildMountain);
+            Terrain? terrain = _mapMakerModel?.Table[0, 0]?.Placement as Terrain;
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 0]?.Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(Terrain));
+            Assert.AreEqual(terrain?.Type,TerrainType.Mountain);
         }
 
         [TestMethod]
         public void BuildLakeTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildLake);
-            Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Terrain));
-            Assert.IsTrue(((Terrain)Model.Table[0, 0].Placement).Type == TerrainType.Lake);
+            _mapMakerModel.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel.SelectOption(MenuOption.BuildLake);
+            Terrain? terrain = _mapMakerModel?.Table[0, 0]?.Placement as Terrain;
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 0]?.Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(Terrain));
+            Assert.AreEqual(terrain?.Type,TerrainType.Lake);
         }
 
         [TestMethod]
         public void BuildCastleTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectedPlayer = Model.BP;
+            _mapMakerModel.SelectPlayer(_mapMakerModel.BP);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildCastle);
-            Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle));
-            Assert.IsTrue(Model.Table[0, 0].Placement.Owner == Model.BP);
+            _mapMakerModel.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel.SelectOption(MenuOption.BuildCastle);
+            Assert.IsNotNull(_mapMakerModel.Table[0, 0].Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.Owner, _mapMakerModel?.BP);
 
-            Model.SelectedPlayer = Model.RP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel.RP);
 
-            Model.SelectField(Model.Table[0, 2]);
-            Model.SelectOption(MenuOption.BuildCastle);
-            Assert.IsNotNull(Model.Table[0, 2].Placement);
-            Assert.IsTrue(Model.Table[0, 2].Placement.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle));
-            Assert.IsTrue(Model.Table[0, 2].Placement.Owner == Model.RP);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 2]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildCastle);
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 2].Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.Owner,_mapMakerModel?.RP);
         }
 
         [TestMethod]
         public void BuildBarackTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectedPlayer = Model.BP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel?.BP);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildBarrack);
-            Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Barrack));
-            Assert.IsTrue(Model.Table[0, 0].Placement.Owner == Model.BP);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildBarrack);
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 0].Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(Barrack));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.Owner, _mapMakerModel?.BP);
 
-            Model.SelectedPlayer = Model.RP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel?.RP);
 
-            Model.SelectField(Model.Table[0, 2]);
-            Model.SelectOption(MenuOption.BuildBarrack);
-            Assert.IsNotNull(Model.Table[0, 2].Placement);
-            Assert.IsTrue(Model.Table[0, 2].Placement.GetType() == typeof(Barrack));
-            Assert.IsTrue(Model.Table[0, 2].Placement.Owner == Model.RP);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 2]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildBarrack);
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 2].Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(), typeof(Barrack));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.Owner, _mapMakerModel?.RP);
         }
 
         [TestMethod]
         public void DestroyPlacementTest()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectedPlayer = Model.BP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel?.BP);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildBarrack);
-            Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Barrack));
-            Assert.IsTrue(Model.Table[0, 0].Placement.Owner == Model.BP);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildBarrack);
+            Assert.IsNotNull(_mapMakerModel?.Table[0, 0].Placement);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(), typeof(Barrack));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.Owner, _mapMakerModel?.BP);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.DestroyPlacement);
-            Assert.IsNull(Model.Table[0, 0].Placement);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel?.SelectOption(MenuOption.DestroyPlacement);
+            Assert.IsNull(_mapMakerModel?.Table[0, 0].Placement);
         }
 
         [TestMethod]
         public void ObstructedPathForBarrack()
         {
-            Model = MakeMapMakerModel();
-            Assert.IsNotNull(Model);
+            _mapMakerModel?.CreateNewMap();
+            Assert.IsNotNull(_mapMakerModel);
 
-            Model.SelectedPlayer = Model.BP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel?.BP);
 
-            Model.SelectField(Model.Table[0, 0]);
-            Model.SelectOption(MenuOption.BuildBarrack);
-            Assert.AreEqual(Model?.Table[0, 0]?.Placement?.GetType(),typeof(Barrack));
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 0]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildBarrack);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(Barrack));
 
-            Model.SelectedPlayer = null;
+            _mapMakerModel?.SelectPlayer(null);
 
-            Model.SelectField(Model.Table[0, 1]);
-            Model.SelectOption(MenuOption.BuildMountain);
-            Assert.AreEqual(((Terrain)Model.Table[0, 1].Placement).Type,TerrainType.Mountain);
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 1]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildMountain);
+            Terrain? terrain = _mapMakerModel?.Table[0, 1]?.Placement as Terrain;
+            Assert.AreEqual(terrain?.Type,TerrainType.Mountain);
 
-            Model.SelectedPlayer = Model.RP;
+            _mapMakerModel?.SelectPlayer(_mapMakerModel?.RP);
 
-            Model.SelectField(Model.Table[0, 2]);
-            Model.SelectOption(MenuOption.BuildCastle);
-            Assert.AreEqual(Model?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 2]);
+            _mapMakerModel?.SelectOption(MenuOption.BuildCastle);
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
 
-            Model.SelectedPlayer = null;
+            _mapMakerModel?.SelectPlayer(null);
 
             try
             {
-                Model.SelectField(Model.Table[1, 0]);
-                Model.SelectOption(MenuOption.BuildMountain);
+                _mapMakerModel?.SelectField(_mapMakerModel.Table[1, 0]);
+                _mapMakerModel?.SelectOption(MenuOption.BuildMountain);
             }
-            catch (InvalidPlacementException ex)
+            catch (InvalidPlacementException)
             {
-                Assert.IsTrue(Model.Table[1, 0].Placement == null);
+                Assert.IsTrue(_mapMakerModel?.Table[1, 0].Placement == null);
             }
 
         }

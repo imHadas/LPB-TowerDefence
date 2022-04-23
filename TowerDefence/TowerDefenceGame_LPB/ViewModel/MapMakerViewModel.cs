@@ -14,7 +14,6 @@ namespace TowerDefenceGame_LPB.ViewModel
     internal class MapMakerViewModel : MainViewModel
     {
         private MapMakerModel model;
-        private Player selectedPlayer;
         private FieldViewModel selectedField;
 
         private ICollection<MenuOption> menuOptions;
@@ -49,11 +48,10 @@ namespace TowerDefenceGame_LPB.ViewModel
 
         public Player SelectedPlayer
         {
-            get { return selectedPlayer; }
+            get { return model.SelectedPlayer; }
             set
             {
-                selectedPlayer = value;
-                model.SelectedPlayer = selectedPlayer; OnPropertyChanged();ButtonClick();
+                model.SelectPlayer(value); OnPropertyChanged();ButtonClick();
             }
         }
         public FieldViewModel SelectedField

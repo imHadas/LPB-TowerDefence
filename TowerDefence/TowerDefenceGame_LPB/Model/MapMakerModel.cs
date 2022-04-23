@@ -27,7 +27,7 @@ namespace TowerDefenceGame_LPB.Model
             private set { bp = value; }
         }
 
-        public Player SelectedPlayer { get; set; }
+        public Player? SelectedPlayer { get; private set; }
         public event EventHandler NewMapCreated;
 
         public MapMakerModel(IDataAccess<GameSaveObject> dataAccess)
@@ -127,6 +127,11 @@ namespace TowerDefenceGame_LPB.Model
                     DestroyPlacement();
                     break;
             }
+        }
+
+        public void SelectPlayer(Player? player)
+        {
+            SelectedPlayer = player;
         }
 
         private void BuildCastle()
