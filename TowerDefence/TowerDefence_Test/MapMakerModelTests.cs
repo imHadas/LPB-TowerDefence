@@ -11,8 +11,8 @@ namespace TowerDefence_Test
     [TestClass]
     public class MapMakerModelTests
     {
-        private IDataAccess<GameSaveObject> _dataAccess;
-        public MapMakerModel Model { get; set; }
+        private IDataAccess<GameSaveObject>? _dataAccess;
+        public MapMakerModel? Model { get; set; }
 
         [TestInitialize]
         public void Init()
@@ -98,7 +98,7 @@ namespace TowerDefence_Test
             Model.SelectField(Model.Table[0, 0]);
             Model.SelectOption(MenuOption.BuildCastle);
             Assert.IsNotNull(Model.Table[0, 0].Placement);
-            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(Castle));
+            Assert.IsTrue(Model.Table[0, 0].Placement.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle));
             Assert.IsTrue(Model.Table[0, 0].Placement.Owner == Model.BP);
 
             Model.SelectedPlayer = Model.RP;
@@ -106,7 +106,7 @@ namespace TowerDefence_Test
             Model.SelectField(Model.Table[0, 2]);
             Model.SelectOption(MenuOption.BuildCastle);
             Assert.IsNotNull(Model.Table[0, 2].Placement);
-            Assert.IsTrue(Model.Table[0, 2].Placement.GetType() == typeof(Castle));
+            Assert.IsTrue(Model.Table[0, 2].Placement.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle));
             Assert.IsTrue(Model.Table[0, 2].Placement.Owner == Model.RP);
         }
 
@@ -162,19 +162,19 @@ namespace TowerDefence_Test
 
             Model.SelectField(Model.Table[0, 0]);
             Model.SelectOption(MenuOption.BuildBarrack);
-            Assert.IsTrue(Model?.Table[1, 0]?.Placement?.GetType() == typeof(Barrack));
+            Assert.AreEqual(Model?.Table[0, 0]?.Placement?.GetType(),typeof(Barrack));
 
             Model.SelectedPlayer = null;
 
             Model.SelectField(Model.Table[0, 1]);
             Model.SelectOption(MenuOption.BuildMountain);
-            Assert.IsTrue(((Terrain)Model.Table[1, 0].Placement).Type == TerrainType.Mountain);
+            Assert.AreEqual(((Terrain)Model.Table[0, 1].Placement).Type,TerrainType.Mountain);
 
             Model.SelectedPlayer = Model.RP;
 
             Model.SelectField(Model.Table[0, 2]);
             Model.SelectOption(MenuOption.BuildCastle);
-            Assert.IsTrue(Model?.Table[1, 0]?.Placement?.GetType() == typeof(Castle));
+            Assert.AreEqual(Model?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
 
             Model.SelectedPlayer = null;
 

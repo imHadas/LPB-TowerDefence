@@ -179,15 +179,17 @@ namespace TowerDefenceGame_LPB.DataAccess
         {
             StringifiedGSO? sgso;
 
-            using (FileStream fs = File.OpenRead(path))
+            if (path != String.Empty)
             {
-                sgso = await JsonSerializer.DeserializeAsync<StringifiedGSO>(fs, _options);
+                using (FileStream fs = File.OpenRead(path))
+                {
+                    sgso = await JsonSerializer.DeserializeAsync<StringifiedGSO>(fs, _options);
+                }
+                if (sgso == null) throw new Exception("Error reading file");
+                return ConstructGSO(sgso);
             }
 
-            if (sgso == null) throw new Exception("Error reading file");
-
-            return ConstructGSO(sgso);
-
+            return new GameSaveObject(new Table(0,0),new Player(PlayerType.BLUE), new Player(PlayerType.RED));
         }
 
 
@@ -308,11 +310,14 @@ namespace TowerDefenceGame_LPB.DataAccess
                 gameSaveObject.BluePlayer,
                 gameSaveObject.RedPlayer
                 );
-
-            using (FileStream fs = File.Create(path))
+            if(path != String.Empty)
             {
-                await JsonSerializer.SerializeAsync(fs, sgso, _options);
+                using (FileStream fs = File.Create(path))
+                {
+                    await JsonSerializer.SerializeAsync(fs, sgso, _options);
+                }
             }
+
         }
     }
 }
