@@ -60,17 +60,6 @@ namespace TowerDefence_Test
             return output;
         }
 
-        private GameModel MakeGameModel()
-        {
-            if(_dataAccess is not null)
-                return new GameModel(_dataAccess);
-            else
-            {
-                _dataAccess = new JsonDataAccess();
-                return new GameModel(_dataAccess);
-            }
-        }
-
         [TestMethod]
         public void GameModelInit()
         {
@@ -165,7 +154,7 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train units"), TestCategory("Money"), TestCategory("Tank")]
         public void TrainTankUnits()
         {
-            _gameModel = MakeGameModel();
+            _gameModel?.NewGame();
             Assert.IsNotNull(_gameModel);
 
             while (_gameModel.CurrentPlayer.Money != 0)
