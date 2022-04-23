@@ -67,8 +67,8 @@ namespace TowerDefence_Test
             Assert.IsNotNull(_mapMakerModel);
 
             _mapMakerModel.ChangeTableSize(12, 15);
-            Assert.IsTrue(_mapMakerModel.Table.Size.x==12);
-            Assert.IsTrue(_mapMakerModel.Table.Size.y==15);
+            Assert.AreEqual(_mapMakerModel.Table.Size.x,12);
+            Assert.AreEqual(_mapMakerModel.Table.Size.y,15);
         }
 
         [TestMethod]
@@ -78,12 +78,12 @@ namespace TowerDefence_Test
             Assert.IsNotNull(_mapMakerModel);
 
             _mapMakerModel.ChangeTableSize(15, 15);
-            Assert.IsTrue(_mapMakerModel.Table.Size.x == 15);
-            Assert.IsTrue(_mapMakerModel.Table.Size.y == 15);
+            Assert.AreEqual(_mapMakerModel.Table.Size.x,15);
+            Assert.AreEqual(_mapMakerModel.Table.Size.y, 15);
 
             _mapMakerModel.ChangeTableSize(5, 5);
-            Assert.IsTrue(_mapMakerModel.Table.Size.x == 5);
-            Assert.IsTrue(_mapMakerModel.Table.Size.y == 5);
+            Assert.AreEqual(_mapMakerModel.Table.Size.x, 5);
+            Assert.AreEqual(_mapMakerModel.Table.Size.y, 5);
         }
 
         [TestMethod]
@@ -213,7 +213,7 @@ namespace TowerDefence_Test
             }
             catch (InvalidPlacementException)
             {
-                Assert.IsTrue(_mapMakerModel?.Table[1, 0].Placement == null);
+                Assert.IsNull(_mapMakerModel?.Table[1, 0].Placement);
             }
 
         }
