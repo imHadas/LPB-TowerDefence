@@ -310,14 +310,10 @@ namespace TowerDefenceGame_LPB.DataAccess
                 gameSaveObject.BluePlayer,
                 gameSaveObject.RedPlayer
                 );
-            if(path != String.Empty)
+            using (FileStream fs = File.Create(path))
             {
-                using (FileStream fs = File.Create(path))
-                {
-                    await JsonSerializer.SerializeAsync(fs, sgso, _options);
-                }
+                await JsonSerializer.SerializeAsync(fs, sgso, _options);
             }
-
         }
     }
 }

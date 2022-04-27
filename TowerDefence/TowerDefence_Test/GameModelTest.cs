@@ -426,41 +426,49 @@ namespace TowerDefence_Test
         }
 
         [TestMethod]
-        public async Task SaveGameAsyncTest()
-        {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
-
-            string path = String.Empty;
-
-            try
-            {
-                await _gameModel.SaveGameAsync(path);
-            }
-            catch(InvalidOperationException)
-            {
-                
-            }
-        }
-
-        [TestMethod]
         public async Task LoadGameAsyncTest()
         {
             _gameModel?.NewGame();
             Assert.IsNotNull(_gameModel);
-            
-            string path = String.Empty;
+
+            int nCastle = 0;
+            int bBarrack = 0;
+            int rBarrack = 0;
 
             try
             {
-                await _gameModel.LoadGameAsync(path);
+                await _gameModel.LoadGameAsync(String.Empty);
             }
             catch(InvalidOperationException)
             {
 
             }
-            
 
+            for(uint i = 0; i < _mockedTable?.Size.x; i++)
+            {
+                for(uint j = 0; j < _mockedTable?.Size.y; j++)
+                {
+                    if (_mockedTable[i, j]?.Placement?.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle))
+                    {
+                        nCastle++;
+                    }
+                    else if (_mockedTable[i, j]?.Placement?.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Barrack))
+                    {
+                        Barrack? barrack = _mockedTable[i, j]?.Placement as Barrack;
+                        Assert.AreNotEqual(barrack?.OwnerType, PlayerType.NEUTRAL);
+                        if (barrack?.OwnerType == PlayerType.RED)
+                            rBarrack++;
+                        else if (barrack?.OwnerType == PlayerType.BLUE)
+                            bBarrack++;
+                    }
+                    else
+                        Assert.IsNull(_mockedTable[i,j]?.Placement);
+                }
+            }
+
+            Assert.AreEqual(nCastle, 2);
+            Assert.AreEqual(bBarrack, 2);
+            Assert.AreEqual(rBarrack, 2);
         }
     }
 }

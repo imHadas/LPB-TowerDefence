@@ -549,6 +549,8 @@ namespace TowerDefenceGame_LPB.Model
         {
             if (gameDataAccess == null)
                 throw new InvalidOperationException("No data access is provided.");
+            if (path == String.Empty)
+                throw new InvalidOperationException("Path is not valid.");
             GameSaveObject save = await gameDataAccess.LoadAsync(path);
             (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
             switch((Table.PhaseCounter - 1) % 3 )
