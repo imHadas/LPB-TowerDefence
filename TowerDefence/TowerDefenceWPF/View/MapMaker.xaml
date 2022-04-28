@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
         mc:Ignorable="d"
-        Title="MapMaker" Height="800" Width="800">
+        Title="MapMaker" Height="800" Width="800" MinHeight="768" MinWidth="768">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
@@ -87,18 +87,18 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" MinWidth="44" MinHeight="44">
+                            <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" MinWidth="256" MinHeight="256" MaxHeight="256" MaxWidth="256">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding PlayerType}" Value="NEUTRAL">
-                                            <Setter Property="Background" Value="white"/>
+                                            <Setter Property="Background" Value="White"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding PlayerType}" Value="RED">
-                                            <Setter Property="Background" Value="red"/>
+                                            <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding PlayerType}" Value="BLUE">
-                                            <Setter Property="Background" Value="blue"/>
+                                            <Setter Property="Background" Value="SteelBlue"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -116,28 +116,28 @@
                                     <Image.Style>
                                         <Style TargetType="Image">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="Castle">
-                                                    <Setter Property="Source" Value="..\Images\Castle.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="Barrack">
-                                                    <Setter Property="Source" Value="..\Images\Barrack.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="BasicTower">
-                                                    <Setter Property="Source" Value="..\Images\Tower.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="SniperTower">
-                                                    <Setter Property="Source" Value="..\Images\SniperTower.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
-                                                    <Setter Property="Source" Value="..\Images\BomberTower.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
-                                                    <Setter Property="Source" Value="..\Images\Mountain.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
-                                                    <Setter Property="Source" Value="..\Images\Lake.png"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="Castle">
+                                                        <Setter Property="Source" Value="/Images/castle.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="Barrack">
+                                                        <Setter Property="Source" Value="/Images/barrack.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="BasicTower">
+                                                        <Setter Property="Source" Value="/Images/basic.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="SniperTower">
+                                                        <Setter Property="Source" Value="/Images/sniper.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="BomberTower">
+                                                        <Setter Property="Source" Value="/Images/bomber.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="Mountain">
+                                                        <Setter Property="Source" Value="/Images/mountain.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
+                                                        <Setter Property="Source" Value="/Images/pond.png"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
                                         </Style>
                                     </Image.Style>
                                 </Image>
@@ -152,33 +152,53 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
-                        <Button Command="{Binding OptionsClickCommand}" CommandParameter="{Binding Type}">
+                        <Button Command="{Binding OptionsClickCommand}" CommandParameter="{Binding Type}" MinHeight="72" MinWidth="72" MaxHeight="72" MaxWidth="72">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer}" Value="null">
-                                            <Setter Property="Background" Value="white"/>
+                                            <Setter Property="Background" Value="White"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="RED">
-                                            <Setter Property="Background" Value="red"/>
+                                            <Setter Property="Background" Value="IndianRed"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=DataContext.SelectedPlayer.Type}" Value="BLUE">
-                                            <Setter Property="Background" Value="blue"/>
+                                            <Setter Property="Background" Value="SteelBlue"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildCastle">
-                                            <Setter Property="Content" Value="BuildCastle"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/castle.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildBarrack">
-                                            <Setter Property="Content" Value="BuildBarrack"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/barrack.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildMountain">
-                                            <Setter Property="Content" Value="BuildMountain"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/mountain.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="BuildLake">
-                                            <Setter Property="Content" Value="BuildLake"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/pond.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="DestroyPlacement">
-                                            <Setter Property="Content" Value="Destroy"/>
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="/Images/destroy.png"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -194,8 +214,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Background="Blue" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Blue"/>
-            <Button Grid.Column="1" Background="Red" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Red"/>
+            <Button Grid.Column="0" Background="SteelBlue" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Blue"/>
+            <Button Grid.Column="1" Background="IndianRed" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Red"/>
             <Button Grid.Column="2" Background="White" Content="" Command="{Binding SelectPlayerCommand}" CommandParameter="Neutral"/>
         </Grid>
     </Grid>
