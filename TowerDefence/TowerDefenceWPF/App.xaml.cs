@@ -121,6 +121,7 @@ namespace TowerDefenceWPF
                 openFileDialog.FileName = "TowerDefenceMentés";
                 if (openFileDialog.ShowDialog() == true)
                 {
+                    _model.Loaded = true;
                     await _model.LoadGameAsync(openFileDialog.FileName);
                 }
             }
@@ -170,15 +171,27 @@ namespace TowerDefenceWPF
                 if (_view == null)
                 {
                     ViewModel_LoadGame(this,EventArgs.Empty);
-                    _view = new MainWindow();
-                    _view.DataContext = _viewModel;
-                    _view.Show();
-                    _view.Closing += CloseWindow;
+                    if (_model.Loaded)
+                    {
+                        _view = new MainWindow();
+                        _view.DataContext = _viewModel;
+                        _view.Show();
+                        _view.Closing += CloseWindow;
+                        _model.Loaded = false;
+                    }
+                    else
+                        return;
                 }
                 else
                 {
                     ViewModel_LoadGame(this, EventArgs.Empty);
-                    _view.Show();
+                    if (_model.Loaded)
+                    {
+                        _view.Show();
+                        _model.Loaded = false;
+                    }
+                    else
+                        return;
                 }
             }
             else if (windowType == 3)

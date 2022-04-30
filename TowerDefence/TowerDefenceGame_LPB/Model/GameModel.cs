@@ -27,6 +27,7 @@ namespace TowerDefenceBackend.Model
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
         public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
+        public bool Loaded { get; set; }
         public uint Phase
         {
             get { return Table.PhaseCounter; }
@@ -85,6 +86,7 @@ namespace TowerDefenceBackend.Model
             CurrentPlayer = bp;
             SaveEnabled = true;
             BuildEnabled = true;
+            Loaded = false;
             SetupCastles();
             SetupBarracks(rp);
             SetupBarracks(bp);
