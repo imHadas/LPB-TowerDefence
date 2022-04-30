@@ -2,12 +2,21 @@ using System.Collections;
 
 namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// Class for storing all the <c>Field</c>s of the game board
+    /// </summary>
     public class Table : IEnumerable
     {
         private Field[,] fields;
 
-        public uint PhaseCounter { get; set; }  //named more accurately and changed to unsigned
+        /// <summary>
+        /// The total number of phases the <c>Table</c> has 'been through'
+        /// </summary>
+        public uint PhaseCounter { get; set; }
 
+        /// <summary>
+        /// Get the size of the encapsulated 2d array as a tuple
+        /// </summary>
         public (int x, int y) Size => (fields.GetLength(0), fields.GetLength(1));
 
         public Field this[uint x, uint y]
