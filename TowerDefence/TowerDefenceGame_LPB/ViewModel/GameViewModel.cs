@@ -181,6 +181,8 @@ namespace TowerDefenceBackend.ViewModel
             }
             OnPropertyChanged(nameof(Fields));
             OnPropertyChanged(nameof(OptionFields));
+            OnPropertyChanged(nameof(UnitFields));
+
         }
         private void AdvanceGame()
         {
