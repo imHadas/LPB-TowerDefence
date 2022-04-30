@@ -13,17 +13,25 @@ namespace TowerDefenceBackend.Persistence
     public class Player
     {
         public PlayerType Type { get; private set; }
-        public uint Money { get; set; }  // changed to unsigned
+        public uint Money { get; set; }
 
         public Castle? Castle { get; set; }
 
-        // all have been changed to sets, since order doesn't matter
         public ISet<Tower> Towers { get; set; }
         public ISet<Unit> Units { get; set; }
         public ISet<Barrack> Barracks { get; set; }
 
+        /// <summary>
+        /// Check for the validity of the <c>Player</c>
+        /// </summary>
+        public bool Valid => Type is PlayerType.RED or PlayerType.BLUE &&
+                             Castle is not null &&
+                             Barracks.Count == 2;
+
         public Player(PlayerType type, Castle? castle = null, ICollection<Barrack>? barracks = null)
         {
+            if (type == PlayerType.NEUTRAL) 
+                throw new ArgumentException("You cannot instatiate a player as NEUTRAL", nameof(type));
             Castle = castle;
             Type = type;
             Money = Constants.PLAYER_STARTING_MONEY;
@@ -34,11 +42,6 @@ namespace TowerDefenceBackend.Persistence
             else
                 Barracks = new HashSet<Barrack>();
         }
-
-        public void AddBarrack(Barrack barrack)
-        {
-            if (Barracks.Count >= 2) throw new ArgumentException("Player can't have more than 2 barracks");
-            Barracks.Add(barrack);
-        }
+        
     }
 }

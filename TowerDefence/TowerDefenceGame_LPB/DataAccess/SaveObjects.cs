@@ -2,9 +2,7 @@
 
 namespace TowerDefenceBackend.DataAccess
 {
-    public abstract class SaveObject
-    {
-    }
+    public abstract class SaveObject { }
 
     public class GameSaveObject : SaveObject
     {

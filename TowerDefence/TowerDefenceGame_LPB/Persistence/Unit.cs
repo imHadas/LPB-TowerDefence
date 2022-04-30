@@ -11,7 +11,7 @@ namespace TowerDefenceBackend.Persistence
         public LinkedList<(uint x, uint y)> Path { get; private set; } // order matters, also O(1) removing first element
         virtual public uint Cost { get; } 
 
-        public Unit(Player player, uint health, uint speed)
+        protected Unit(Player player, uint health, uint speed)
         {
             Owner = player;
             Health = health;

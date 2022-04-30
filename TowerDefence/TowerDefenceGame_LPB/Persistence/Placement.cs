@@ -21,7 +21,7 @@ namespace TowerDefenceBackend.Persistence
     {
         public TerrainType Type { get; private set; }
 
-        public int NumericType => (int)Type; // maybe unnecessary
+        public uint NumericType => (uint)Type; // maybe unnecessary
 
         public Terrain(uint x, uint y, TerrainType type) : base((x, y))
         {
@@ -31,6 +31,8 @@ namespace TowerDefenceBackend.Persistence
     public class Castle : Placement
     {
         public uint Health { get; private set; }  // changed to unsigned
+
+        public bool Destroyed => Health <= 0;
 
         public Castle(Player owner, uint x, uint y) : base((x, y), owner)
         {

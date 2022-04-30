@@ -4,7 +4,7 @@ namespace TowerDefenceBackend.Persistence
 {
     public class Table : IEnumerable
     {
-        private Field[,] fields;
+        private readonly Field[,] fields;
 
         public uint PhaseCounter { get; set; }  //named more accurately and changed to unsigned
 
@@ -15,11 +15,23 @@ namespace TowerDefenceBackend.Persistence
             get { return fields[x, y]; }
             set { fields[x,y] = value; }
         }
+
+        public Field this[int x, int y]
+        {
+            get { return this[(uint)x, (uint)y]; }
+            set { this[(uint)x, (uint)y] = value; }
+        }
         
         public Field this[(uint x, uint y) c]
         {
             get { return fields[c.x, c.y]; }
             set { fields[c.x,c.y] = value; }
+        }
+
+        public Field this[(int x, int y) c]
+        {
+            get { return this[(uint)c.x, (uint)c.y]; }
+            set { this[c.x, c.y] = value; }
         }
 
         public Table(uint height, uint width)

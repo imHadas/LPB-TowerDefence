@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using TowerDefenceBackend.Persistence;
+﻿using System.Threading.Tasks;
 
 namespace TowerDefenceBackend.DataAccess
 {

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using TowerDefenceBackend.Persistence;
 using System.IO;
 using System.Text.Json;  //use the .NET 6 serializer
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace TowerDefenceBackend.DataAccess
@@ -40,9 +39,12 @@ namespace TowerDefenceBackend.DataAccess
         {
             Type = placement.GetType().Name;
             Owner = placement.OwnerType.ToString();
-            if(placement is Tower) Level = ((Tower)placement).Level;
-            else if(placement is Terrain) Level = (uint)((Terrain)placement).Type;  //a bit hacky
-            else Level = 0;
+            Level = placement switch
+            {
+                Tower tower => tower.Level,
+                Terrain terrain => terrain.NumericType,
+                _ => 0,
+            };
         }
     }
 
@@ -198,9 +200,9 @@ namespace TowerDefenceBackend.DataAccess
         /// <param name="bp">Reference to output blue Player</param>
         /// <param name="rp">Reference to output red Player</param>
         /// <returns>Parsed Field</returns>
-        private Field ConstructField(StringifiedField sf, Player bp, Player rp)
+        private static Field ConstructField(StringifiedField sf, Player bp, Player rp)
         {
-            Field output = new Field(sf.Coords.Item1, sf.Coords.Item2);
+            Field output = new(sf.Coords.x, sf.Coords.y);
             foreach(StringifiedUnit unit in sf.Units.red)
             {
                 Unit nu;
@@ -237,7 +239,7 @@ namespace TowerDefenceBackend.DataAccess
                 if(owner is null)
                 {
                     if (sf.Placement.Type != "Terrain") throw new Exception($"Placement of type {sf.Placement.Type} must have owner");
-                    output.Placement = new Terrain(sf.Coords.Item1, sf.Coords.Item2, (TerrainType)sf.Placement.Level);
+                    output.Placement = new Terrain(sf.Coords.x, sf.Coords.y, (TerrainType)sf.Placement.Level);
                 }
 
                 else switch(sf.Placement.Type)
@@ -245,14 +247,14 @@ namespace TowerDefenceBackend.DataAccess
                     case "Castle":
                             if (owner.Castle != null) 
                                 throw new Exception($"{owner.Type} has multiple castles");
-                            owner.Castle = new(owner, sf.Coords.Item1, sf.Coords.Item2);
+                            owner.Castle = new(owner, sf.Coords.x, sf.Coords.y);
                             output.Placement = owner.Castle;
                         break;
                     case "Barrack":
                             try
                             {
-                                output.Placement = new Barrack(owner, sf.Coords.Item1, sf.Coords.Item2);
-                                owner.AddBarrack((Barrack)output.Placement);
+                                output.Placement = new Barrack(owner, sf.Coords.x, sf.Coords.y);
+                                owner.Barracks.Add((Barrack)output.Placement);
                             }
                             catch (ArgumentException)
                             {
@@ -260,15 +262,15 @@ namespace TowerDefenceBackend.DataAccess
                             }
                         break;
                     case "BasicTower":
-                            output.Placement = new BasicTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new BasicTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                     case "SniperTower":
-                            output.Placement = new SniperTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new SniperTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                     case "BomberTower":
-                            output.Placement = new BomberTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new BomberTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                 }
@@ -279,7 +281,7 @@ namespace TowerDefenceBackend.DataAccess
             return output;
         }
 
-        private GameSaveObject ConstructGSO(StringifiedGSO sgso)
+        private static GameSaveObject ConstructGSO(StringifiedGSO sgso)
         {
             Table table = new((uint)sgso.Table.Height, (uint)sgso.Table.Width);
             Player bp = new(PlayerType.BLUE);
@@ -309,10 +311,8 @@ namespace TowerDefenceBackend.DataAccess
                 gameSaveObject.RedPlayer
                 );
 
-            using (FileStream fs = File.Create(path))
-            {
-                await JsonSerializer.SerializeAsync(fs, sgso, _options);
-            }
+            using FileStream fs = File.Create(path);
+            await JsonSerializer.SerializeAsync(fs, sgso, _options);
         }
     }
 }

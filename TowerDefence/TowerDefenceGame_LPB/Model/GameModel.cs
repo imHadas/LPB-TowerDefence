@@ -211,11 +211,11 @@ namespace TowerDefenceBackend.Model
 
             foreach (Tower tower in bp.Towers)
             {
-                tower.ResetSpeed();
+                tower.ResetCooldown();
             }
             foreach (Tower tower in rp.Towers)
             {
-                tower.ResetSpeed();
+                tower.ResetCooldown();
             }
 
             if (AttackEnded != null)
