@@ -2,6 +2,10 @@
 
 namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// Generic class for the tower structure.
+    /// Cannot be instantiated directly, must be derived.
+    /// </summary>
     public abstract class Tower : Placement
     {
         /// <summary>
@@ -14,6 +18,9 @@ namespace TowerDefenceBackend.Persistence
         public uint Cooldown { get; protected set; }
         public abstract uint Cost { get; }
 
+        /// <summary>
+        /// Method for leveling up the tower
+        /// </summary>
         public abstract void LevelUp();
         public virtual bool InRange((uint x, uint y) coords)
         {
@@ -31,6 +38,10 @@ namespace TowerDefenceBackend.Persistence
 
         internal Tower(Player player, (uint, uint) coords) : base(coords, player) { }
     }
+
+    /// <summary>
+    /// Basic tower structure. Shoots at directly adjacent <c>Unit</c>s, dealing low damage.
+    /// </summary>
     public class BasicTower : Tower
     {
         public override uint Cost => Constants.BASIC_TOWER_COST;
@@ -64,6 +75,10 @@ namespace TowerDefenceBackend.Persistence
             Level = 1;
         }
     }
+
+    /// <summary>
+    /// Sniper tower structure. Has higher range than basic.
+    /// </summary>
     public class SniperTower : Tower
     {
         public override uint Cost => Constants.SNIPER_TOWER_COST;
@@ -98,6 +113,10 @@ namespace TowerDefenceBackend.Persistence
             Level = 1;
         }
     }
+
+    /// <summary>
+    /// Bomber tower structure. Deals more damage than basic.
+    /// </summary>
     public class BomberTower : Tower
     {
         public override uint Cost => Constants.BOMBER_TOWER_COST;

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// For visual representation and differentiation of <c>Player</c>s
+    /// </summary>
     public enum PlayerType
     {
         NEUTRAL,
@@ -10,13 +13,14 @@ namespace TowerDefenceBackend.Persistence
         BLUE
     }
 
+    /// <summary>
+    /// Class for storing data related to a specific player
+    /// </summary>
     public class Player
     {
         public PlayerType Type { get; private set; }
         public uint Money { get; set; }
-
         public Castle? Castle { get; set; }
-
         public ISet<Tower> Towers { get; set; }
         public ISet<Unit> Units { get; set; }
         public ISet<Barrack> Barracks { get; set; }

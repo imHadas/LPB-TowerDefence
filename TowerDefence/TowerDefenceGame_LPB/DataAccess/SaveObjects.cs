@@ -2,8 +2,14 @@
 
 namespace TowerDefenceBackend.DataAccess
 {
+    /// <summary>
+    /// Generic object for storing saveable data. (exists for expandability reasons)
+    /// </summary>
     public abstract class SaveObject { }
 
+    /// <summary>
+    /// Object for storing entire gamestate
+    /// </summary>
     public class GameSaveObject : SaveObject
     {
         public Table Table { get; private set; }

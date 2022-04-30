@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace TowerDefenceBackend.DataAccess
 {
+    /// <summary>
+    /// Abstraction for <c>Unit</c>
+    /// </summary>
     internal class StringifiedUnit
     {
         public string Type { get; set; }
@@ -24,6 +27,9 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Abstraction for <c>Placement</c>
+    /// </summary>
     internal class StringifiedPlacement
     {
         public string Type { get; set; }
@@ -48,6 +54,9 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Abstraction for Field
+    /// </summary>
     internal class StringifiedField
     {
         public (uint x, uint y) Coords { get; set; }
@@ -87,7 +96,8 @@ namespace TowerDefenceBackend.DataAccess
 
 
     /// <summary>
-    /// You cannot serialize multi-dimensional arrays, that's why
+    /// Abstraction for Table.
+    /// Needed, because you cannot serialize multi-dimensional arrays
     /// </summary>
     internal class StringifiedTable
     {
@@ -138,6 +148,9 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Abstraction for <c>GameSaveObject</c>
+    /// </summary>
     internal class StringifiedGSO
     {
         public StringifiedTable Table { get; set; }
@@ -166,17 +179,25 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Implementation of <c>IDataAccess</c> using <c>JSON</c> serialization
+    /// </summary>
     public class JsonDataAccess : IDataAccess<GameSaveObject>
     {
         private static readonly JsonSerializerOptions _options
         = new()
         {
-            //ReferenceHandler = ReferenceHandler.Preserve,
-            PropertyNameCaseInsensitive = false,
-            WriteIndented = true,
-            IncludeFields = true,
+            PropertyNameCaseInsensitive = false,    // just in case
+            WriteIndented = true,                   // pretty print
+            IncludeFields = true,                   // neccessary for tuples and the like
         };
 
+        /// <summary>
+        /// Implementation of loading
+        /// </summary>
+        /// <param name="path">Path of the file to load</param>
+        /// <returns>A <c>GameSaveObject</c> containing the game's state</returns>
+        /// <exception cref="IOException">Thrown if the <c>Serializer</c> fails to parse the file</exception>
         public async Task<GameSaveObject> LoadAsync(string path)
         {
             StringifiedGSO? sgso;
@@ -186,7 +207,7 @@ namespace TowerDefenceBackend.DataAccess
                 sgso = await JsonSerializer.DeserializeAsync<StringifiedGSO>(fs, _options);
             }
 
-            if (sgso == null) throw new Exception("Error reading file");
+            if (sgso == null) throw new IOException("Error reading file");
 
             return ConstructGSO(sgso);
 
@@ -281,6 +302,12 @@ namespace TowerDefenceBackend.DataAccess
             return output;
         }
 
+        /// <summary>
+        /// Constructs <c>GameSaveObject</c> from it's stringified version
+        /// </summary>
+        /// <param name="sgso">Stringified version of <c>GameSaveObject</c> to be converted</param>
+        /// <returns>A <c>GameSaveObject</c> with parsed values</returns>
+        /// <exception cref="ArgumentException">Thrown if the input was invalid</exception>
         private static GameSaveObject ConstructGSO(StringifiedGSO sgso)
         {
             Table table = new((uint)sgso.Table.Height, (uint)sgso.Table.Width);
@@ -298,11 +325,17 @@ namespace TowerDefenceBackend.DataAccess
             bp.Money = sgso.BPMoney;
             rp.Money = sgso.RPMoney;
             table.PhaseCounter = sgso.PhaseCounter;
-            if (bp.Castle == null || rp.Castle == null || bp.Barracks.Count < 2 || rp.Barracks.Count < 2) throw new Exception("Read table was invalid");
+            if (bp.Castle == null || rp.Castle == null || bp.Barracks.Count < 2 || rp.Barracks.Count < 2) throw new ArgumentException("Read table was invalid");
 
             return new GameSaveObject(table, bp, rp);
         }
 
+        /// <summary>
+        /// Implementation of saving
+        /// </summary>
+        /// <param name="path">Path of file to save to</param>
+        /// <param name="gameSaveObject"><c>GameSaveObject</c> containing gamestate to save</param>
+        /// <returns></returns>
         public async Task SaveAsync(string path, GameSaveObject gameSaveObject)
         {
             StringifiedGSO sgso = new(
