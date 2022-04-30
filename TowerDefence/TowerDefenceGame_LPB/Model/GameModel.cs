@@ -71,6 +71,7 @@ namespace TowerDefenceBackend.Model
             NewGame();
         }
 
+        [Obsolete("The game is always loaded", false)]
         public void NewGame()
         {
             //Table = new Table(11, 11);

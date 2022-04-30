@@ -6,6 +6,7 @@ using TowerDefenceBackend.ViewModel;
 using TowerDefenceBackend.Model;
 using TowerDefenceBackend.DataAccess;
 using TowerDefenceWPF.View;
+using System.Threading.Tasks;
 
 namespace TowerDefenceWPF
 {
@@ -80,8 +81,9 @@ namespace TowerDefenceWPF
         {
             OpenFileDialog openFileDialog = new(); // dialógablak
             openFileDialog.Title = "Pálya Betöltése";
-            openFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
-            openFileDialog.FileName = "TowerDefenceMentés.json";
+            openFileDialog.Filter = "JSON formátumú pálya|*.tdm|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefencePálya.tdm";
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\maps";
             if (openFileDialog.ShowDialog() == true)
             {
                 try
@@ -99,8 +101,9 @@ namespace TowerDefenceWPF
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
             saveFileDialog.Title = "Pálya mentése";
-            saveFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
-            saveFileDialog.FileName = "TowerDefenceMentés";
+            saveFileDialog.Filter = "JSON formátumú pálya|*.tdm|Összes fájl|*.*";
+            saveFileDialog.FileName = "TowerDefencePálya.tdm";
+            saveFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\maps";
             if (saveFileDialog.ShowDialog() == true)
                 try 
                 { 
@@ -114,16 +117,67 @@ namespace TowerDefenceWPF
 
         private async void ViewModel_LoadGame(object? sender, EventArgs e)
         {
+            OpenFileDialog openFileDialog = new (); // dialógablak
+            openFileDialog.Title = "Játék Betöltése";
+            openFileDialog.Filter = "JSON formátumú mentés|*.tds|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefenceMentés.tds";
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\saves";
+            if (openFileDialog.ShowDialog() == true)
             {
-                OpenFileDialog openFileDialog = new (); // dialógablak
-                openFileDialog.Title = "Játék Betöltése";
-                openFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
-                openFileDialog.FileName = "TowerDefenceMentés";
-                if (openFileDialog.ShowDialog() == true)
+                await _model.LoadGameAsync(openFileDialog.FileName);
+            }
+        }
+
+        private async void ViewModel_SaveGame(object? sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
+            saveFileDialog.Title = "Játék mentése";
+            saveFileDialog.Filter = "JSON formátumú mentés|*.tds|Összes fájl|*.*";
+            saveFileDialog.FileName = "TowerDefenceMentés.tds";
+            saveFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\saves";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                await _model.SaveGameAsync(saveFileDialog.FileName);
+            }
+        }
+
+        private async Task<bool> StartNewGame()
+        {
+            //_model.NewGame();
+            OpenFileDialog openFileDialog = new(); // dialógablak
+            openFileDialog.Title = "Pálya Betöltése";
+            openFileDialog.Filter = "JSON formátumú pálya|*.tdm|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefencePálya.tdm";
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\maps";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
                 {
                     await _model.LoadGameAsync(openFileDialog.FileName);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Hiba", MessageBoxButton.OK);
+                }
+
+                return true;
             }
+            return false;
+        }
+
+        private async Task<bool> LoadFromMain()
+        {
+            OpenFileDialog openFileDialog = new(); // dialógablak
+            openFileDialog.Title = "Játék Betöltése";
+            openFileDialog.Filter = "JSON formátumú mentés|*.tds|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefenceMentés.tds";
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\saves";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                await _model.LoadGameAsync(openFileDialog.FileName);
+                return true;
+            }
+            return false;
         }
 
 
@@ -146,40 +200,31 @@ namespace TowerDefenceWPF
             MessageBox.Show(msg, "Játék vége", MessageBoxButton.OK);
         }
 
-        private void OpenNewWindow(int windowType)
+        private async void OpenNewWindow(int windowType)
         {
             if (windowType == 1)
             {
-                if(_view==null)
+                if (!await StartNewGame()) return;
+                if (_view==null)
                 {
                     _view = new MainWindow();
                     _view.DataContext = _viewModel;
-                    _model.NewGame();
-                    _view.Show();
                     _view.Closing += CloseWindow;
                 }
-                else
-                {
-                    _model.NewGame();
-                    _view.Show();
-                }
-                
+                _viewModel.NewGame();
+                _view.Show();
+
             }
             else if(windowType == 2)
             {
+                if (!await LoadFromMain()) return;
                 if (_view == null)
                 {
-                    ViewModel_LoadGame(this,EventArgs.Empty);
                     _view = new MainWindow();
                     _view.DataContext = _viewModel;
-                    _view.Show();
                     _view.Closing += CloseWindow;
                 }
-                else
-                {
-                    ViewModel_LoadGame(this, EventArgs.Empty);
-                    _view.Show();
-                }
+                _view.Show();
             }
             else if (windowType == 3)
             {
@@ -248,7 +293,7 @@ namespace TowerDefenceWPF
             _mapMaker.Hide();
         }
 
-        private void CloseWindow(object sender, System.ComponentModel.CancelEventArgs e)
+        private void CloseWindow(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             if ((_view is null && _mapMaker is null) || (_view is not null && _view.IsVisible) || (_mapMaker is not null && _mapMaker.IsVisible) || (_mainMenu is not null && _mainMenu.IsVisible))
             {
@@ -271,33 +316,6 @@ namespace TowerDefenceWPF
             else
             {
                 System.Windows.Application.Current.Shutdown();
-            }
-        }
-
-        private async void ViewModel_SaveGame(object sender, EventArgs e)
-        {
-            //try
-            {
-                SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
-                saveFileDialog.Title = "Játék mentése";
-                saveFileDialog.Filter = "Json objektum|*.json|Összes fájl|*.*";
-                saveFileDialog.FileName = "TowerDefenceMentés";
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    //try
-                    {
-                        // játéktábla mentése
-                        await _model.SaveGameAsync(saveFileDialog.FileName);
-                    }
-                   // catch (Exception)
-                    {
-                       // MessageBox.Show("Játék mentése sikertelen!" + Environment.NewLine + "Hibás az elérési út, vagy a könyvtár nem írható.", "Hiba!", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-            }
-            //catch
-            {
-              //  MessageBox.Show("A fájl mentése sikertelen!", "Tower Defence", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
