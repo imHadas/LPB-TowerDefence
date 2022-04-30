@@ -28,15 +28,21 @@ namespace TowerDefenceBackend.Persistence
         }
         public virtual void Fire()
         {
-            if (Cooldown != 0)
-                Cooldown--;
-        }
-        public virtual void ResetCooldown()
-        {
             Cooldown = Speed;
         }
 
-        internal Tower(Player player, (uint, uint) coords) : base(coords, player) { }
+        public virtual void Cool(uint amount = 1)
+        {
+            if(amount > Cooldown) Cooldown = 0;
+            else Cooldown -= amount;
+        }
+
+        public virtual void ResetCooldown()
+        {
+            Cooldown = 0;
+        }
+
+        internal Tower(Player player, (uint, uint) coords) : base(coords, player) { Cooldown = 0; }
     }
 
     /// <summary>

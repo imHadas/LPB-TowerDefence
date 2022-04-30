@@ -204,7 +204,6 @@ namespace TowerDefenceBackend.Model
             while(AvailableUnits.Count > 0)
             {
                 await MoveUnits();
-                RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
                 await FireTower();
                 RemoveFromCollection(AvailableUnits, e => e.Stamina == 0 || e.Health == 0);
             }
@@ -279,10 +278,14 @@ namespace TowerDefenceBackend.Model
 
             foreach (Tower tower in rp.Towers)
             {
-                for (int i = (int)tower.Coords.x-(int)tower.Range > 0 ? ((int)tower.Coords.x-(int)tower.Range) : 0; 
-                    tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                if(tower.Cooldown > 0)
                 {
-                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    tower.Cool();
+                    continue;
+                }
+                for (int i = (int)tower.Coords.x-(int)tower.Range > 0 ? ((int)tower.Coords.x-(int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
                     {
                         if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
                         {
@@ -312,9 +315,14 @@ namespace TowerDefenceBackend.Model
 
             foreach (Tower tower in bp.Towers)
             {
-                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; tower.Speed > 0 && i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                if (tower.Cooldown > 0)
                 {
-                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; tower.Speed > 0 && j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    tower.Cool();
+                    continue;
+                }
+                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                {
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0;j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
                     {
                         if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
                         {
@@ -348,23 +356,22 @@ namespace TowerDefenceBackend.Model
 
         private void SetupCastles()
         {
-            Table[(uint)rp.Castle.Coords.x, (uint)rp.Castle.Coords.y].Placement = rp.Castle;
-            Table[(uint)bp.Castle.Coords.x, (uint)bp.Castle.Coords.y].Placement = bp.Castle;
+            Table[rp.Castle.Coords.x, rp.Castle.Coords.y].Placement = rp.Castle;
+            Table[bp.Castle.Coords.x, bp.Castle.Coords.y].Placement = bp.Castle;
         }
 
         private void SetupBarracks(Player player)
         {
             foreach(Barrack barrack in player.Barracks)
             {
-                
-                uint x = barrack.Coords.x;
-                uint y = barrack.Coords.y;
-                Table[x, y].Placement = barrack;
+                Table[barrack.Coords].Placement = barrack;
             }
         }
 
         public override void SelectOption(MenuOption option)
         {
+            if (SelectedField is null)
+                throw new InvalidOperationException("A field must be selected before selecting an option");
             switch (option)
             {
                 case MenuOption.TrainBasic:
@@ -438,21 +445,17 @@ namespace TowerDefenceBackend.Model
             CurrentPlayer.Money -= tower.Cost;
         }
 
-        private void UpgradeTower(Tower tower)
+        private static void UpgradeTower(Tower tower)
         {
-            if (!(SelectedField.Placement.GetType() != typeof(BasicTower) || SelectedField.Placement.GetType() != typeof(SniperTower) || SelectedField.Placement.GetType() != typeof(BomberTower)))
-                throw new InvalidPlacementException(SelectedField, "Cannot destroy Placement that is not a tower");
             tower.LevelUp();
         }
 
         private void DestroyTower(Tower tower)
         {
-            if (!(SelectedField.Placement.GetType() != typeof(BasicTower) || SelectedField.Placement.GetType() != typeof(SniperTower) || SelectedField.Placement.GetType() != typeof(BomberTower)))
-                throw new InvalidPlacementException(SelectedField, "Cannot destroy Placement that is not a tower");
             CurrentPlayer.Money += tower.Cost;
             CurrentPlayer.Towers.Remove(tower);
-            SelectedField.Placement = null;
-            pathfinder.ChangeState(SelectedField);
+            Table[tower.Coords].Placement = null;
+            pathfinder.ChangeState(Table[tower.Coords]);
         }
 
         /// <summary>
