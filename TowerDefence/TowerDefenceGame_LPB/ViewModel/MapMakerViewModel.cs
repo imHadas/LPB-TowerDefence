@@ -93,6 +93,8 @@ namespace TowerDefenceBackend.ViewModel
 
         private void Model_GameLoaded(object? sender, EventArgs e)
         {
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
             GenerateTable();
             RefreshTable();
             OnPropertyChanged(nameof(Fields));
