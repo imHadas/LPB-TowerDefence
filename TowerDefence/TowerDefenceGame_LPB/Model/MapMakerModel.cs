@@ -204,7 +204,7 @@ namespace TowerDefenceBackend.Model
             foreach (Barrack barrack in rp.Barracks)
             {
                 if (bp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, bp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != bp.Castle.Coords)
                     return false;
@@ -212,7 +212,7 @@ namespace TowerDefenceBackend.Model
             foreach (Barrack barrack in bp.Barracks)
             {
                 if (rp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, rp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != rp.Castle.Coords)
                     return false;
@@ -267,7 +267,7 @@ namespace TowerDefenceBackend.Model
 
             GameSaveObject save = await gameDataAccess.LoadAsync(path);
             (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
-
+            pathfinder = new AStar(Table);
             OnGameLoaded();
         }
 
