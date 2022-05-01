@@ -73,6 +73,7 @@ namespace TowerDefence_Test
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
             Model.SelectOption(MenuOption.TrainBasic);
             Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
             Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY-Constants.BASIC_UNIT_COST);
@@ -90,6 +91,7 @@ namespace TowerDefence_Test
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
             while (Model.CurrentPlayer.Money != 0)
             {
                 Model.SelectOption(MenuOption.TrainBasic);
@@ -104,6 +106,7 @@ namespace TowerDefence_Test
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
             Model.SelectOption(MenuOption.TrainTank);
             Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
             Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.TANK_UNIT_COST);
@@ -121,6 +124,7 @@ namespace TowerDefence_Test
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
             while (Model.CurrentPlayer.Money != 0)
             {
                 Model.SelectOption(MenuOption.TrainTank);
@@ -135,6 +139,7 @@ namespace TowerDefence_Test
             Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
             while (Model.CurrentPlayer.Money != 0)
             {
                 Model.SelectOption(MenuOption.TrainTank);
