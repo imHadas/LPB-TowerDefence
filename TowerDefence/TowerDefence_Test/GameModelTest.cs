@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.Model;
 using TowerDefenceBackend.DataAccess;
-using System;
 using Moq;
 using System.Threading.Tasks;
 
@@ -93,17 +91,6 @@ namespace TowerDefence_Test
 
             Assert.IsTrue(Model.Phase == 4);
             Assert.IsTrue(Model.Round == 2);
-        }
-
-        [TestMethod]
-        public void NewGame()
-        {
-            Assert.IsNotNull(Model);
-
-            Model.Advance();
-            Assert.IsTrue(Model.Phase == 2);
-            Model.NewGame();
-            Assert.IsTrue(Model.Phase == 1);
         }
 
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Basic")]

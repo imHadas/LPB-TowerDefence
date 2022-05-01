@@ -87,10 +87,5 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
-        public async void LoadMap()
-        {
-
-        }
-
     }
 }
