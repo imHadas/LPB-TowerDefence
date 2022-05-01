@@ -1,0 +1,542 @@
+{
+  "Table": {
+    "Width": 5,
+    "Height": 9,
+    "Fields": [
+      {
+        "Coords": {
+          "Item1": 0,
+          "Item2": 0
+        },
+        "Placement": {
+          "Type": "Barrack",
+          "Owner": "BLUE",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 0,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 0,
+          "Item2": 2
+        },
+        "Placement": {
+          "Type": "Castle",
+          "Owner": "BLUE",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 0,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 0,
+          "Item2": 4
+        },
+        "Placement": {
+          "Type": "Barrack",
+          "Owner": "BLUE",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 1,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 1,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 1,
+          "Item2": 2
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 1,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 1,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 2,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 2,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 2,
+          "Item2": 2
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 2,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 2,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 3,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 3,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 3,
+          "Item2": 2
+        },
+        "Placement": {
+          "Type": "Terrain",
+          "Owner": "NEUTRAL",
+          "Level": 1
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 3,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 3,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 4,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 4,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 4,
+          "Item2": 2
+        },
+        "Placement": {
+          "Type": "Terrain",
+          "Owner": "NEUTRAL",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 4,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 4,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 5,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 5,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 5,
+          "Item2": 2
+        },
+        "Placement": {
+          "Type": "Terrain",
+          "Owner": "NEUTRAL",
+          "Level": 1
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 5,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 5,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 6,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 6,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 6,
+          "Item2": 2
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 6,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 6,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 7,
+          "Item2": 0
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 7,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 7,
+          "Item2": 2
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 7,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 7,
+          "Item2": 4
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 8,
+          "Item2": 0
+        },
+        "Placement": {
+          "Type": "Barrack",
+          "Owner": "RED",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 8,
+          "Item2": 1
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 8,
+          "Item2": 2
+        },
+        "Placement": {
+          "Type": "Castle",
+          "Owner": "RED",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 8,
+          "Item2": 3
+        },
+        "Placement": null,
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      },
+      {
+        "Coords": {
+          "Item1": 8,
+          "Item2": 4
+        },
+        "Placement": {
+          "Type": "Barrack",
+          "Owner": "RED",
+          "Level": 0
+        },
+        "Units": {
+          "Item1": [],
+          "Item2": []
+        }
+      }
+    ]
+  },
+  "BPMoney": 200,
+  "RPMoney": 200,
+  "PhaseCounter": 1
+}

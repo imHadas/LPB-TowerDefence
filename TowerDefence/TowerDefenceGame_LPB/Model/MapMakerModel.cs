@@ -47,7 +47,6 @@ namespace TowerDefenceBackend.Model
         public void ChangeTableSize(uint height, uint width)
         {
             Table newTable = new Table(height, width);
-            allCoords.Clear();
             for (uint i = 0; i < height; i++)
             {
                 for (uint j = 0; j < width; j++)
@@ -56,7 +55,6 @@ namespace TowerDefenceBackend.Model
                         newTable[i, j] = Table[i, j];
                     else
                         newTable[i, j] = new Field(i, j);
-                    allCoords.Add((i, j));
                 }
             }
             Table = newTable;

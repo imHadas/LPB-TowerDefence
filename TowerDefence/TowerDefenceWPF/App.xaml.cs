@@ -7,6 +7,7 @@ using TowerDefenceBackend.Model;
 using TowerDefenceBackend.DataAccess;
 using TowerDefenceWPF.View;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TowerDefenceWPF
 {
@@ -130,6 +131,8 @@ namespace TowerDefenceWPF
 
         private async void ViewModel_SaveGame(object? sender, EventArgs e)
         {
+            if (!Directory.Exists(Environment.CurrentDirectory + "\\saves"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + "\\saves");
             SaveFileDialog saveFileDialog = new SaveFileDialog(); // dialógablak
             saveFileDialog.Title = "Játék mentése";
             saveFileDialog.Filter = "JSON formátumú mentés|*.tds|Összes fájl|*.*";
@@ -167,6 +170,8 @@ namespace TowerDefenceWPF
 
         private async Task<bool> LoadFromMain()
         {
+            if(!Directory.Exists(Environment.CurrentDirectory + "\\saves"))
+                Directory.CreateDirectory(Environment.CurrentDirectory + "\\saves");
             OpenFileDialog openFileDialog = new(); // dialógablak
             openFileDialog.Title = "Játék Betöltése";
             openFileDialog.Filter = "JSON formátumú mentés|*.tds|Összes fájl|*.*";
