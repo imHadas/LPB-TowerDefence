@@ -91,9 +91,14 @@ namespace TowerDefenceBackend.ViewModel
             UnitFields = new ObservableCollection<Unit>();
             GenerateTable();
             RefreshTable();
-            SelectedField = null;
+            SelectedField = new FieldViewModel
+            {
+                IsCastle = false,
+                IsTower = false,
+            };
             SelectedTower = null;
             SelectedCastle = null;
+            OptionFields.Clear();
         }
 
         private void Model_GameLoaded(object? sender, EventArgs e)
