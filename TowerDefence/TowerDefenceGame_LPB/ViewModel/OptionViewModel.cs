@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceBackend.Persistence;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
     public class OptionField : ViewModelBase
     {

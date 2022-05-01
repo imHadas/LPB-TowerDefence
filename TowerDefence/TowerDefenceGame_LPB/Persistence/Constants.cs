@@ -1,7 +1,7 @@
-﻿namespace TowerDefenceGame_LPB.Persistence
+﻿namespace TowerDefenceBackend.Persistence
 {
     /// <summary>
-    /// We could store all constants here, up for debate
+    /// Class for all constant values
     /// </summary>
     public static class Constants
     {

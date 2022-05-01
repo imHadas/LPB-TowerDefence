@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TowerDefenceGame_LPB.Persistence;
-using TowerDefenceGame_LPB.Model;
-using TowerDefenceGame_LPB.DataAccess;
-using System;
+using TowerDefenceBackend.Persistence;
+using TowerDefenceBackend.Model;
+using TowerDefenceBackend.DataAccess;
 using Moq;
+using System;
 using System.Threading.Tasks;
 
 namespace TowerDefence_Test
@@ -11,278 +11,278 @@ namespace TowerDefence_Test
     [TestClass]
     public class GameModelTest
     {
-        private GameSaveObject? _mockedGameSaveObject;
-        private Table? _mockedTable;
-        private Player? _mockedRedPlayer;
-        private Player? _mockedBluePlayer;
-        private GameModel? _gameModel;
-        private Mock<IDataAccess<GameSaveObject>>? _mock;
-        private IDataAccess<GameSaveObject>? _dataAccess;
+        private IDataAccess<GameSaveObject> _dataAccess;
+        public GameModel Model { get; set; }
 
-        [TestInitialize]
-        public void Init()
+
+        public void MockDA()
         {
-            _mockedTable = MakeTable(10,15);
-            _mockedRedPlayer = new Player(PlayerType.RED);
-            _mockedBluePlayer = new Player(PlayerType.BLUE);
-            _mockedGameSaveObject = new GameSaveObject(_mockedTable, _mockedBluePlayer, _mockedRedPlayer);
-
-            Assert.IsNotNull(_mockedTable);
-            Assert.IsNotNull(_mockedRedPlayer);
-
-            _mockedTable[0, 0].Placement = new TowerDefenceGame_LPB.Persistence.Castle(_mockedRedPlayer,0,0);
-            _mockedTable[0, 1].Placement = new TowerDefenceGame_LPB.Persistence.Barrack(_mockedRedPlayer, 0, 1);
-            _mockedTable[0, 2].Placement = new TowerDefenceGame_LPB.Persistence.Barrack(_mockedRedPlayer, 0, 2);
-
-            _mockedTable[2, 0].Placement = new TowerDefenceGame_LPB.Persistence.Castle(_mockedBluePlayer, 2, 0);
-            _mockedTable[2, 1].Placement = new TowerDefenceGame_LPB.Persistence.Barrack(_mockedBluePlayer, 2, 1);
-            _mockedTable[2, 2].Placement = new TowerDefenceGame_LPB.Persistence.Barrack(_mockedBluePlayer, 2, 1);
-
-            _mock = new Mock<IDataAccess<GameSaveObject>>();
-            _mock.Setup(mock => mock.LoadAsync(It.IsAny<String>())).Returns(() => Task.FromResult(_mockedGameSaveObject));
-
-            _gameModel = new GameModel(_mock.Object);
-
-            _dataAccess = new JsonDataAccess();
-        }
-
-        private Table MakeTable(uint width, uint height)
-        {
-            Table output = new(height, width);
-            for (uint i = 0; i < height; i++)
+            Table tablemock = new(15,10);
+            for(uint i = 0; i < 15; i++)
             {
-                for (uint j = 0; j < width; j++)
+                for (uint j = 0; j < 10; j++)
                 {
-                    output[i, j] = new(i, j);
+                    tablemock[i, j] = new(i, j);
                 }
             }
+            tablemock.PhaseCounter = 1;
+            Player rp = new(PlayerType.RED);
+            Player bp = new(PlayerType.BLUE);
+            rp.Barracks.Add(new(rp, 9, 9)); rp.Barracks.Add(new(rp, 9, 1));
+            bp.Barracks.Add(new(bp, 1, 1)); bp.Barracks.Add(new(bp, 1, 9));
+            rp.Castle = new(rp, 9, 5);
+            bp.Castle = new(bp, 1, 5);
+            tablemock[rp.Castle.Coords].Placement = rp.Castle;
+            tablemock[bp.Castle.Coords].Placement = bp.Castle;
+            foreach (Barrack barrack in rp.Barracks)
+            {
+                tablemock[barrack.Coords].Placement = barrack;
+            }
+            foreach (Barrack barrack in bp.Barracks)
+            {
+                tablemock[barrack.Coords].Placement = barrack;
+            }
 
-            return output;
+            GameSaveObject gsomock = new(tablemock, bp, rp);
+
+            var dbmock = new Mock<IDataAccess<GameSaveObject>>();
+            dbmock.Setup(d => d.LoadAsync("1")).Returns(Task.FromResult(gsomock));
+            _dataAccess = dbmock.Object;
         }
+
+        public async Task<GameModel> MakeGameModel()
+        {
+            GameModel newmodel = new(_dataAccess);
+            await newmodel.LoadGameAsync("1");
+            return newmodel;
+        }
+
+        [TestInitialize]
+        public async Task TestInit()
+        {
+            MockDA();
+            Model = await MakeGameModel();
+        }
+
 
         [TestMethod]
         public void GameModelInit()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
-            Assert.IsNotNull(_gameModel.CurrentPlayer);
-            Assert.IsNotNull(_gameModel.OtherPlayer);
-            Assert.IsNotNull(_gameModel.Table);
+            Assert.IsNotNull(Model);
+            Assert.IsNotNull(Model.CurrentPlayer);
+            Assert.IsNotNull(Model.OtherPlayer);
+            Assert.IsNotNull(Model.Table);
         }
 
         [TestMethod]
         public void GameAdvance()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            Assert.IsTrue(_gameModel.CurrentPlayer.Type == PlayerType.BLUE);
-            _gameModel.Advance();
-            Assert.IsTrue(_gameModel.Phase == 2);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Type == PlayerType.RED);
-            Assert.IsTrue(_gameModel.Round == 1);
+            Assert.IsTrue(Model.CurrentPlayer.Type == PlayerType.BLUE);
+            Model.Advance();
+            Assert.IsTrue(Model.Phase == 2);
+            Assert.IsTrue(Model.CurrentPlayer.Type == PlayerType.RED);
+            Assert.IsTrue(Model.Round == 1);
 
-            while(_gameModel.Phase < 4)
+            while(Model.Phase < 4)
             {
-                _gameModel.Advance();
+                Model.Advance();
             }
 
-            Assert.IsTrue(_gameModel.Phase == 4);
-            Assert.IsTrue(_gameModel.Round == 2);
-        }
-
-        [TestMethod]
-        public void NewGameTest()
-        {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
-
-            _gameModel.Advance();
-            Assert.IsTrue(_gameModel.Phase == 2);
-            _gameModel.NewGame();
-            Assert.IsTrue(_gameModel.Phase == 1);
+            Assert.IsTrue(Model.Phase == 4);
+            Assert.IsTrue(Model.Round == 2);
         }
 
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Basic")]
         public void TrainBasicUnit()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectOption(MenuOption.TrainBasic);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY-Constants.BASIC_UNIT_COST);
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY-Constants.BASIC_UNIT_COST);
 
-            _gameModel.Advance();
-            _gameModel.SelectOption(MenuOption.TrainBasic);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.OtherPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
+            Model.Advance();
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
         }
 
         [TestMethod, TestCategory("Train units"), TestCategory("Money"), TestCategory("Basic")]
         public void TrainBasicUnits()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            while (_gameModel.CurrentPlayer.Money != 0)
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            while (Model.CurrentPlayer.Money != 0)
             {
-                _gameModel.SelectOption(MenuOption.TrainBasic);
+                Model.SelectOption(MenuOption.TrainBasic);
             }
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY/Constants.BASIC_UNIT_COST);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY/Constants.BASIC_UNIT_COST);
+            Assert.IsTrue(Model.CurrentPlayer.Money == 0);
         }
 
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Tank")]
         public void TrainTankUnit()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectOption(MenuOption.TrainTank);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.TANK_UNIT_COST);
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            Model.SelectOption(MenuOption.TrainTank);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.TANK_UNIT_COST);
 
-            _gameModel.Advance();
-            _gameModel.SelectOption(MenuOption.TrainTank);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.OtherPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.TANK_UNIT_COST);
+            Model.Advance();
+            Model.SelectOption(MenuOption.TrainTank);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.TANK_UNIT_COST);
         }
 
         [TestMethod, TestCategory("Train units"), TestCategory("Money"), TestCategory("Tank")]
         public void TrainTankUnits()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            while (_gameModel.CurrentPlayer.Money != 0)
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            while (Model.CurrentPlayer.Money != 0)
             {
-                _gameModel.SelectOption(MenuOption.TrainTank);
+                Model.SelectOption(MenuOption.TrainTank);
             }
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+            Assert.IsTrue(Model.CurrentPlayer.Money == 0);
         }
 
         [TestMethod, TestCategory("Train units"), TestCategory("No money")]
         public void TrainUnitsNoMoney()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            while (_gameModel.CurrentPlayer.Money != 0)
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            while (Model.CurrentPlayer.Money != 0)
             {
-                _gameModel.SelectOption(MenuOption.TrainTank);
+                Model.SelectOption(MenuOption.TrainTank);
             }
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+            Assert.IsTrue(Model.CurrentPlayer.Money == 0);
 
-            _gameModel.SelectOption(MenuOption.TrainTank);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+            Model.SelectOption(MenuOption.TrainTank);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
 
-            _gameModel.SelectOption(MenuOption.TrainBasic);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
         }
 
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Basic tower")]
         public void BuildBasicTower()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildBasic);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0,0]?.Placement?.GetType() == typeof(BasicTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0,0]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
         }
 
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Sniper tower")]
         public void BuildSniperTower()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildSniper);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.SNIPER_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildSniper);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.SNIPER_TOWER_COST);
         }
 
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Bomber tower")]
         public void BuildBomberTower()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildBomber);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(BomberTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BOMBER_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBomber);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(BomberTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BOMBER_TOWER_COST);
         }
 
         [TestMethod, TestCategory("Build tower"), TestCategory("No money")]
         public void BuildAnyTowerNoMoney()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildSniper);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
-            _gameModel.SelectField(_gameModel.Table[0, 1]);
-            _gameModel.SelectOption(MenuOption.BuildSniper);
-            Assert.IsNotNull(_gameModel.Table[0, 1].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 1]?.Placement?.GetType() == typeof(SniperTower));
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildSniper);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
+            Model.SelectField(Model.Table[0, 1]);
+            Model.SelectOption(MenuOption.BuildSniper);
+            Assert.IsNotNull(Model.Table[0, 1].Placement);
+            Assert.IsTrue(Model.Table[0, 1]?.Placement?.GetType() == typeof(SniperTower));
 
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Money == 0);
 
-            _gameModel.SelectField(_gameModel.Table[0, 2]);
-            _gameModel.SelectOption(MenuOption.BuildSniper);
-            Assert.IsNull(_gameModel.Table[0, 2].Placement);
+            Model.SelectField(Model.Table[0, 2]);
+            Model.SelectOption(MenuOption.BuildSniper);
+            Assert.IsNull(Model.Table[0, 2].Placement);
 
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Money == 0);
         }
 
         [TestMethod, TestCategory("DestroyTower"), TestCategory("With tower")]
         public void DestroyTower()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildSniper);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.SNIPER_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildSniper);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(SniperTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.SNIPER_TOWER_COST);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.DestroyTower);
-            Assert.IsNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY );
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.DestroyTower);
+            Assert.IsNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY );
         }
 
         [TestMethod, TestCategory("FireTower")]
         public async Task FireTowerTest()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 0);
-            Assert.IsTrue(_gameModel.OtherPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
 
-            _gameModel.SelectOption(MenuOption.TrainBasic);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 1);
-            Assert.IsTrue(_gameModel.OtherPlayer.Units.Count == 0);
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
+            (uint, uint) bCoords = (0,0);
+            Random r = new Random();
+            int x = r.Next(2);
+
+            foreach (Barrack barrack in Model.CurrentPlayer.Barracks)
+            {
+                if (x == 0)
+                    bCoords = barrack.Coords;
+                else if(x == 1)
+                {
+                    x = 0;
+                }
+            }
+
+            Model.SelectField(Model.Table[bCoords]);
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.IsTrue(Model.CurrentPlayer.Units.Count == 1);
+            Assert.IsTrue(Model.OtherPlayer.Units.Count == 0);
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
 
             uint X = 0, Y = 0;
 
-            foreach(Barrack barrack in _gameModel.CurrentPlayer.Barracks)
+            foreach(Barrack barrack in Model.CurrentPlayer.Barracks)
             {
                 if(barrack.UnitQueue.Count == 1)
                 {
@@ -291,7 +291,7 @@ namespace TowerDefence_Test
                 }
             }
 
-            if (X < _gameModel.Table.Size.x - 1)
+            if (X < Model.Table.Size.x - 1)
             {
                 X++;
             }
@@ -300,25 +300,25 @@ namespace TowerDefence_Test
                 X--;
             }
 
-            Assert.IsTrue(_gameModel.Phase == 1);
-            _gameModel.Advance();
-            Assert.IsTrue(_gameModel.Phase == 2);
+            Assert.IsTrue(Model.Phase == 1);
+            Model.Advance();
+            Assert.IsTrue(Model.Phase == 2);
 
-            _gameModel.SelectField(_gameModel.Table[X, Y]);
-            _gameModel.SelectOption(MenuOption.BuildBasic);
-            Assert.IsNotNull(_gameModel.Table[X, Y].Placement);
-            Assert.IsTrue(_gameModel.Table[X, Y]?.Placement?.GetType() == typeof(BasicTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+            Model.SelectField(Model.Table[X, Y]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[X, Y].Placement);
+            Assert.IsTrue(Model.Table[X, Y]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
 
-            _gameModel.Advance();
+            Model.Advance();
             await Task.Delay(1200);
-            Assert.IsTrue(_gameModel.Phase == 3);
-            _gameModel.Advance();
-            Assert.IsTrue(_gameModel.Phase == 4);
+            Assert.AreEqual(Model.Phase,(uint)3);
+            Model.Advance();
+            Assert.AreEqual(Model.Phase,(uint)4);
 
-            Assert.IsTrue(_gameModel.CurrentPlayer.Units.Count == 0);
-            Assert.IsTrue(_gameModel.OtherPlayer.Units.Count == 0);
-            Assert.IsTrue(_gameModel.OtherPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
+            Assert.AreEqual(Model.CurrentPlayer.Units.Count,0);
+            Assert.AreEqual(Model.OtherPlayer.Units.Count, 0);
+            Assert.AreEqual(Model.OtherPlayer.Money,Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
 
         }
 
@@ -326,110 +326,118 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("UpgradeTower"), TestCategory("Level two")]
         public void UpgradeTowerLvl2()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildBasic);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
 
-            Tower? tower = _gameModel?.Table[0, 0]?.Placement as Tower;
-            uint? damage = tower?.Damage;
+            Tower? tower = Model?.Table[0, 0]?.Placement as Tower;
+            uint? range = tower?.Range;
 
-            _gameModel?.SelectField(_gameModel.Table[0, 0]);
-            _gameModel?.SelectOption(MenuOption.UpgradeTower);
-            Assert.IsFalse(damage == (tower?.Damage));
+            Model?.SelectField(Model.Table[0, 0]);
+            Model?.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(range == (tower?.Range));
             Assert.IsTrue(tower?.Level == 2);
         }
 
         [TestMethod, TestCategory("UpgradeTower"), TestCategory("Level max")]
         public void UpgradeTowerLvlMax()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            _gameModel.SelectField(_gameModel.Table[0, 0]);
-            _gameModel.SelectOption(MenuOption.BuildBasic);
-            Assert.IsNotNull(_gameModel.Table[0, 0].Placement);
-            Assert.IsTrue(_gameModel.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
-            Assert.IsTrue(_gameModel.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
+            Model.SelectField(Model.Table[0, 0]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[0, 0].Placement);
+            Assert.IsTrue(Model.Table[0, 0]?.Placement?.GetType() == typeof(BasicTower));
+            Assert.IsTrue(Model.CurrentPlayer.Money == Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
 
-            Tower? tower = _gameModel?.Table[0, 0]?.Placement as Tower;
+            Tower? tower = Model?.Table[0, 0]?.Placement as Tower;
 
-            uint? damage = tower?.Damage;
             uint? speed = tower?.Speed;
             uint? range = tower?.Range;
 
-            _gameModel?.SelectField(_gameModel.Table[0, 0]);
-            _gameModel?.SelectOption(MenuOption.UpgradeTower);
-            Assert.IsFalse(damage == tower?.Damage);
+            Model?.SelectField(Model.Table[0, 0]);
+            Model?.SelectOption(MenuOption.UpgradeTower);
+            Assert.IsFalse(range == tower?.Range);
             Assert.IsTrue(tower?.Level == 2);
 
-            _gameModel?.SelectField(_gameModel.Table[0, 0]);
-            _gameModel?.SelectOption(MenuOption.UpgradeTower);
+            Model?.SelectField(Model.Table[0, 0]);
+            Model?.SelectOption(MenuOption.UpgradeTower);
             Assert.IsFalse(speed == tower?.Speed);
             Assert.IsTrue(tower?.Level == 3);
             
-            _gameModel?.SelectField(_gameModel.Table[0, 0]);
-            _gameModel?.SelectOption(MenuOption.UpgradeTower);
-            Assert.IsFalse(range == tower?.Range);
-            Assert.IsTrue(tower?.Level == 4);
+            
         }
 
         [TestMethod]
         public async Task GameOverTest()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
-            while (_gameModel.CurrentPlayer.Money != 0)
+            (uint, uint) bCoords = (0, 0);
+            Random r = new Random();
+            int x = r.Next(2);
+
+            foreach (Barrack barrack in Model.CurrentPlayer.Barracks)
             {
-                _gameModel.SelectOption(MenuOption.TrainBasic);
+                if (x == 0)
+                    bCoords = barrack.Coords;
+                else if (x == 1)
+                {
+                    x = 0;
+                }
             }
 
-            _gameModel.Advance();
-            _gameModel.Advance();
-            _gameModel.Advance();
+            Model.SelectField(Model.Table[bCoords]);
+
+            while (Model.CurrentPlayer.Money != 0)
+            {
+                Model.SelectOption(MenuOption.TrainBasic);
+            }
+
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
             await Task.Delay(3000);
 
-            Assert.IsTrue(_gameModel.Round == 2);
-            Assert.IsFalse(_gameModel.GameOverProp);
+            Assert.IsTrue(Model.Round == 2);
+            Assert.IsFalse(Model.GameOverProp);
 
-            _gameModel.Advance();
-            _gameModel.Advance();
-            _gameModel.Advance();
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
             await Task.Delay(3000);
 
-            Assert.IsTrue(_gameModel.Round == 3);
-            Assert.IsFalse(_gameModel.GameOverProp);
+            Assert.IsTrue(Model.Round == 3);
+            Assert.IsFalse(Model.GameOverProp);
 
-            _gameModel.Advance();
-            _gameModel.Advance();
-            _gameModel.Advance();
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
             await Task.Delay(3000);
 
-            Assert.IsTrue(_gameModel.Round == 4);
-            Assert.IsFalse(_gameModel.GameOverProp);
+            Assert.IsTrue(Model.Round == 4);
+            Assert.IsFalse(Model.GameOverProp);
 
-            _gameModel.Advance();
-            _gameModel.Advance();
-            _gameModel.Advance();
+            Model.Advance();
+            Model.Advance();
+            Model.Advance();
             await Task.Delay(3200);
 
-            Assert.IsTrue(_gameModel.Round == 5);
-            Assert.IsTrue(_gameModel.GameOverProp);
-            Assert.IsFalse(_gameModel.SaveEnabled);
-            Assert.IsFalse(_gameModel.BuildEnabled);
+            Assert.IsTrue(Model.Round == 5);
+            Assert.IsTrue(Model.GameOverProp);
+            Assert.IsFalse(Model.SaveEnabled);
+            Assert.IsFalse(Model.BuildEnabled);
             
         }
 
         [TestMethod]
         public async Task LoadGameAsyncTest()
         {
-            _gameModel?.NewGame();
-            Assert.IsNotNull(_gameModel);
+            Assert.IsNotNull(Model);
 
             int nCastle = 0;
             int bBarrack = 0;
@@ -437,24 +445,24 @@ namespace TowerDefence_Test
 
             try
             {
-                await _gameModel.LoadGameAsync(String.Empty);
+                await Model.LoadGameAsync(String.Empty);
             }
             catch(InvalidOperationException)
             {
 
             }
 
-            for(uint i = 0; i < _mockedTable?.Size.x; i++)
+            for(uint i = 0; i < Model.Table?.Size.x; i++)
             {
-                for(uint j = 0; j < _mockedTable?.Size.y; j++)
+                for(uint j = 0; j < Model.Table?.Size.y; j++)
                 {
-                    if (_mockedTable[i, j]?.Placement?.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Castle))
+                    if (Model.Table[i, j]?.Placement?.GetType() == typeof(TowerDefenceBackend.Persistence.Castle))
                     {
                         nCastle++;
                     }
-                    else if (_mockedTable[i, j]?.Placement?.GetType() == typeof(TowerDefenceGame_LPB.Persistence.Barrack))
+                    else if (Model.Table[i, j]?.Placement?.GetType() == typeof(TowerDefenceBackend.Persistence.Barrack))
                     {
-                        Barrack? barrack = _mockedTable[i, j]?.Placement as Barrack;
+                        Barrack? barrack = Model.Table[i, j]?.Placement as Barrack;
                         Assert.AreNotEqual(barrack?.OwnerType, PlayerType.NEUTRAL);
                         if (barrack?.OwnerType == PlayerType.RED)
                             rBarrack++;
@@ -462,7 +470,7 @@ namespace TowerDefence_Test
                             bBarrack++;
                     }
                     else
-                        Assert.IsNull(_mockedTable[i,j]?.Placement);
+                        Assert.IsNull(Model.Table[i,j]?.Placement);
                 }
             }
 

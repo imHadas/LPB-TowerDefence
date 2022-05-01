@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
     public class DelegateCommand : ICommand
     {

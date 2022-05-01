@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {

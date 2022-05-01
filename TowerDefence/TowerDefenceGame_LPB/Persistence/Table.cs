@@ -1,13 +1,22 @@
 using System.Collections;
 
-namespace TowerDefenceGame_LPB.Persistence
+namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// Class for storing all the <c>Field</c>s of the game board
+    /// </summary>
     public class Table : IEnumerable
     {
-        private Field[,] fields;
+        private readonly Field[,] fields;
 
-        public uint PhaseCounter { get; set; }  //named more accurately and changed to unsigned
+        /// <summary>
+        /// The total number of phases the <c>Table</c> has 'been through'
+        /// </summary>
+        public uint PhaseCounter { get; set; }
 
+        /// <summary>
+        /// Get the size of the encapsulated 2d array as a tuple
+        /// </summary>
         public (int x, int y) Size => (fields.GetLength(0), fields.GetLength(1));
 
         public Field this[uint x, uint y]
@@ -15,11 +24,23 @@ namespace TowerDefenceGame_LPB.Persistence
             get { return fields[x, y]; }
             set { fields[x,y] = value; }
         }
+
+        public Field this[int x, int y]
+        {
+            get { return this[(uint)x, (uint)y]; }
+            set { this[(uint)x, (uint)y] = value; }
+        }
         
         public Field this[(uint x, uint y) c]
         {
             get { return fields[c.x, c.y]; }
             set { fields[c.x,c.y] = value; }
+        }
+
+        public Field this[(int x, int y) c]
+        {
+            get { return this[(uint)c.x, (uint)c.y]; }
+            set { this[c.x, c.y] = value; }
         }
 
         public Table(uint height, uint width)

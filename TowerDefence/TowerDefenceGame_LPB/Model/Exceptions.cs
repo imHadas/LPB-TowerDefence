@@ -1,8 +1,8 @@
 using System;
 
-using TowerDefenceGame_LPB.Persistence;
+using TowerDefenceBackend.Persistence;
 
-namespace TowerDefenceGame_LPB.Model
+namespace TowerDefenceBackend.Model
 {
     public class NotEnoughMoneyException : Exception
     {

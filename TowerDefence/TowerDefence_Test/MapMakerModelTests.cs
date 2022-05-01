@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using TowerDefenceGame_LPB.Persistence;
-using TowerDefenceGame_LPB.Model;
-using TowerDefenceGame_LPB.DataAccess;
+using TowerDefenceBackend.Persistence;
+using TowerDefenceBackend.Model;
+using TowerDefenceBackend.DataAccess;
 using System;
 using Moq;
 using System.Threading.Tasks;
@@ -125,7 +125,7 @@ namespace TowerDefence_Test
             _mapMakerModel.SelectField(_mapMakerModel.Table[0, 0]);
             _mapMakerModel.SelectOption(MenuOption.BuildCastle);
             Assert.IsNotNull(_mapMakerModel.Table[0, 0].Placement);
-            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.GetType(),typeof(TowerDefenceBackend.Persistence.Castle));
             Assert.AreEqual(_mapMakerModel?.Table[0, 0]?.Placement?.Owner, _mapMakerModel?.BP);
 
             _mapMakerModel?.SelectPlayer(_mapMakerModel.RP);
@@ -133,7 +133,7 @@ namespace TowerDefence_Test
             _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 2]);
             _mapMakerModel?.SelectOption(MenuOption.BuildCastle);
             Assert.IsNotNull(_mapMakerModel?.Table[0, 2].Placement);
-            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceBackend.Persistence.Castle));
             Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.Owner,_mapMakerModel?.RP);
         }
 
@@ -202,7 +202,7 @@ namespace TowerDefence_Test
 
             _mapMakerModel?.SelectField(_mapMakerModel.Table[0, 2]);
             _mapMakerModel?.SelectOption(MenuOption.BuildCastle);
-            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceGame_LPB.Persistence.Castle));
+            Assert.AreEqual(_mapMakerModel?.Table[0, 2]?.Placement?.GetType(),typeof(TowerDefenceBackend.Persistence.Castle));
 
             _mapMakerModel?.SelectPlayer(null);
 

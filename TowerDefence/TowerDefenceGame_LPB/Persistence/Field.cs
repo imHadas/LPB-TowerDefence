@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace TowerDefenceGame_LPB.Persistence
+namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// Class for storing data related to a specific square of the game board
+    /// </summary>
     public class Field
     {
         public (uint x, uint y) Coords { get; private set; }

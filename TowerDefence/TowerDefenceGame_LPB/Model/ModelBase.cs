@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TowerDefenceGame_LPB.Persistence;
-using TowerDefenceGame_LPB.DataAccess;
+using TowerDefenceBackend.Persistence;
+using TowerDefenceBackend.DataAccess;
 
-namespace TowerDefenceGame_LPB.Model
+namespace TowerDefenceBackend.Model
 {
     public enum MenuOption
     {
@@ -86,11 +86,6 @@ namespace TowerDefenceGame_LPB.Model
         }*/
 
         #endregion
-
-        public async void LoadMap()
-        {
-
-        }
 
     }
 }

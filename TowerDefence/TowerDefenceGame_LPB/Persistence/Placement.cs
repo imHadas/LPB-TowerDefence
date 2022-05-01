@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
 
-namespace TowerDefenceGame_LPB.Persistence
+namespace TowerDefenceBackend.Persistence
 {
+    /// <summary>
+    /// Multiple visual representaion for terrain. (for expandability)
+    /// </summary>
     public enum TerrainType { Mountain, Lake }
 
+    /// <summary>
+    /// Class containing generic data related structures placed on a <c>Field</c>.
+    /// Cannot be directly constructed, must be derived.
+    /// </summary>
+    /// <remarks>Immutable</remarks>
     public class Placement
     {
         public Player? Owner { get; private set; }
@@ -21,16 +29,25 @@ namespace TowerDefenceGame_LPB.Persistence
     {
         public TerrainType Type { get; private set; }
 
-        public int NumericType => (int)Type; // maybe unnecessary
+        /// <summary>
+        /// Property for implicit casting of <c>Type</c>
+        /// </summary>
+        public uint NumericType => (uint)Type;
 
         public Terrain(uint x, uint y, TerrainType type) : base((x, y))
         {
             Type = type;
         }
     }
+
+    /// <summary>
+    /// <c>Player</c>'s base structure
+    /// </summary>
     public class Castle : Placement
     {
         public uint Health { get; private set; }  // changed to unsigned
+
+        public bool Destroyed => Health <= 0;
 
         public Castle(Player owner, uint x, uint y) : base((x, y), owner)
         {
@@ -43,6 +60,9 @@ namespace TowerDefenceGame_LPB.Persistence
         }
     }
 
+    /// <summary>
+    /// Structure where the <c>Player</c>'s <c>Unit</c>s will be placed down after training
+    /// </summary>
     public class Barrack : Placement
     {
         public (uint,uint) WhereToPlace { get; private set; }
@@ -55,11 +75,19 @@ namespace TowerDefenceGame_LPB.Persistence
             UnitQueue = new Queue<Unit>();
         }
 
+        /// <summary>
+        /// Method to modify the side of the <c>Barrack</c> where trained <c>Unit</c>s will be placed down
+        /// </summary>
+        /// <param name="path">Path from the <c>Barrack</c> to the enemy <c>Castle</c></param>
         public void NewPath(IList<(uint,uint)> path)
         {
             WhereToPlace = path[0];
         }
-        
+
+        /// <summary>
+        /// Method to modify the side of the <c>Barrack</c> where trained <c>Unit</c>s will be placed down
+        /// </summary>
+        /// <param name="tile">Coordinates of where the <c>Unit</c>s should be placed</param>
         public void NewPath((uint,uint) tile)
         {
             WhereToPlace = tile;

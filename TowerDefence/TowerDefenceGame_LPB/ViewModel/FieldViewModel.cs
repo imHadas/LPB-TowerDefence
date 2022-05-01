@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using TowerDefenceGame_LPB.Persistence;
+﻿using TowerDefenceBackend.Persistence;
 
-namespace TowerDefenceGame_LPB.ViewModel
+namespace TowerDefenceBackend.ViewModel
 {
     public class FieldViewModel : ViewModelBase
     {
@@ -24,7 +16,7 @@ namespace TowerDefenceGame_LPB.ViewModel
         private bool isSniperTower;
         private bool isBomberTower;
         */
-        private Brush isSelected;
+        private bool isSelected;
         private PlayerType playerType;
         private Placement placement;
         private string placementType;
@@ -219,7 +211,7 @@ namespace TowerDefenceGame_LPB.ViewModel
                 IsUnits = true;
         }
 
-        public Brush IsSelected 
+        public bool IsSelected 
         { 
             get { return isSelected; } 
             set 
