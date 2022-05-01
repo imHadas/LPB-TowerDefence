@@ -79,7 +79,7 @@ namespace TowerDefenceBackend.ViewModel
             model.UnitMoved += new EventHandler((object o, EventArgs e) => ButtonClick());
             model.GameOver += Model_GameOver;
 
-            NewGame();
+            //NewGame();
         }
 
         public void NewGame()

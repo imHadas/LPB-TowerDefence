@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.DataAccess;
@@ -9,7 +8,7 @@ using TowerDefenceBackend.DataAccess;
 
 namespace TowerDefenceBackend.Model
 {
-    
+
     public class GameModel : ModelBase
     {
         #region Variables
@@ -52,25 +51,17 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
-        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
+        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)
         {
             this.gameDataAccess = gameDataAccess;
-
-            //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
-
-            /*Table = new Table(11, 11);
-            ICollection<Barrack> rBarracks = new HashSet<Barrack>();
-            ICollection<Barrack> bBarracks = new HashSet<Barrack>();
-            rp = new Player(PlayerType.RED, rBarracks);
-            bp = new Player(PlayerType.BLUE, bBarracks);
-            rBarracks.Add(new Barrack(rp, 9, 9)); rBarracks.Add(new Barrack(rp, 9, 1));
-            bBarracks.Add(new Barrack(bp, 1, 1)); bBarracks.Add(new Barrack(bp, 1, 9));
-            currentPlayer = bp;
-            SetupTable();*/
-
-            NewGame();
+            rp = new(PlayerType.RED);
+            bp = new(PlayerType.BLUE);
+            SaveEnabled = true;
+            BuildEnabled = true;
+            //NewGame();
         }
 
+        /*[Obsolete("The game is always loaded", false)]
         public void NewGame()
         {
             //Table = new Table(11, 11);
@@ -91,7 +82,7 @@ namespace TowerDefenceBackend.Model
             if(NewGameCreated != null)
                 NewGameCreated(this, EventArgs.Empty);
             
-        }
+        }*/
 
         /// <summary>
         /// Method for end turn.
@@ -225,7 +216,7 @@ namespace TowerDefenceBackend.Model
             else if (bp.Castle.Health <= 0) OnGameOver(GameOverType.REDWIN);
         }
 
-        private void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
+        private static void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
         {
             List<T> toRemove = new();
             foreach (T item in coll)
@@ -354,7 +345,7 @@ namespace TowerDefenceBackend.Model
             }
         }
 
-        private void SetupCastles()
+        /*private void SetupCastles()
         {
             Table[rp.Castle.Coords.x, rp.Castle.Coords.y].Placement = rp.Castle;
             Table[bp.Castle.Coords.x, bp.Castle.Coords.y].Placement = bp.Castle;
@@ -366,7 +357,7 @@ namespace TowerDefenceBackend.Model
             {
                 Table[barrack.Coords].Placement = barrack;
             }
-        }
+        }*/
 
         public override void SelectOption(MenuOption option)
         {
