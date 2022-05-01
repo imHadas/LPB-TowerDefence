@@ -52,23 +52,14 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
-        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)  // it says some fields must contain a non-null value, so we should check this sometime!
+        public GameModel(IDataAccess<GameSaveObject> gameDataAccess)
         {
             this.gameDataAccess = gameDataAccess;
-
-            //ne = new Player(PlayerType.NEUTRAL); // do we need a neutral player? we could just make placement owner nullable
-
-            /*Table = new Table(11, 11);
-            ICollection<Barrack> rBarracks = new HashSet<Barrack>();
-            ICollection<Barrack> bBarracks = new HashSet<Barrack>();
-            rp = new Player(PlayerType.RED, rBarracks);
-            bp = new Player(PlayerType.BLUE, bBarracks);
-            rBarracks.Add(new Barrack(rp, 9, 9)); rBarracks.Add(new Barrack(rp, 9, 1));
-            bBarracks.Add(new Barrack(bp, 1, 1)); bBarracks.Add(new Barrack(bp, 1, 9));
-            currentPlayer = bp;
-            SetupTable();*/
-
-            NewGame();
+            rp = new(PlayerType.RED);
+            bp = new(PlayerType.BLUE);
+            SaveEnabled = true;
+            BuildEnabled = true;
+            //NewGame();
         }
 
         [Obsolete("The game is always loaded", false)]

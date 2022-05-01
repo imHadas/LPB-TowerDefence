@@ -4,6 +4,8 @@ using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.Model;
 using TowerDefenceBackend.DataAccess;
 using System;
+using Moq;
+using System.Threading.Tasks;
 
 namespace TowerDefence_Test
 {
@@ -13,21 +15,58 @@ namespace TowerDefence_Test
         private IDataAccess<GameSaveObject> _dataAccess;
         public GameModel Model { get; set; }
 
-        [TestInitialize]
-        public void Init()
+        public void MockDA()
         {
-            _dataAccess = new JsonDataAccess();
+            Table tablemock = new(15,10);
+            for(uint i = 0; i < 15; i++)
+            {
+                for (uint j = 0; j < 10; j++)
+                {
+                    tablemock[i, j] = new(i, j);
+                }
+            }
+            Player rp = new(PlayerType.RED);
+            Player bp = new(PlayerType.BLUE);
+            rp.Barracks.Add(new(rp, 9, 9)); rp.Barracks.Add(new(rp, 9, 1));
+            bp.Barracks.Add(new(bp, 1, 1)); rp.Barracks.Add(new(bp, 1, 9));
+            rp.Castle = new(rp, 9, 5);
+            bp.Castle = new(bp, 1, 5);
+            tablemock[rp.Castle.Coords].Placement = rp.Castle;
+            tablemock[bp.Castle.Coords].Placement = bp.Castle;
+            foreach (Barrack barrack in rp.Barracks)
+            {
+                tablemock[barrack.Coords].Placement = barrack;
+            }
+            foreach (Barrack barrack in bp.Barracks)
+            {
+                tablemock[barrack.Coords].Placement = barrack;
+            }
+
+            GameSaveObject gsomock = new(tablemock, bp, rp);
+
+            var dbmock = new Mock<JsonDataAccess>();
+            dbmock.Setup(d => d.LoadAsync("1")).Returns(Task.FromResult(gsomock));
+            _dataAccess = dbmock.Object;
         }
 
-        private GameModel MakeGameModel()
+        public async Task<GameModel> MakeGameModel()
         {
-            return new GameModel(_dataAccess);
+            GameModel newmodel = new(_dataAccess);
+            await newmodel.LoadGameAsync("1");
+            return newmodel;
         }
+
+        [TestInitialize]
+        public async void TestInit()
+        {
+            MockDA();
+            Model = await MakeGameModel();
+        }
+
 
         [TestMethod]
         public void GameModelInit()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
             Assert.IsNotNull(Model.CurrentPlayer);
             Assert.IsNotNull(Model.OtherPlayer);
@@ -37,7 +76,6 @@ namespace TowerDefence_Test
         [TestMethod]
         public void GameAdvance()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Assert.IsTrue(Model.CurrentPlayer.Type == PlayerType.BLUE);
@@ -58,7 +96,6 @@ namespace TowerDefence_Test
         [TestMethod]
         public void NewGame()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.Advance();
@@ -70,7 +107,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Basic")]
         public void TrainBasicUnit()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
@@ -88,7 +124,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train units"), TestCategory("Money"), TestCategory("Basic")]
         public void TrainBasicUnits()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
@@ -103,7 +138,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Tank")]
         public void TrainTankUnit()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
@@ -121,7 +155,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train units"), TestCategory("Money"), TestCategory("Tank")]
         public void TrainTankUnits()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
@@ -136,7 +169,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Train units"), TestCategory("No money")]
         public void TrainUnitsNoMoney()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
@@ -157,7 +189,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Basic tower")]
         public void BuildBasicTower()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[0, 0]);
@@ -170,7 +201,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Sniper tower")]
         public void BuildSniperTower()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[0, 0]);
@@ -183,7 +213,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Build tower"), TestCategory("Money"), TestCategory("Bomber tower")]
         public void BuildBomberTower()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[0, 0]);
@@ -196,7 +225,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("Build tower"), TestCategory("No money")]
         public void BuildAnyTowerNoMoney()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[0, 0]);
@@ -220,7 +248,6 @@ namespace TowerDefence_Test
         [TestMethod, TestCategory("DestroyTower"), TestCategory("With tower")]
         public void DestroyTower()
         {
-            Model = MakeGameModel();
             Assert.IsNotNull(Model);
 
             Model.SelectField(Model.Table[0, 0]);
