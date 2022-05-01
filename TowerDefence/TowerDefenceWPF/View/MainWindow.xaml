@@ -237,6 +237,7 @@
             <Label Grid.Row="0" Grid.Column="0" Content="HP:"/>
             <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedCastle.Health}"/>
         </Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Column="1" Grid.Row="3">
         <ItemsControl Grid.Column="1" Grid.Row="3" ItemsSource="{Binding UnitFields}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -282,6 +283,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        </ScrollViewer>
         <StatusBar Grid.Row="4">
             <TextBlock Text="Kör: "/>
             <TextBlock Text="{Binding Round}"/>
