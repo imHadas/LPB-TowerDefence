@@ -15,6 +15,7 @@ namespace TowerDefence_Test
         private IDataAccess<GameSaveObject> _dataAccess;
         public GameModel Model { get; set; }
 
+
         public void MockDA()
         {
             Table tablemock = new(15,10);
@@ -25,10 +26,11 @@ namespace TowerDefence_Test
                     tablemock[i, j] = new(i, j);
                 }
             }
+            tablemock.PhaseCounter = 1;
             Player rp = new(PlayerType.RED);
             Player bp = new(PlayerType.BLUE);
             rp.Barracks.Add(new(rp, 9, 9)); rp.Barracks.Add(new(rp, 9, 1));
-            bp.Barracks.Add(new(bp, 1, 1)); rp.Barracks.Add(new(bp, 1, 9));
+            bp.Barracks.Add(new(bp, 1, 1)); bp.Barracks.Add(new(bp, 1, 9));
             rp.Castle = new(rp, 9, 5);
             bp.Castle = new(bp, 1, 5);
             tablemock[rp.Castle.Coords].Placement = rp.Castle;
@@ -44,7 +46,7 @@ namespace TowerDefence_Test
 
             GameSaveObject gsomock = new(tablemock, bp, rp);
 
-            var dbmock = new Mock<JsonDataAccess>();
+            var dbmock = new Mock<IDataAccess<GameSaveObject>>();
             dbmock.Setup(d => d.LoadAsync("1")).Returns(Task.FromResult(gsomock));
             _dataAccess = dbmock.Object;
         }
@@ -57,7 +59,7 @@ namespace TowerDefence_Test
         }
 
         [TestInitialize]
-        public async void TestInit()
+        public async Task TestInit()
         {
             MockDA();
             Model = await MakeGameModel();
