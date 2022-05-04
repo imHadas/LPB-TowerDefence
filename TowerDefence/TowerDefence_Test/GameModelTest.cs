@@ -81,17 +81,17 @@ namespace TowerDefence_Test
 
             Assert.AreEqual(Model.CurrentPlayer.Type, PlayerType.BLUE);
             Model?.Advance();
-            Assert.AreEqual(Model?.Phase, 2);
+            Assert.AreEqual(Model?.Phase, (uint)2);
             Assert.AreEqual(Model?.CurrentPlayer.Type, PlayerType.RED);
-            Assert.AreEqual(Model?.Round, 1);
+            Assert.AreEqual(Model?.Round, (uint)1);
 
             while(Model?.Phase < 4)
             {
                 Model?.Advance();
             }
 
-            Assert.AreEqual(Model?.Phase, 4);
-            Assert.AreEqual(Model?.Round, 2);
+            Assert.AreEqual(Model?.Phase, (uint)4);
+            Assert.AreEqual(Model?.Round, (uint)2);
         }
 
         [TestMethod, TestCategory("Train unit"), TestCategory("Money"), TestCategory("Basic")]
@@ -125,8 +125,8 @@ namespace TowerDefence_Test
                 {
                     Model?.SelectOption(MenuOption.TrainBasic);
                 }
-                Assert.AreEqual(Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.BASIC_UNIT_COST);
-                Assert.AreEqual(Model.CurrentPlayer.Money, 0);
+                Assert.AreEqual((uint)Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.BASIC_UNIT_COST);
+                Assert.AreEqual(Model.CurrentPlayer.Money, (uint)0);
             }
         }
 
@@ -162,8 +162,8 @@ namespace TowerDefence_Test
                 {
                     Model?.SelectOption(MenuOption.TrainTank);
                 }
-                Assert.AreEqual(Model?.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
-                Assert.AreEqual(Model?.CurrentPlayer.Money, 0);
+                Assert.AreEqual((uint)Model?.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+                Assert.AreEqual(Model?.CurrentPlayer.Money, (uint)0);
             }
         }
 
@@ -179,14 +179,14 @@ namespace TowerDefence_Test
                 {
                     Model.SelectOption(MenuOption.TrainTank);
                 }
-                Assert.AreEqual(Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
-                Assert.AreEqual(Model.CurrentPlayer.Money, 0);
+                Assert.AreEqual((uint)Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+                Assert.AreEqual(Model.CurrentPlayer.Money, (uint)0);
 
                 Model.SelectOption(MenuOption.TrainTank);
-                Assert.AreEqual(Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+                Assert.AreEqual((uint)Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
 
                 Model.SelectOption(MenuOption.TrainBasic);
-                Assert.AreEqual(Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+                Assert.AreEqual((uint)Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
             }
         }
 
@@ -246,7 +246,7 @@ namespace TowerDefence_Test
             Model.SelectOption(MenuOption.BuildSniper);
             Assert.IsNull(Model.Table[0, 2].Placement);
 
-            Assert.AreEqual(Model.CurrentPlayer.Money, 0);
+            Assert.AreEqual(Model.CurrentPlayer.Money, (uint)0);
         }
 
         [TestMethod, TestCategory("DestroyTower"), TestCategory("With tower")]
@@ -320,9 +320,9 @@ namespace TowerDefence_Test
                 X--;
             }
 
-            Assert.AreEqual(Model?.Phase, 1);
+            Assert.AreEqual(Model?.Phase, (uint)1);
             Model?.Advance();
-            Assert.AreEqual?.Phase, 2);
+            Assert.AreEqual(Model?.Phase, (uint)2);
             
             Model?.SelectField(Model.Table[X, Y]);
             Model?.SelectOption(MenuOption.BuildBasic);
@@ -360,7 +360,7 @@ namespace TowerDefence_Test
             Model?.SelectField(Model.Table[0, 0]);
             Model?.SelectOption(MenuOption.UpgradeTower);
             Assert.IsFalse(range == (tower?.Range));
-            Assert.AreEqual(tower?.Level, 2);
+            Assert.AreEqual(tower?.Level, (uint)2);
         }
 
         [TestMethod, TestCategory("UpgradeTower"), TestCategory("Level max")]
@@ -382,12 +382,12 @@ namespace TowerDefence_Test
             Model?.SelectField(Model.Table[0, 0]);
             Model?.SelectOption(MenuOption.UpgradeTower);
             Assert.AreNotEqual(range, tower?.Range);
-            Assert.AreEqual(tower?.Level, 2);
+            Assert.AreEqual(tower?.Level, (uint)2);
 
             Model?.SelectField(Model.Table[0, 0]);
             Model?.SelectOption(MenuOption.UpgradeTower);
             Assert.AreNotEqual(speed, tower?.Speed);
-            Assert.AreEqual(tower?.Level, 3);
+            Assert.AreEqual(tower?.Level, (uint)3);
             
             
         }
@@ -422,28 +422,28 @@ namespace TowerDefence_Test
             await Model.Advance();
             await Model.Advance();
 
-            Assert.AreEqual(Model.Round, 2);
+            Assert.AreEqual(Model.Round, (uint)2);
             Assert.IsFalse(Model.GameOverProp);
 
             await Model.Advance();
             await Model.Advance();
             await Model.Advance();
 
-            Assert.AreEqual(Model.Round, 3);
+            Assert.AreEqual(Model.Round, (uint)3);
             Assert.IsFalse(Model.GameOverProp);
 
             await Model.Advance();
             await Model.Advance();
             await Model.Advance();
 
-            Assert.AreEqual(Model.Round, 4);
+            Assert.AreEqual(Model.Round, (uint)4);
             Assert.IsFalse(Model.GameOverProp);
 
             await Model.Advance();
             await Model.Advance();
             //Model.Advance();
 
-            Assert.AreEqual(Model.Round, 5);
+            Assert.AreEqual(Model.Round, (uint)5);
             Assert.IsTrue(Model.GameOverProp);
             Assert.IsFalse(Model.SaveEnabled);
             Assert.IsFalse(Model.BuildEnabled);
