@@ -19,6 +19,17 @@
 		<None Remove="Images\soldier.png" />
 		<None Remove="Images\tank.png" />
 		<None Remove="Images\upgrade.png" />
+		<None Remove="maps\map4.tdm" />
+		<None Remove="maps\straightforward.tdm" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="maps\map4.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="maps\straightforward.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
   <ItemGroup>

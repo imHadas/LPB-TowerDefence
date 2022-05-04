@@ -46,8 +46,9 @@ namespace TowerDefenceBackend.Model
 
         public void ChangeTableSize(uint height, uint width)
         {
+            if (width > 20 || width < 4 || height > 20 || height < 4)
+                throw new InvalidOperationException("You can't set the size bigger than 20x20!");
             Table newTable = new Table(height, width);
-            allCoords.Clear();
             for (uint i = 0; i < height; i++)
             {
                 for (uint j = 0; j < width; j++)
@@ -56,7 +57,6 @@ namespace TowerDefenceBackend.Model
                         newTable[i, j] = Table[i, j];
                     else
                         newTable[i, j] = new Field(i, j);
-                    allCoords.Add((i, j));
                 }
             }
             Table = newTable;
@@ -207,7 +207,7 @@ namespace TowerDefenceBackend.Model
             foreach (Barrack barrack in rp.Barracks)
             {
                 if (bp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, bp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != bp.Castle.Coords)
                     return false;
@@ -215,7 +215,7 @@ namespace TowerDefenceBackend.Model
             foreach (Barrack barrack in bp.Barracks)
             {
                 if (rp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, rp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != rp.Castle.Coords)
                     return false;
@@ -270,7 +270,7 @@ namespace TowerDefenceBackend.Model
 
             GameSaveObject save = await gameDataAccess.LoadAsync(path);
             (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
-
+            pathfinder = new AStar(Table);
             OnGameLoaded();
         }
 

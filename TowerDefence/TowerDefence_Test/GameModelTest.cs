@@ -398,34 +398,30 @@ namespace TowerDefence_Test
                 Model.SelectOption(MenuOption.TrainBasic);
             }
 
-            Model.Advance();
-            Model.Advance();
-            Model.Advance();
-            await Task.Delay(3000);
+            await Model.Advance();
+            await Model.Advance();
+            await Model.Advance();
 
             Assert.IsTrue(Model.Round == 2);
             Assert.IsFalse(Model.GameOverProp);
 
-            Model.Advance();
-            Model.Advance();
-            Model.Advance();
-            await Task.Delay(3000);
+            await Model.Advance();
+            await Model.Advance();
+            await Model.Advance();
 
             Assert.IsTrue(Model.Round == 3);
             Assert.IsFalse(Model.GameOverProp);
 
-            Model.Advance();
-            Model.Advance();
-            Model.Advance();
-            await Task.Delay(3000);
+            await Model.Advance();
+            await Model.Advance();
+            await Model.Advance();
 
             Assert.IsTrue(Model.Round == 4);
             Assert.IsFalse(Model.GameOverProp);
 
-            Model.Advance();
-            Model.Advance();
-            Model.Advance();
-            await Task.Delay(3200);
+            await Model.Advance();
+            await Model.Advance();
+            //Model.Advance();
 
             Assert.IsTrue(Model.Round == 5);
             Assert.IsTrue(Model.GameOverProp);

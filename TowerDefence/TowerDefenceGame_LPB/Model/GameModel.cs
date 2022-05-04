@@ -91,7 +91,7 @@ namespace TowerDefenceBackend.Model
         /// Checks Phase and sets Round.
         /// In attack phase, it disables building and it calls Attack().
         /// </summary>
-        public void Advance()
+        public async Task Advance()
         {
             Phase++;
             if(Phase % 3 == 0)
@@ -99,7 +99,7 @@ namespace TowerDefenceBackend.Model
                 BuildEnabled = false; // in attack phase you can't build, or place units
                 SaveEnabled = false;
                 PlaceUnits();
-                Attack();
+                await Attack();
             }
             else if(Phase % 3 == 1)
             {
@@ -141,7 +141,7 @@ namespace TowerDefenceBackend.Model
         /// <summary>
         /// Checks for new path, calls MoveUnits() and FireTowers() untill there are available units.
         /// </summary>
-        private async void Attack()
+        private async Task Attack()
         {
             AvailableUnits = new List<Unit>(); // List for available units
 

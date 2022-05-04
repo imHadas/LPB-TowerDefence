@@ -78,7 +78,7 @@ namespace TowerDefenceBackend.ViewModel
             SetBlueMoney = model.BP.Money;
             SetRedMoney = model.RP.Money;
             OptionFields = new ObservableCollection<OptionField>();
-            model.NewMapCreated += (sender, args) => RefreshTable();
+            model.NewMapCreated += (sender, args) => { GenerateTable(); RefreshTable(); };
             model.GameLoaded += Model_GameLoaded;
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
@@ -93,13 +93,23 @@ namespace TowerDefenceBackend.ViewModel
 
         private void Model_GameLoaded(object? sender, EventArgs e)
         {
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
             GenerateTable();
             RefreshTable();
             OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(SetGridSizeX));
+            OnPropertyChanged(nameof(SetGridSizeY));
         }
 
         private void GenerateTable()
         {
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
             Fields = new ObservableCollection<FieldViewModel>();
             for (int i = 0; i < GridSizeX; i++)
             {
@@ -145,8 +155,16 @@ namespace TowerDefenceBackend.ViewModel
 
         public void SetGameSize()
         {
+            try 
+            {
+                model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
+            }
+            catch(InvalidOperationException ex)
+            {
+                OnSendMessage(ex.Message);
+                return;
+            }
             SelectedField = null;
-            model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
             GenerateTable();

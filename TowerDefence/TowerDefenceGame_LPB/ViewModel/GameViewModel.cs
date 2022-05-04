@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.Model;
+using System.Threading.Tasks;
 
 namespace TowerDefenceBackend.ViewModel
 {
@@ -69,14 +70,14 @@ namespace TowerDefenceBackend.ViewModel
         public GameViewModel(GameModel model)
         {
             this.model = model;
-            AdvanceCommand = new DelegateCommand(p => AdvanceGame());
+            AdvanceCommand = new DelegateCommand(async p => await AdvanceGame());
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
             LoadGameCommand = new DelegateCommand(param => OnLoadGame());
             model.TowerFired += new EventHandler((object? o, EventArgs e) => RefreshTable());
-            model.AttackEnded += new EventHandler((object o, EventArgs e) => AdvanceGame());
-            model.UnitMoved += new EventHandler((object o, EventArgs e) => RefreshTable());
+            model.AttackEnded += new EventHandler(async (object? o, EventArgs e) => await AdvanceGame());
+            model.UnitMoved += new EventHandler((object? o, EventArgs e) => RefreshTable());
             model.GameLoaded += Model_GameLoaded;
-            model.UnitMoved += new EventHandler((object o, EventArgs e) => ButtonClick());
+            model.UnitMoved += new EventHandler((object? o, EventArgs e) => ButtonClick());
             model.GameOver += Model_GameOver;
 
             //NewGame();
@@ -91,9 +92,14 @@ namespace TowerDefenceBackend.ViewModel
             UnitFields = new ObservableCollection<Unit>();
             GenerateTable();
             RefreshTable();
-            SelectedField = null;
+            SelectedField = new FieldViewModel
+            {
+                IsCastle = false,
+                IsTower = false,
+            };
             SelectedTower = null;
             SelectedCastle = null;
+            OptionFields.Clear();
         }
 
         private void Model_GameLoaded(object? sender, EventArgs e)
@@ -183,9 +189,9 @@ namespace TowerDefenceBackend.ViewModel
             OnPropertyChanged(nameof(OptionFields));
             OnPropertyChanged(nameof(UnitFields));
         }
-        private void AdvanceGame()
+        private async Task AdvanceGame()
         {
-            model.Advance();
+            await model.Advance();
             SetupText();
             RefreshTable();
             ButtonClick();
