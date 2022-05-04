@@ -78,7 +78,7 @@ namespace TowerDefenceBackend.ViewModel
             SetBlueMoney = model.BP.Money;
             SetRedMoney = model.RP.Money;
             OptionFields = new ObservableCollection<OptionField>();
-            model.NewMapCreated += (sender, args) => RefreshTable();
+            model.NewMapCreated += (sender, args) => { GenerateTable(); RefreshTable(); };
             model.GameLoaded += Model_GameLoaded;
             SelectPlayerCommand = new DelegateCommand(param => SelectPlayer((string)param));
             SetGameSizeCommand = new DelegateCommand(p => SetGameSize());
@@ -95,13 +95,21 @@ namespace TowerDefenceBackend.ViewModel
         {
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
             GenerateTable();
             RefreshTable();
             OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(SetGridSizeX));
+            OnPropertyChanged(nameof(SetGridSizeY));
         }
 
         private void GenerateTable()
         {
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
             Fields = new ObservableCollection<FieldViewModel>();
             for (int i = 0; i < GridSizeX; i++)
             {
