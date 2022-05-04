@@ -46,6 +46,8 @@ namespace TowerDefenceBackend.Model
 
         public void ChangeTableSize(uint height, uint width)
         {
+            if (width > 20 || width < 0 || height > 20 || height < 0)
+                throw new InvalidOperationException("You can't set the size bigger than 20x20!");
             Table newTable = new Table(height, width);
             for (uint i = 0; i < height; i++)
             {

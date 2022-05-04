@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.DataAccess;
+using System;
 
 namespace TowerDefenceBackend.Model
 {
@@ -70,6 +71,8 @@ namespace TowerDefenceBackend.Model
         /// <param name="height"></param>
         protected void SetupTable(uint width, uint height)  //height is the x coordinates (columns), width is the y (rows)
         {
+            if (width > 20 || width < 0 || height > 20 || height < 0)
+                throw new InvalidOperationException("You can't set the size bigger than 20x20!");
             Table = new(height, width);
             for (uint i = 0; i < height; i++) //go through every column (x coord)
             {

@@ -256,7 +256,7 @@ namespace TowerDefenceWPF
 
         
 
-        private void SetupNewWindow(int windowType)
+        private void SetupNewWindow(int windowType) //not used should we delete?
         {
             //use values from dialogBox for gridSize
             //can use _dialogBox.Rows.Text and _dialogBox.Columns.Text with converting

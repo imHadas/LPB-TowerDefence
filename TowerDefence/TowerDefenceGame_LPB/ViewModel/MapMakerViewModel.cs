@@ -155,8 +155,16 @@ namespace TowerDefenceBackend.ViewModel
 
         public void SetGameSize()
         {
+            try 
+            {
+                model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
+            }
+            catch(InvalidOperationException ex)
+            {
+                OnSendMessage(ex.Message);
+                return;
+            }
             SelectedField = null;
-            model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
             GridSizeX = model.Table.Size.x;
             GridSizeY = model.Table.Size.y;
             GenerateTable();
