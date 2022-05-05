@@ -8,16 +8,13 @@ using TowerDefenceBackend.DataAccess;
 
 namespace TowerDefenceBackend.Model
 {
-
     public class GameModel : ModelBase
     {
-        #region Variables
+        #region Fields
 
-        //Table Table; // ModelBase has a Table
         private Player rp;
         private Player bp;
         private IList<Unit> AvailableUnits;
-        //Player ne;
 
         #endregion
 
@@ -36,8 +33,6 @@ namespace TowerDefenceBackend.Model
 
         public Player OtherPlayer => CurrentPlayer == rp ? bp : rp;
 
-        // public Table Table { get { return table; } } // ModelBase already has a Table
-
         #endregion
 
         #region Events
@@ -52,6 +47,51 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
+        #region On-Event methods
+
+        private void OnShowUnit()
+        {
+            ShowUnits?.Invoke(this,
+                (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
+                SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
+                );
+        }
+
+        public enum GameOverType { DRAW, REDWIN, BLUEWIN }
+
+        private void OnGameOver(GameOverType gameOverType)
+        {
+            BuildEnabled = false;
+            SaveEnabled = false;
+            GameOverProp = true;
+            GameOver?.Invoke(this, gameOverType);
+        }
+
+        private void OnGameLoaded()
+        {
+            pathfinder = new AStar(Table);
+            GameLoaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnTowerFired()
+        {
+            TowerFired?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnUnitMoved()
+        {
+            UnitMoved?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnAttackEnded()
+        {
+            AttackEnded?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Constructor(s)
+
         public GameModel(IDataAccess<GameSaveObject> gameDataAccess)
         {
             this.gameDataAccess = gameDataAccess;
@@ -59,70 +99,44 @@ namespace TowerDefenceBackend.Model
             bp = new(PlayerType.BLUE);
             SaveEnabled = true;
             BuildEnabled = true;
-            //NewGame();
         }
 
-        /*[Obsolete("The game is always loaded", false)]
-        public void NewGame()
-        {
-            //Table = new Table(11, 11);
-            SetupTable(10,15);
-            Phase = 1;
-            ICollection<Barrack> rBarracks = new HashSet<Barrack>();
-            ICollection<Barrack> bBarracks = new HashSet<Barrack>();
-            rBarracks.Add(new Barrack(rp,9,9)); rBarracks.Add(new Barrack(rp,9,1));
-            bBarracks.Add(new Barrack(bp,1,1)); bBarracks.Add(new Barrack(bp,1,9));
-            rp = new Player(PlayerType.RED, new Castle(rp,9,5) ,rBarracks);
-            bp = new Player(PlayerType.BLUE, new Castle(bp,1,5), bBarracks);
-            CurrentPlayer = bp;
-            SaveEnabled = true;
-            BuildEnabled = true;
-            GameOverProp = false;
-            SetupCastles();
-            SetupBarracks(rp);
-            SetupBarracks(bp);
-            if(NewGameCreated != null)
-                NewGameCreated(this, EventArgs.Empty);
-            
-        }*/
+        #endregion
+
+        #region Utility Methods
 
         /// <summary>
-        /// Method for end turn.
-        /// Checks Phase and sets Round.
-        /// In attack phase, it disables building and it calls Attack().
+        /// Takes a collection and removes elements that match the predicate
         /// </summary>
-        public async Task Advance()
+        /// <typeparam name="T">Type of data in the collection</typeparam>
+        /// <param name="coll">Collection to remove from</param>
+        /// <param name="pred">Predicate to filter with</param>
+        private static void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
         {
-            Phase++;
-            if(Phase % 3 == 0)
+            List<T> toRemove = new();
+            foreach (T item in coll)
             {
-                BuildEnabled = false; // in attack phase you can't build, or place units
-                SaveEnabled = false;
-                PlaceUnits();
-                await Attack();
+                if (pred.Invoke(item)) toRemove.Add(item);
             }
-            else if(Phase % 3 == 1)
+            foreach (T item in toRemove)
             {
-                bp.Money += Constants.PASSIVE_INCOME;
-                rp.Money += Constants.PASSIVE_INCOME;
-                BuildEnabled = true;
-                SaveEnabled = true;
-                CurrentPlayer = bp;
-            }
-            else if(Phase % 3 == 2)
-            {
-                SaveEnabled = true;
-                BuildEnabled = true;
-                CurrentPlayer = rp;
+                coll.Remove(item);
             }
         }
 
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Dumps all units from all <c>Barrack</c>s unit queue
+        /// </summary>
         private void PlaceUnits()
         {
             foreach (var barrack in rp.Barracks)
             {
                 barrack.NewPath(FindPath(barrack.Coords, bp.Castle.Coords));
-                while(barrack.UnitQueue.Count > 0)
+                while (barrack.UnitQueue.Count > 0)
                 {
                     Table[barrack.WhereToPlace].Units.Add(barrack.UnitQueue.Dequeue());
                 }
@@ -139,7 +153,7 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// Checks for new path, calls MoveUnits() and FireTowers() untill there are available units.
+        /// Checks for new path, calls MoveUnits() and FireTowers() as long as there are available units.
         /// </summary>
         private async Task Attack()
         {
@@ -194,7 +208,7 @@ namespace TowerDefenceBackend.Model
             } // sets new path for all units
 
 
-            while(AvailableUnits.Count > 0)
+            while (AvailableUnits.Count > 0)
             {
                 await MoveUnits();
                 await FireTower();
@@ -210,25 +224,11 @@ namespace TowerDefenceBackend.Model
                 tower.ResetCooldown();
             }
 
-            if (AttackEnded != null)
-                AttackEnded(this, EventArgs.Empty);
+            OnAttackEnded();
 
             if (rp.Castle.Health <= 0 && bp.Castle.Health <= 0) OnGameOver(GameOverType.DRAW);
             else if (rp.Castle.Health <= 0) OnGameOver(GameOverType.BLUEWIN);
             else if (bp.Castle.Health <= 0) OnGameOver(GameOverType.REDWIN);
-        }
-
-        private static void RemoveFromCollection<T>(ICollection<T> coll, Predicate<T> pred)
-        {
-            List<T> toRemove = new();
-            foreach (T item in coll)
-            {
-                if (pred.Invoke(item)) toRemove.Add(item);
-            }
-            foreach (T item in toRemove)
-            {
-                coll.Remove(item);
-            }
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace TowerDefenceBackend.Model
                     Table[unit.Path.First.Value].Units.Remove(unit);
                     unit.Moved();
                     Table[unit.Path.First.Value].Units.Add(unit);
-                    if(unit.Path.First.Value.Equals(GetOppositePlayer(unit.Owner).Castle.Coords))
+                    if (unit.Path.First.Value.Equals(GetOppositePlayer(unit.Owner).Castle.Coords))
                     {
                         GetOppositePlayer(unit.Owner).Castle.Damage();
                         Table[unit.Path.First.Value].Units.Remove(unit);
@@ -255,36 +255,44 @@ namespace TowerDefenceBackend.Model
                     }
                 }
             }
-            if(UnitMoved != null)
-                UnitMoved(this, EventArgs.Empty);
+            OnUnitMoved();
         }
 
+        /// <summary>
+        /// Gets the opposite <c>Player</c>
+        /// </summary>
+        /// <param name="player"><c>Player</c> to get the opposite of</param>
+        /// <returns>The other <c>Player</c></returns>
         private Player GetOppositePlayer(Player player)
         {
             if (player == bp) return rp;
             else return bp;
         }
 
+        /// <summary>
+        /// Iterates through all <c>Tower</c>s and damages <c>Unit</c>s in range
+        /// </summary>
+        /// <returns></returns>
         private async Task FireTower()
         {
-            await Task.Delay(500);
+            await Task.Delay(350);
 
             foreach (Tower tower in rp.Towers)
             {
-                if(tower.Cooldown > 0)
+                if (tower.Cooldown > 0)
                 {
                     tower.Cool();
                     continue;
                 }
-                for (int i = (int)tower.Coords.x-(int)tower.Range > 0 ? ((int)tower.Coords.x-(int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
                 {
                     for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
                     {
                         if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
                         {
-                            foreach(Unit unit in Table[(uint)i, (uint)j].Units)
+                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                             {
-                                if(unit.Owner != rp)
+                                if (unit.Owner != rp)
                                 {
                                     Table[(uint)i, (uint)j]?.Units?.First().Damage(tower.Damage);
                                 }
@@ -294,12 +302,11 @@ namespace TowerDefenceBackend.Model
                                     unit.Owner.Units.Remove(unit);
                                     Table[(uint)i, (uint)j].Units.Remove(unit);
                                     tower.Fire();
-                                    if (TowerFired != null)
-                                        TowerFired(this, EventArgs.Empty);
+                                    OnTowerFired();
                                     break;
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -314,13 +321,13 @@ namespace TowerDefenceBackend.Model
                 }
                 for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
                 {
-                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0;j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
                     {
                         if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
                         {
                             foreach (Unit unit in Table[(uint)i, (uint)j].Units)
                             {
-                                if(tower.Speed > 0)
+                                if (tower.Speed > 0)
                                 {
                                     if (unit.Owner != bp)
                                     {
@@ -332,12 +339,11 @@ namespace TowerDefenceBackend.Model
                                         unit.Owner.Units.Remove(unit);
                                         Table[(uint)i, (uint)j].Units.Remove(unit);
                                         tower.Fire();
-                                        if (TowerFired != null)
-                                            TowerFired(this, EventArgs.Empty);
+                                        OnTowerFired();
                                         break;
                                     }
                                 }
-                                
+
                             }
                         }
                     }
@@ -345,20 +351,174 @@ namespace TowerDefenceBackend.Model
             }
         }
 
-        /*private void SetupCastles()
+        /// <summary>
+        /// Adds a unit to the training queue of a random <c>Barrack</c> or the current <c>Player</c>
+        /// </summary>
+        /// <param name="unit"><c>Unit to train</c></param>
+        private void TrainUnit(Unit unit)
         {
-            Table[rp.Castle.Coords.x, rp.Castle.Coords.y].Placement = rp.Castle;
-            Table[bp.Castle.Coords.x, bp.Castle.Coords.y].Placement = bp.Castle;
+            Barrack placeTo = CurrentPlayer.Barracks
+                    .ElementAt(new Random().Next(2));
+
+            if (CurrentPlayer.Money < unit.Cost)
+                return;
+
+            placeTo.UnitQueue.Enqueue(unit);
+            CurrentPlayer.Units.Add(unit);
+            CurrentPlayer.Money -= unit.Cost;
         }
 
-        private void SetupBarracks(Player player)
+        /// <summary>
+        /// Builds a <c>Tower</c> on the selected <c>Field</c> if valid
+        /// </summary>
+        /// <param name="tower"><c>Tower to build</c></param>
+        /// <exception cref="InvalidPlacementException">Thrown if placement would be incorrect</exception>
+        private void BuildTower(Tower tower)
         {
-            foreach(Barrack barrack in player.Barracks)
-            {
-                Table[barrack.Coords].Placement = barrack;
-            }
-        }*/
+            if (SelectedField.Placement is not null)
+                throw new InvalidPlacementException(SelectedField, "Cannot build tower on non-empty field");
+            if (SelectedField.Units.Count > 0)
+                throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");
+            if (CurrentPlayer.Money < tower.Cost)
+                return;
 
+            SelectedField.Placement = tower;
+
+            if (!ValidatePath())
+            {
+                SelectedField.Placement = null;
+                return;
+            }
+            pathfinder.ChangeState(SelectedField);
+            CurrentPlayer.Towers.Add(tower);
+            CurrentPlayer.Money -= tower.Cost;
+        }
+
+        /// <summary>
+        /// Upgrades <c>Tower</c>
+        /// </summary>
+        /// <param name="tower"><c>Tower</c> to upgrade</param>
+        private static void UpgradeTower(Tower tower)
+        {
+            tower.LevelUp();
+        }
+
+        /// <summary>
+        /// Destroys the given <c>Tower</c>, updates pathfinder
+        /// </summary>
+        /// <param name="tower"><c>Tower</c> to destroy</param>
+        private void DestroyTower(Tower tower)
+        {
+            CurrentPlayer.Money += tower.Cost;
+            CurrentPlayer.Towers.Remove(tower);
+            Table[tower.Coords].Placement = null;
+            pathfinder.ChangeState(Table[tower.Coords]);
+        }
+
+        /// <summary>
+        /// Validates all necessary paths for game to function correctly
+        /// </summary>
+        /// <returns>Whether all paths are traversable</returns>
+        private bool ValidatePath()
+        {
+            IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
+            foreach (Barrack barrack in rp.Barracks)
+            {
+                path = FindPath(barrack.Coords, bp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != bp.Castle.Coords)
+                    return false;
+            }
+            foreach (Barrack barrack in bp.Barracks)
+            {
+                path = FindPath(barrack.Coords, rp.Castle.Coords);
+                if (path.Count == 0 || path.Last() != rp.Castle.Coords)
+                    return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Method for end turn.
+        /// Checks Phase and sets Round.
+        /// In attack phase, it disables building and it calls Attack().
+        /// </summary>
+        public async Task Advance()
+        {
+            Phase++;
+            if (Phase % 3 == 0)
+            {
+                BuildEnabled = false; // in attack phase you can't build, or place units
+                SaveEnabled = false;
+                PlaceUnits();
+                await Attack();
+            }
+            else if (Phase % 3 == 1)
+            {
+                bp.Money += Constants.PASSIVE_INCOME;
+                rp.Money += Constants.PASSIVE_INCOME;
+                BuildEnabled = true;
+                SaveEnabled = true;
+                CurrentPlayer = bp;
+            }
+            else if (Phase % 3 == 2)
+            {
+                SaveEnabled = true;
+                BuildEnabled = true;
+                CurrentPlayer = rp;
+            }
+        }
+
+        /// <summary>
+        /// Method for selecting a field model-side
+        /// </summary>
+        /// <param name="field">The field to be selected</param>
+        /// <returns>List of possible menu options for a field</returns>
+        public override ICollection<MenuOption> SelectField(Field field)
+        {
+            SelectedField = field;
+            ICollection<MenuOption> options = new List<MenuOption>();
+            if (SelectedField.Placement is null)
+            {
+                if (SelectedField.Units.Count != 0)
+                    OnShowUnit();
+                else if (BuildEnabled)
+                {
+                    options.Add(MenuOption.BuildBasic);
+                    options.Add(MenuOption.BuildBomber);
+                    options.Add(MenuOption.BuildSniper);
+                }
+            }
+            else if (BuildEnabled && SelectedField.Placement.OwnerType == CurrentPlayer.Type)
+            {
+                switch (SelectedField.Placement)
+                {
+                    case Tower:
+                        if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
+                            options.Add(MenuOption.UpgradeTower);
+                        options.Add(MenuOption.DestroyTower);
+                        break;
+                    case Castle: /*FALLTHROUGH*/
+                    case Barrack:
+                        options.Add(MenuOption.TrainBasic);
+                        options.Add(MenuOption.TrainTank);
+                        break;
+                }
+            }
+
+
+            return options;
+        }
+
+        /// <summary>
+        /// Method for selecting an option (related to the selected <c>Field</c>
+        /// </summary>
+        /// <param name="option">Option to select</param>
+        /// <exception cref="InvalidOperationException">Thrown when there is no selected <c>Field</c></exception>
         public override void SelectOption(MenuOption option)
         {
             if (SelectedField is null)
@@ -386,146 +546,15 @@ namespace TowerDefenceBackend.Model
                 case MenuOption.DestroyTower:
                     DestroyTower((Tower)SelectedField.Placement);
                     break;
-                /*case MenuOption.ShowUnits:      //not an option, but a consequence of selecting a field with units
-                    OnShowUnit();
-                    break;*/
                 default:
                     break;
             }
-                
+
         }
 
-        private void TrainUnit(Unit unit)
-        {
-            Barrack placeTo = CurrentPlayer.Barracks
-                    .ElementAt(new Random().Next(2));
+        #endregion
 
-            /*if (Table[coords].Placement is not null) //empty field has type Placement
-                throw new InvalidPlacementException(Table[coords], "Unit cannot be placed on (" + coords.Item1 + ";" + coords.Item2 + ")");*/
-
-            if (CurrentPlayer.Money < unit.Cost)
-                return;
-                //throw new NotEnoughMoneyException(CurrentPlayer.Money, unit.Cost, "Player does not have enough money to buy unit");
-            
-            placeTo.UnitQueue.Enqueue(unit);
-            CurrentPlayer.Units.Add(unit);
-            CurrentPlayer.Money -= unit.Cost;
-        }
-
-        private void BuildTower(Tower tower)
-        {
-            if (SelectedField.Placement is not null) //empty field has tyype Placement
-                throw new InvalidPlacementException(SelectedField, "Cannot build tower on non-empty field");
-            if (SelectedField.Units.Count > 0)
-                throw new InvalidPlacementException(SelectedField, "Cannot build tower on field that contains units");
-            if (CurrentPlayer.Money < tower.Cost)
-                return;
-            //throw new NotEnoughMoneyException(CurrentPlayer.Money, tower.Cost, "Player does not have enough money to build this tower");
-            
-
-            SelectedField.Placement = tower;
-            
-            if (!ValidatePath())
-            {
-                SelectedField.Placement = null;
-                
-                return;
-            }
-            pathfinder.ChangeState(SelectedField);
-            CurrentPlayer.Towers.Add(tower);
-            CurrentPlayer.Money -= tower.Cost;
-        }
-
-        private static void UpgradeTower(Tower tower)
-        {
-            tower.LevelUp();
-        }
-
-        private void DestroyTower(Tower tower)
-        {
-            CurrentPlayer.Money += tower.Cost;
-            CurrentPlayer.Towers.Remove(tower);
-            Table[tower.Coords].Placement = null;
-            pathfinder.ChangeState(Table[tower.Coords]);
-        }
-
-        /// <summary>
-        /// Method for selecting a field model-side
-        /// </summary>
-        /// <param name="field">The field to be selected</param>
-        /// <returns>List of possible menu options for a field</returns>
-        public override ICollection<MenuOption> SelectField(Field field)
-        {
-            SelectedField = field;
-            ICollection<MenuOption> options = new List<MenuOption>();
-            if(SelectedField.Placement is null)
-            {
-                if (SelectedField.Units.Count != 0)
-                    OnShowUnit();
-                else if(BuildEnabled)
-                {
-                    options.Add(MenuOption.BuildBasic);
-                    options.Add(MenuOption.BuildBomber);
-                    options.Add(MenuOption.BuildSniper);
-                }
-            }
-            else if(BuildEnabled && SelectedField.Placement.OwnerType == CurrentPlayer.Type)
-            {
-                switch (SelectedField.Placement)
-                {
-                    case Tower:
-                        if (((Tower)SelectedField.Placement).Level < Constants.MAX_TOWER_LEVEL)
-                            options.Add(MenuOption.UpgradeTower);
-                        options.Add(MenuOption.DestroyTower);
-                        break;
-                    case Castle: /*FALLTHROUGH*/
-                    case Barrack:
-                        options.Add(MenuOption.TrainBasic);
-                        options.Add(MenuOption.TrainTank);
-                        break;
-                }
-            } 
-                
-
-            return options;
-        }
-
-        private bool ValidatePath()
-        {
-            IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
-            foreach (Barrack barrack in rp.Barracks)
-            {
-                path = FindPath(barrack.Coords, bp.Castle.Coords);
-                if (path.Count == 0 || path.Last() != bp.Castle.Coords)
-                    return false;
-            }
-            foreach (Barrack barrack in bp.Barracks)
-            {
-                path = FindPath(barrack.Coords, rp.Castle.Coords);
-                if (path.Count == 0 || path.Last() != rp.Castle.Coords)
-                    return false;
-            }
-
-            return true;
-        }
-
-        private void OnShowUnit()
-        {
-            ShowUnits?.Invoke(this,
-                (SelectedField.Units.Intersect(CurrentPlayer.Units).ToList(),
-                SelectedField.Units.Intersect(OtherPlayer.Units).ToList())
-                );
-        }
-
-        public enum GameOverType { DRAW, REDWIN, BLUEWIN }
-
-        private void OnGameOver(GameOverType gameOverType)
-        {
-            BuildEnabled = false;
-            SaveEnabled = false;
-            GameOverProp = true;
-            GameOver?.Invoke(this, gameOverType);
-        }
+        #region Persistence Methods
 
         public async Task SaveGameAsync(string path)
         {
@@ -533,14 +562,6 @@ namespace TowerDefenceBackend.Model
                 throw new InvalidOperationException("No data access is provided.");
 
             await gameDataAccess.SaveAsync(path, new(Table, bp, rp));
-        }
-
-        
-
-        private void OnGameLoaded()
-        {
-            pathfinder = new AStar(Table);
-            GameLoaded?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task LoadGameAsync(string path)
@@ -559,5 +580,7 @@ namespace TowerDefenceBackend.Model
             }
             OnGameLoaded();
         }
+
+        #endregion
     }
 }
