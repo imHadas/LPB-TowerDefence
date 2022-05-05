@@ -4,6 +4,9 @@ using TowerDefenceBackend.Persistence;
 
 namespace TowerDefenceBackend.Model
 {
+    /// <summary>
+    /// Interface for a pathfinder
+    /// </summary>
     public abstract class IPathfinder
     {
         /// <summary>
@@ -27,11 +30,17 @@ namespace TowerDefenceBackend.Model
     /// </summary>
     public class AStar : IPathfinder
     {
+
+        #region Fields
+
         /// <summary>
         /// All <c>Fields</c> stored as <c>Nodes</c>
         /// </summary>
-        private HashSet<Node> allNodes;
+        private readonly HashSet<Node> allNodes;
 
+        #endregion
+
+        #region Constructor(s)
 
         /// <summary>
         /// Construct pathfinder
@@ -45,6 +54,84 @@ namespace TowerDefenceBackend.Model
                 allNodes.Add(new Node(field));
             }
         }
+
+        #endregion
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Calculates the heuristic value for the <c>from</c> <c>Node</c> with the destination of <c>to</c> with Manhattan distance.
+        /// </summary>
+        /// <param name="from">Starting <c>Node</c></param>
+        /// <param name="to">Destination <c>Node</c></param>
+        /// <returns>The heuristic value (as a uint)</returns>
+        private static uint Heuristic(Node from, Node to)
+        {
+            return (uint)(Math.Abs((int)from.Coords.x - (int)to.Coords.x) + Math.Abs((int)from.Coords.y - (int)to.Coords.y));
+        }
+
+        /// <summary>
+        /// Extracts the coordinates from a collection of <c>Node</c>s
+        /// </summary>
+        /// <param name="nodes">The <c>Collection</c> of <c>Nodes</c> from which the coordinates are extracted</param>
+        /// <returns>A <c>List</c> of coordinates (as uint tuples)</returns>
+        private static List<(uint, uint)> NodesToCoords(ICollection<Node> nodes)
+        {
+            List<(uint, uint)> result = new();
+            foreach (Node node in nodes)
+            {
+                result.Add(node.Coords);
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Finds all the neighbours of a given <c>Node</c> (if they exist)
+        /// </summary>
+        /// <param name="node">The <c>Node</c> in the center</param>
+        /// <returns><c>Collection</c> of neighbouring <c>Node</c>s</returns>
+        private ICollection<Node> Neighbours(Node node)
+        {
+            HashSet<Node> result = new();
+            Node? current;
+            if ((current = GetNodeByCoord(node.Coords.x - 1, node.Coords.y)) is not null)
+            {
+                result.Add((Node)current.Clone());
+            }
+            if ((current = GetNodeByCoord(node.Coords.x, node.Coords.y - 1)) is not null)
+            {
+                result.Add((Node)current.Clone());
+            }
+            if ((current = GetNodeByCoord(node.Coords.x + 1, node.Coords.y)) is not null)
+            {
+                result.Add((Node)current.Clone());
+            }
+            if ((current = GetNodeByCoord(node.Coords.x, node.Coords.y + 1)) is not null)
+            {
+                result.Add((Node)current.Clone());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the <c>Node</c> from <c>allNodes</c> which's coordinates match.
+        /// </summary>
+        /// <param name="x">X coordinate</param>
+        /// <param name="y">Y coordinate</param>
+        /// <returns><c>Node</c> with matching coordinates. Null if there is no such.</returns>
+        private Node? GetNodeByCoord(uint x, uint y)
+        {
+            allNodes.TryGetValue(new(new(x, y)), out Node? result);
+            return result;
+        }
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Implemention of changing a <c>Field</c>'s state
@@ -67,19 +154,19 @@ namespace TowerDefenceBackend.Model
         public override IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to, ICollection<Field>? except = null)
         {
             HashSet<Node> exceptNodes = new();
-            if(except is not null) foreach (var field in except)
-            {
-                exceptNodes.Add(new Node(field));
-            }
+            if (except is not null) foreach (var field in except)
+                {
+                    exceptNodes.Add(new Node(field));
+                }
 
             HashSet<Node> closedSet = new();
             List<WeightedNode> openSet = new();
             LinkedList<Node> path = new();
 
-            Node end = getNodeByCoord(to.Item1, to.Item2);
+            Node end = GetNodeByCoord(to.Item1, to.Item2);
             WeightedNode start;
             {
-                Node temp = getNodeByCoord(from.Item1, from.Item2);
+                Node temp = GetNodeByCoord(from.Item1, from.Item2);
                 start = new(temp, 0, Heuristic(temp, end));
             }
 
@@ -97,7 +184,7 @@ namespace TowerDefenceBackend.Model
                     while (!(current.Equals(start) || current is null))
                     {
                         path.AddFirst(current);
-                        current = (WeightedNode) current.Parent;
+                        current = (WeightedNode)current.Parent;
                     }
                     path.AddFirst(start);
                     return NodesToCoords(path);
@@ -128,74 +215,8 @@ namespace TowerDefenceBackend.Model
             return new List<(uint, uint)>();
         }
 
-        /// <summary>
-        /// Extracts the coordinates from a collection of <c>Node</c>s
-        /// </summary>
-        /// <param name="nodes">The <c>Collection</c> of <c>Nodes</c> from which the coordinates are extracted</param>
-        /// <returns>A <c>List</c> of coordinates (as uint tuples)</returns>
-        private List<(uint, uint)> NodesToCoords(ICollection<Node> nodes)
-        {
-            List<(uint, uint)> result = new List<(uint, uint)>();
-            foreach (Node node in nodes)
-            {
-                result.Add(node.Coords);
-            }
-            return result;
-        }
+        #endregion
 
-        /// <summary>
-        /// Calculates the heuristic value for the <c>from</c> <c>Node</c> with the destination of <c>to</c> with Manhattan distance.
-        /// </summary>
-        /// <param name="from">Starting <c>Node</c></param>
-        /// <param name="to">Destination <c>Node</c></param>
-        /// <returns>The heuristic value (as a uint)</returns>
-        private uint Heuristic(Node from, Node to)
-        {
-            return (uint)(Math.Abs((int)from.Coords.x - (int)to.Coords.x) + Math.Abs((int)from.Coords.y - (int)to.Coords.y)); //ki hitte volna, hogy a nummod hasznos lesz? (delta x + delta y) aka Manhattan norma
-        }
-
-        /// <summary>
-        /// Finds all the neighbours of a given <c>Node</c> (if they exist)
-        /// </summary>
-        /// <param name="node">The <c>Node</c> in the center</param>
-        /// <returns><c>Collection</c> of neighbouring <c>Node</c>s</returns>
-        private ICollection<Node> Neighbours(Node node)
-        {
-            HashSet<Node> result = new();
-            Node? current;
-            if ((current = getNodeByCoord(node.Coords.x - 1, node.Coords.y)) is not null)
-            {
-                result.Add((Node)current.Clone());
-            }
-            if((current = getNodeByCoord(node.Coords.x, node.Coords.y - 1)) is not null)
-            {
-                result.Add((Node)current.Clone());
-            }
-            if ((current = getNodeByCoord(node.Coords.x + 1, node.Coords.y)) is not null)
-            {
-                result.Add((Node)current.Clone());
-            }
-            if ((current = getNodeByCoord(node.Coords.x, node.Coords.y + 1)) is not null)
-            {
-                result.Add((Node)current.Clone());
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the <c>Node</c> from <c>allNodes</c> which's coordinates match.
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y">Y coordinate</param>
-        /// <returns><c>Node</c> with matching coordinates. Null if there is no such.</returns>
-        private Node? getNodeByCoord(uint x, uint y)
-        {
-            Node? result = null;
-            allNodes.TryGetValue(new(new(x, y)), out result);
-            return result;
-        }
-
-        
     }
 
     /// <summary>
@@ -223,6 +244,7 @@ namespace TowerDefenceBackend.Model
     class Node : IEquatable<Node>, ICloneable, IComparable<Node>
     {
         public Node? Parent { get; set; }
+
         /// <summary>
         /// Encapsulated <c>Field</c>
         /// </summary>
