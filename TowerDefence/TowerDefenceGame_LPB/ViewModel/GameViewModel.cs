@@ -191,8 +191,9 @@ namespace TowerDefenceBackend.ViewModel
         }
         private async Task AdvanceGame()
         {
-            await model.Advance();
+            var t = model.Advance();
             SetupText();
+            await t;
             RefreshTable();
             ButtonClick();
         }
