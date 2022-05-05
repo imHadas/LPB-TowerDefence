@@ -34,7 +34,7 @@ namespace TowerDefenceBackend.Model
     /// </summary>
     public abstract class ModelBase
     {
-        #region Variables
+        #region Fields
 
         protected IDataAccess<GameSaveObject> gameDataAccess;
 
@@ -50,19 +50,8 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
-        /// <summary>
-        /// Abstract method for selecting a <c>Field</c> on the <c>Table</c>
-        /// </summary>
-        /// <param name="field"><c>Field</c> to select</param>
-        /// <returns>Collection of available menu options</returns>
-        public abstract ICollection<MenuOption> SelectField(Field field);
+        #region Protected Methods
 
-        /// <summary>
-        /// Abstract method selecting an option
-        /// </summary>
-        /// <param name="option">Option to select</param>
-        public abstract void SelectOption(MenuOption option);
-        
         /// <summary>
         /// Sets <c>Table</c> to specified height and sets all fields to empty ones.
         /// Also updates pathfinder
@@ -105,5 +94,25 @@ namespace TowerDefenceBackend.Model
         {
             return FindPath(from.Coords, to.Coords);
         }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Abstract method for selecting a <c>Field</c> on the <c>Table</c>
+        /// </summary>
+        /// <param name="field"><c>Field</c> to select</param>
+        /// <returns>Collection of available menu options</returns>
+        public abstract ICollection<MenuOption> SelectField(Field field);
+
+        /// <summary>
+        /// Abstract method selecting an option
+        /// </summary>
+        /// <param name="option">Option to select</param>
+        public abstract void SelectOption(MenuOption option);
+
+        #endregion
+                
     }
 }
