@@ -11,6 +11,7 @@ namespace TowerDefenceBackend.Persistence
         /// <summary>
         /// Amount of cooldown after firing.
         /// </summary>
+        /// <remarks>A lower value means faster firing</remarks>
         public uint Speed { get; protected set; }
         public uint Damage { get; protected set; }
         public uint Range { get; protected set; }
@@ -26,17 +27,27 @@ namespace TowerDefenceBackend.Persistence
         {
             return Math.Sqrt(Math.Pow((int)coords.x - (int)Coords.x, 2) + Math.Pow((int)coords.y - (int)Coords.y, 2)) <= Range;
         }
+        /// <summary>
+        /// Starts cooldown of the <c>Tower</c>
+        /// </summary>
         public virtual void Fire()
         {
             Cooldown = Speed;
         }
 
+        /// <summary>
+        /// Decrements the <c>Tower</c>'s cooldown
+        /// </summary>
+        /// <param name="amount">Amount to subtract</param>
         public virtual void Cool(uint amount = 1)
         {
             if(amount > Cooldown) Cooldown = 0;
             else Cooldown -= amount;
         }
 
+        /// <summary>
+        /// Sets cooldown to 0, meaning the <c>Tower</c> can immediately fire again
+        /// </summary>
         public virtual void ResetCooldown()
         {
             Cooldown = 0;

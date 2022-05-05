@@ -25,6 +25,10 @@ namespace TowerDefenceBackend.Persistence
             Coords = coords;
         }
     }
+
+    /// <summary>
+    /// Obstacles with no owner
+    /// </summary>
     public class Terrain : Placement
     {
         public TerrainType Type { get; private set; }
