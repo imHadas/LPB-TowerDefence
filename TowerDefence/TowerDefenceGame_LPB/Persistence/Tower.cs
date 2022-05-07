@@ -88,7 +88,7 @@ namespace TowerDefenceBackend.Persistence
         {
             Speed = 2;
             Damage = 1;
-            Range = 2;
+            Range = 1;
             Level = 1;
         }
     }

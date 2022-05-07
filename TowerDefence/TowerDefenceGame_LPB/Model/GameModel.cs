@@ -163,44 +163,22 @@ namespace TowerDefenceBackend.Model
             {
                 for (int j = 0; j < Table.Size.y; j++)
                 {
-                    if (Table[(uint)i, (uint)j].Units.Count > 0)
+                    if (Table[i, j].Units.Count > 0)
                     {
-                        IList<(uint x, uint y)> rpPath = null;
-                        IList<(uint x, uint y)> bpPath = null;
-                        bool rpTobp = false;
-                        bool bpTorp = false;
-                        foreach (Unit unit in Table[(uint)i, (uint)j].Units)
-                        {
-                            if (bpTorp && rpTobp)
-                                break;
-                            else if (!bpTorp && unit.Owner == bp)
-                            {
-                                bpTorp = true;
-                            }
-                            else if (!rpTobp && unit.Owner == rp)
-                            {
-                                rpTobp = true;
-                            }
-                        }
-                        if (bpTorp || rpTobp)
-                        {
-                            if (rpTobp)
-                                rpPath = FindPath(Table[(uint)i, (uint)j].Coords, bp.Castle.Coords);
-                            if (bpTorp)
-                                bpPath = FindPath(Table[(uint)i, (uint)j].Coords, rp.Castle.Coords);
-                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
-                            {
-                                unit.ResetStamina();
-                                AvailableUnits.Add(unit); // add unit to list
+                        IList<(uint x, uint y)> rpPath = FindPath(Table[i, j].Coords, bp.Castle.Coords);
+                        IList<(uint x, uint y)> bpPath = FindPath(Table[i, j].Coords, rp.Castle.Coords);
 
-                                if (unit.Owner == bp)
-                                {
-                                    unit.NewPath(bpPath);
-                                }
-                                else if (unit.Owner == rp)
-                                {
-                                    unit.NewPath(rpPath);
-                                }
+                        foreach (Unit unit in Table[i, j].Units)
+                        {
+                            unit.ResetStamina();
+                            AvailableUnits.Add(unit);
+                            if(unit.Owner.Equals(bp))
+                            {
+                                unit.NewPath(bpPath);
+                            }
+                            else if(unit.Owner.Equals(rp))
+                            {
+                                unit.NewPath(rpPath);
                             }
                         }
                     }
@@ -284,29 +262,25 @@ namespace TowerDefenceBackend.Model
                     tower.Cool();
                     continue;
                 }
-                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i < Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
                 {
-                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j < Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
                     {
-                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        foreach (Unit unit in Table[i, j].Units)
                         {
-                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                            if (unit.Owner != rp)
                             {
-                                if (unit.Owner != rp)
-                                {
-                                    Table[(uint)i, (uint)j]?.Units?.First().Damage(tower.Damage);
-                                }
-                                if (unit.Health == 0)
-                                {
-                                    rp.Money += unit.Cost / 2;
-                                    unit.Owner.Units.Remove(unit);
-                                    Table[(uint)i, (uint)j].Units.Remove(unit);
-                                    tower.Fire();
-                                    OnTowerFired();
-                                    break;
-                                }
+                                unit.Damage(tower.Damage);
                             }
-
+                            if (unit.Health == 0)
+                            {
+                                rp.Money += unit.Cost / 2;
+                                unit.Owner.Units.Remove(unit);
+                                Table[i, j].Units.Remove(unit);
+                                tower.Fire();
+                                OnTowerFired();
+                                break;
+                            }
                         }
                     }
                 }
@@ -319,31 +293,24 @@ namespace TowerDefenceBackend.Model
                     tower.Cool();
                     continue;
                 }
-                for (int i = (int)tower.Coords.x - (int)tower.Range > 0 ? ((int)tower.Coords.x - (int)tower.Range) : 0; i < (tower.Coords.x + tower.Range < Table.Size.x ? (int)(tower.Coords.x + tower.Range) : Table.Size.x); i++)
+                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i < Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
                 {
-                    for (int j = (int)tower.Coords.y - (int)tower.Range > 0 ? ((int)tower.Coords.y - (int)tower.Range) : 0; j < (tower.Coords.y + tower.Range < Table.Size.y ? (int)(tower.Coords.y + tower.Range) : Table.Size.y); j++)
+                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j < Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
                     {
-                        if (tower.InRange(Table[(uint)i, (uint)j].Coords) && Table[(uint)i, (uint)j].Units.Count > 0)
+                        foreach (Unit unit in Table[i, j].Units)
                         {
-                            foreach (Unit unit in Table[(uint)i, (uint)j].Units)
+                            if (unit.Owner != bp)
                             {
-                                if (tower.Speed > 0)
-                                {
-                                    if (unit.Owner != bp)
-                                    {
-                                        unit.Damage(tower.Damage);
-                                    }
-                                    if (unit.Health == 0)
-                                    {
-                                        bp.Money += unit.Cost / 2;
-                                        unit.Owner.Units.Remove(unit);
-                                        Table[(uint)i, (uint)j].Units.Remove(unit);
-                                        tower.Fire();
-                                        OnTowerFired();
-                                        break;
-                                    }
-                                }
-
+                                unit.Damage(tower.Damage);
+                            }
+                            if (unit.Health == 0)
+                            {
+                                bp.Money += unit.Cost / 2;
+                                unit.Owner.Units.Remove(unit);
+                                Table[i, j].Units.Remove(unit);
+                                tower.Fire();
+                                OnTowerFired();
+                                break;
                             }
                         }
                     }
