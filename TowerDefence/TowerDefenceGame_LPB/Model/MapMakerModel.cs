@@ -9,24 +9,46 @@ namespace TowerDefenceBackend.Model
 {
     public class MapMakerModel : ModelBase
     {
+        #region Fields
+
         private Player rp;
         private Player bp;
 
+        #endregion
+
+        #region Properties
 
         public Player RP
         {
             get { return rp; }
             private set { rp = value; }
         }
-
         public Player BP
         {
             get { return bp; }
             private set { bp = value; }
         }
-
         public Player? SelectedPlayer { get; private set; }
+
+        #endregion
+
+        #region Events
+
         public event EventHandler NewMapCreated;
+        public event EventHandler GameLoaded;
+
+        #endregion
+
+        #region On-event methods
+
+        private void OnGameLoaded()
+        {
+            GameLoaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Constructor(s)
 
         public MapMakerModel(IDataAccess<GameSaveObject> dataAccess)
         {
@@ -34,6 +56,13 @@ namespace TowerDefenceBackend.Model
             CreateNewMap();
         }
 
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void CreateNewMap()
         {
             SetupTable(11, 11);
@@ -44,6 +73,12 @@ namespace TowerDefenceBackend.Model
                 NewMapCreated(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="height"></param>
+        /// <param name="width"></param>
+        /// <exception cref="InvalidOperationException"></exception>
         public void ChangeTableSize(uint height, uint width)
         {
             if (width > 20 || width < 4 || height > 20 || height < 4)
@@ -80,6 +115,11 @@ namespace TowerDefenceBackend.Model
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
         public override ICollection<MenuOption> SelectField(Field field)
         {
             SelectedField = field;
@@ -105,6 +145,10 @@ namespace TowerDefenceBackend.Model
             return options;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="option"></param>
         public override void SelectOption(MenuOption option)
         {
             switch (option)
@@ -127,11 +171,23 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
         public void SelectPlayer(Player? player)
         {
             SelectedPlayer = player;
         }
 
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="InvalidPlacementException"></exception>
         private void BuildCastle()
         {
             if (SelectedPlayer is null)
@@ -150,6 +206,10 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="InvalidPlacementException"></exception>
         private void BuildBarrack()
         {
             if (SelectedPlayer is null)
@@ -187,6 +247,12 @@ namespace TowerDefenceBackend.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <exception cref="InvalidPlacementException"></exception>
         private void BuildTerrain(TerrainType type)
         {
             if (SelectedPlayer is not null)
@@ -201,6 +267,10 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private bool ValidatePath()
         {
             IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
@@ -224,6 +294,10 @@ namespace TowerDefenceBackend.Model
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="InvalidPlacementException"></exception>
         private void DestroyPlacement()
         {
             if (SelectedField.Placement is null)
@@ -247,6 +321,10 @@ namespace TowerDefenceBackend.Model
             }
 
         }
+
+        #endregion
+
+        #region Persistence methods
 
         public async Task SaveGameAsync(string path)
         {
@@ -274,11 +352,6 @@ namespace TowerDefenceBackend.Model
             OnGameLoaded();
         }
 
-        public event EventHandler GameLoaded;
-        
-        private void OnGameLoaded()
-        {
-            GameLoaded?.Invoke(this, EventArgs.Empty);
-        }
+        #endregion
     }
 }
