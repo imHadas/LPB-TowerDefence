@@ -213,7 +213,7 @@ namespace TowerDefenceBackend.Model
         /// Method for building a barrack for the selected player on the selected field.
         /// </summary>
         /// <exception cref="InvalidPlacementException">
-        /// Throws if the player is not selected, or something is already on the selected field, or the player already has 2 barracks on the table, or the path between a castle and enemy barrack becomes blocked.
+        /// Throws if the player is not selected, or something is already placed on the selected field, or the player already has 2 barracks on the table, or the path between a castle and enemy barrack becomes blocked.
         /// </exception>
         private void BuildBarrack()
         {
@@ -254,10 +254,10 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for building a terrain element on the selected field
         /// </summary>
-        /// <param name="type"></param>
-        /// <exception cref="InvalidPlacementException"></exception>
+        /// <param name="type">Type of terrain</param>
+        /// <exception cref="InvalidPlacementException">Throws if player is selected or something is already placed on the selected field</exception>
         private void BuildTerrain(TerrainType type)
         {
             if (SelectedPlayer is not null)
@@ -273,9 +273,9 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for validating the available path between each players barracks and the enemy castle
         /// </summary>
-        /// <returns></returns>
+        /// <returns>If the path is valid</returns>
         private bool ValidatePath()
         {
             IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
@@ -300,9 +300,9 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for destroying a placement on the selected field
         /// </summary>
-        /// <exception cref="InvalidPlacementException"></exception>
+        /// <exception cref="InvalidPlacementException">Throws when the field is already empty</exception>
         private void DestroyPlacement()
         {
             if (SelectedField.Placement is null)

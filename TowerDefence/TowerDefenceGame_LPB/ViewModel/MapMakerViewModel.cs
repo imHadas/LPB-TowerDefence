@@ -8,22 +8,14 @@ namespace TowerDefenceBackend.ViewModel
 {
     public class MapMakerViewModel : MainViewModel
     {
+        #region Variables
         private MapMakerModel model;
         private FieldViewModel selectedField;
 
         private ICollection<MenuOption> menuOptions;
-        public event EventHandler SaveGame;
-        public event EventHandler LoadGame;
+        #endregion
 
-        public DelegateCommand SelectPlayerCommand { get; set; }
-        public DelegateCommand SetGameSizeCommand { get; set; }
-        public DelegateCommand SetStartingMoneyCommand { get; set; }
-        public DelegateCommand ExitCommand { get; set; }
-        public DelegateCommand CloseMapMakerCommand { get; set; }
-
-        public DelegateCommand SaveGameCommand { get; set; }
-        public DelegateCommand LoadGameCommand { get; set; }
-
+        #region Properties
         public uint SetGridSizeX { get; set; }
         public uint SetGridSizeY { get; set; }
         public uint SetBlueMoney { get; set; }
@@ -32,7 +24,7 @@ namespace TowerDefenceBackend.ViewModel
         public uint BlueMoney
         {
             get { return model.BP.Money; }
-            set { model.BP.Money = value; OnPropertyChanged();}
+            set { model.BP.Money = value; OnPropertyChanged(); }
         }
 
         public uint RedMoney
@@ -46,7 +38,7 @@ namespace TowerDefenceBackend.ViewModel
             get { return model.SelectedPlayer; }
             set
             {
-                model.SelectPlayer(value); OnPropertyChanged();ButtonClick();
+                model.SelectPlayer(value); OnPropertyChanged(); ButtonClick();
             }
         }
         public FieldViewModel SelectedField
@@ -60,7 +52,7 @@ namespace TowerDefenceBackend.ViewModel
                     selectedField.IsSelectedSize = 1;
                 }
                 selectedField = value;
-                if(selectedField is not null)
+                if (selectedField is not null)
                 {
                     selectedField.IsSelected = true;
                     selectedField.IsSelectedSize = 3;
@@ -68,6 +60,44 @@ namespace TowerDefenceBackend.ViewModel
                 ButtonClick();
             }
         }
+        #endregion
+
+        #region Events
+        public event EventHandler SaveGame;
+        public event EventHandler LoadGame;
+        public event EventHandler<string> MessageSender;
+        #endregion
+
+        #region On-Event Methods
+
+        private void OnSaveGame()
+        {
+            SaveGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnLoadGame()
+        {
+            LoadGame?.Invoke(this, EventArgs.Empty);
+        }
+        private void OnSendMessage(string msg)
+        {
+            MessageSender?.Invoke(this, msg);
+        }
+
+        #endregion
+
+        #region Commands
+        public DelegateCommand SelectPlayerCommand { get; set; }
+        public DelegateCommand SetGameSizeCommand { get; set; }
+        public DelegateCommand SetStartingMoneyCommand { get; set; }
+        public DelegateCommand ExitCommand { get; set; }
+        public DelegateCommand CloseMapMakerCommand { get; set; }
+
+        public DelegateCommand SaveGameCommand { get; set; }
+        public DelegateCommand LoadGameCommand { get; set; }
+        #endregion
+
+        #region Constructor
         public MapMakerViewModel(MapMakerModel model)
         {
             this.model = model;
@@ -90,59 +120,15 @@ namespace TowerDefenceBackend.ViewModel
             GenerateTable();
             RefreshTable();
         }
+        #endregion
 
-        private void Model_GameLoaded(object? sender, EventArgs e)
-        {
-            GridSizeX = model.Table.Size.x;
-            GridSizeY = model.Table.Size.y;
-            SetGridSizeX = (uint)GridSizeX;
-            SetGridSizeY = (uint)GridSizeY;
-            GenerateTable();
-            RefreshTable();
-            OnPropertyChanged(nameof(Fields));
-            OnPropertyChanged(nameof(SetGridSizeX));
-            OnPropertyChanged(nameof(SetGridSizeY));
-        }
-
-        private void GenerateTable()
-        {
-            GridSizeX = model.Table.Size.x;
-            GridSizeY = model.Table.Size.y;
-            SetGridSizeX = (uint)GridSizeX;
-            SetGridSizeY = (uint)GridSizeY;
-            Fields = new ObservableCollection<FieldViewModel>();
-            for (int i = 0; i < GridSizeX; i++)
-            {
-                for (int j = 0; j < GridSizeY; j++)
-                {
-                    Fields.Add(new FieldViewModel
-                    {
-                        Coords = (i, j),
-                        Number = i * GridSizeY + j,
-                        BlueBasic = 0,
-                        BlueTank = 0,
-                        RedBasic = 0,
-                        RedTank = 0,
-                        PlayerType = model.Table[(uint)i, (uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
-                        Placement = model.Table[(uint)i, (uint)j].Placement,
-                        IsSelected =  false,
-                        IsSelectedSize = 1,
-                        ClickCommand = new DelegateCommand(param => SelectedField = Fields[(int)param])
-                    });
-                }
-            }
-        }
-        private void RefreshTable()
-        {
-            foreach (FieldViewModel field in Fields)
-            {
-                field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
-                field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement?.Owner?.Type ?? PlayerType.NEUTRAL;
-            }
-        }
+        #region Public Methods
+        /// <summary>
+        /// Method for setting up the sidebar menu when a button is clicked on the board
+        /// </summary>
         public override void ButtonClick()
         {
-            if(selectedField is not null)
+            if (selectedField is not null)
                 menuOptions = model.SelectField(model.Table[(uint)selectedField.Coords.x, (uint)selectedField.Coords.y]);
             else
                 menuOptions?.Clear();
@@ -152,33 +138,11 @@ namespace TowerDefenceBackend.ViewModel
                 OptionFields.Add(new OptionField { Type = menuOption.ToString(), OptionsClickCommand = new DelegateCommand(param => OptionsButtonClick((string)param)) });
             }
         }
-
-        public void SetGameSize()
-        {
-            try 
-            {
-                model.ChangeTableSize(SetGridSizeX,SetGridSizeY);
-            }
-            catch(InvalidOperationException ex)
-            {
-                OnSendMessage(ex.Message);
-                return;
-            }
-            SelectedField = null;
-            GridSizeX = model.Table.Size.x;
-            GridSizeY = model.Table.Size.y;
-            GenerateTable();
-            RefreshTable();
-            OnPropertyChanged("Fields");
-            ButtonClick();
-        }
-
-        public void SetStartingMoney()
-        {
-            BlueMoney = SetBlueMoney;
-            RedMoney = SetRedMoney;
-        }
-        public void OptionsButtonClick(string option)
+        /// <summary>
+        /// Method for executing the sidebar menu option
+        /// </summary>
+        /// <param name="option">Selected option</param>
+        public override void OptionsButtonClick(string option)
         {
             try
             {
@@ -210,14 +174,87 @@ namespace TowerDefenceBackend.ViewModel
                 OnSendMessage(ex.Message);
             }
         }
+        #endregion
 
-        public event EventHandler<string> MessageSender;
-
-        private void OnSendMessage(string msg)
+        #region Private Methods
+        /// <summary>
+        /// Method for setting the new size of the game board
+        /// </summary>
+        private void SetGameSize()
         {
-            MessageSender?.Invoke(this, msg);
+            try
+            {
+                model.ChangeTableSize(SetGridSizeX, SetGridSizeY);
+            }
+            catch (InvalidOperationException ex)
+            {
+                OnSendMessage(ex.Message);
+                return;
+            }
+            SelectedField = null;
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            GenerateTable();
+            RefreshTable();
+            OnPropertyChanged("Fields");
+            ButtonClick();
+        }
+        /// <summary>
+        /// Method for setting the starting money for each player in the game model
+        /// </summary>
+        private void SetStartingMoney()
+        {
+            BlueMoney = SetBlueMoney;
+            RedMoney = SetRedMoney;
+        }
+        /// <summary>
+        /// Method for generating an empty game board
+        /// </summary>
+        private void GenerateTable()
+        {
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
+            Fields = new ObservableCollection<FieldViewModel>();
+            for (int i = 0; i < GridSizeX; i++)
+            {
+                for (int j = 0; j < GridSizeY; j++)
+                {
+                    Fields.Add(new FieldViewModel
+                    {
+                        Coords = (i, j),
+                        Number = i * GridSizeY + j,
+                        BlueBasic = 0,
+                        BlueTank = 0,
+                        RedBasic = 0,
+                        RedTank = 0,
+                        PlayerType = model.Table[(uint)i, (uint)j].Placement?.Owner?.Type ?? PlayerType.NEUTRAL,
+                        Placement = model.Table[(uint)i, (uint)j].Placement,
+                        IsSelected = false,
+                        IsSelectedSize = 1,
+                        ClickCommand = new DelegateCommand(param => SelectedField = Fields[(int)param])
+                    });
+                }
+            }
         }
 
+        /// <summary>
+        /// Method for refreshing the game board, setting the owner and placement of the fields
+        /// </summary>
+        private void RefreshTable()
+        {
+            foreach (FieldViewModel field in Fields)
+            {
+                field.Placement = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement;
+                field.PlayerType = model.Table[(uint)field.Coords.x, (uint)field.Coords.y].Placement?.Owner?.Type ?? PlayerType.NEUTRAL;
+            }
+        }
+
+        /// <summary>
+        /// Method for setting the player the user wants to place down a new <c>Placement</c>
+        /// </summary>
+        /// <param name="type">The player type</param>
         public void SelectPlayer(string type)
         {
             switch (type)
@@ -234,14 +271,19 @@ namespace TowerDefenceBackend.ViewModel
             }
         }
 
-        private void OnSaveGame()
+        private void Model_GameLoaded(object? sender, EventArgs e)
         {
-            SaveGame?.Invoke(this, EventArgs.Empty);
+            GridSizeX = model.Table.Size.x;
+            GridSizeY = model.Table.Size.y;
+            SetGridSizeX = (uint)GridSizeX;
+            SetGridSizeY = (uint)GridSizeY;
+            GenerateTable();
+            RefreshTable();
+            OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(SetGridSizeX));
+            OnPropertyChanged(nameof(SetGridSizeY));
         }
 
-        private void OnLoadGame()
-        {
-            LoadGame?.Invoke(this, EventArgs.Empty);
-        }
+        #endregion
     }
 }
