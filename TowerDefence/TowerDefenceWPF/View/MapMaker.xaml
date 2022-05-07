@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
+        xmlns:viewmodel="clr-namespace:TowerDefenceBackend.ViewModel;assembly=TowerDefenceBackend" 
+        d:DataContext="{d:DesignInstance Type=viewmodel:MapMakerViewModel}"
         mc:Ignorable="d"
-        Title="MapMaker" Height="800" Width="800" MinHeight="500" MinWidth="768">
+        Title="Pályaszerkesztő" Height="800" Width="800" MinHeight="500" MinWidth="768">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
@@ -23,12 +25,11 @@
         </Grid.ColumnDefinitions>
         <Menu Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="Fájl">
-                <MenuItem Header="Pálya mentése" Command="{Binding SaveGameCommand}"/>
-                <MenuItem Header="Pálya betöltése" Command="{Binding LoadGameCommand}"/>
                 <MenuItem Header="Kilépés a menübe" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="Pálya">
-
+                <MenuItem Header="Pálya mentése" Command="{Binding SaveGameCommand}"/>
+                <MenuItem Header="Pálya betöltése" Command="{Binding LoadGameCommand}"/>
             </MenuItem>
             <MenuItem Header="Kilépés" Command="{Binding CloseMapMakerCommand}">
 

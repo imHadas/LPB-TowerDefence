@@ -41,12 +41,14 @@ namespace TowerDefenceBackend.ViewModel
         public uint Money{get { return money; } set { money = value; OnPropertyChanged(); }}
         public event EventHandler SaveGame;
         public event EventHandler LoadGame;
+        public event EventHandler LoadMap;
         public ObservableCollection<Unit> UnitFields { get; set; }
         public DelegateCommand ExitCommand { get; set; }
         public DelegateCommand CloseGameCommand { get; set; }
-        public DelegateCommand SaveGameCommand { get; set; }
-        public DelegateCommand LoadGameCommand { get; set; }
-        public DelegateCommand AdvanceCommand { get; set; }
+        public DelegateCommand SaveGameCommand { get; private set; }
+        public DelegateCommand LoadGameCommand { get; private set; }
+        public DelegateCommand AdvanceCommand { get; private set; }
+        public DelegateCommand LoadMapCommand { get; private set; }
         public FieldViewModel? SelectedField 
         { 
             get { return selectedField; } 
@@ -73,6 +75,7 @@ namespace TowerDefenceBackend.ViewModel
             AdvanceCommand = new DelegateCommand(async p => await AdvanceGame());
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
             LoadGameCommand = new DelegateCommand(param => OnLoadGame());
+            LoadMapCommand = new(param => OnLoadMap());
             model.TowerFired += new EventHandler((object? o, EventArgs e) => RefreshTable());
             model.AttackEnded += new EventHandler(async (object? o, EventArgs e) => await AdvanceGame());
             model.UnitMoved += new EventHandler((object? o, EventArgs e) => RefreshTable());
@@ -110,6 +113,11 @@ namespace TowerDefenceBackend.ViewModel
             RefreshTable();
             SetupText();
             OnPropertyChanged(nameof(Fields));
+        }
+
+        private void OnLoadMap()
+        {
+            LoadMap?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnLoadGame()

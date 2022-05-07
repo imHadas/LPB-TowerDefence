@@ -51,6 +51,7 @@ namespace TowerDefenceWPF
             _viewModel.CloseGameCommand = new DelegateCommand(p => _view.Close());
             _viewModel.SaveGame += new EventHandler(ViewModel_SaveGame);
             _viewModel.LoadGame += ViewModel_LoadGame;
+            _viewModel.LoadMap += ViewModel_LoadMap;
 
             _mapMakerViewModel = new MapMakerViewModel(_mapMakerModel);
             _mapMakerViewModel.CloseMapMakerCommand = new DelegateCommand(p => _mapMaker.Close());
@@ -126,6 +127,26 @@ namespace TowerDefenceWPF
             if (openFileDialog.ShowDialog() == true)
             {
                 await _model.LoadGameAsync(openFileDialog.FileName);
+            }
+        }
+
+        private async void ViewModel_LoadMap(object? sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new(); // dialógablak
+            openFileDialog.Title = "Pálya Betöltése";
+            openFileDialog.Filter = "JSON formátumú pálya|*.tdm|Összes fájl|*.*";
+            openFileDialog.FileName = "TowerDefencePálya.tdm";
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + "\\maps";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    await _model.LoadGameAsync(openFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Hiba", MessageBoxButton.OK);
+                }
             }
         }
 

@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
         mc:Ignorable="d"
-        Title="MainMenu" Height="450" Width="800">
+        Title="Főmenü" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -20,10 +20,20 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="1" Grid.Column="1" Content="Tower Defence" FontSize="56" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
-        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="1"  Grid.Column="1" Grid.Row="2" Content="New Game" FontSize="34" FontWeight="Bold"/>
-        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="2"  Grid.Column="1" Grid.Row="3" Content="Load Game" FontSize="34" FontWeight="Bold"/>
-        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="3" Grid.Column="1" Grid.Row="4" Content="Map Editor" FontSize="34" FontWeight="Bold"/>
+        <Border Grid.Row="1" Grid.Column="1" CornerRadius="20" Margin="15" BorderThickness="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="IndianRed" Offset="0"/>
+                    <GradientStop Color="IndianRed" Offset="0.37"/>
+                    <GradientStop Color="SteelBlue" Offset="0.52"/>
+                    <GradientStop Color="SteelBlue" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Label Content="Tower Defence" FontSize="56" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+        </Border>
+        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="1"  Grid.Column="1" Grid.Row="2" Content="Új játék" FontSize="34" FontWeight="Bold"/>
+        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="2"  Grid.Column="1" Grid.Row="3" Content="Játék betöltése" FontSize="34" FontWeight="Bold"/>
+        <Button Command="{Binding OpenNewWindowCommand}" CommandParameter="3" Grid.Column="1" Grid.Row="4" Content="Pályaszerkesztő" FontSize="34" FontWeight="Bold"/>
         
     </Grid>
 </Window>
