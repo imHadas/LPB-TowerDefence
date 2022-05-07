@@ -273,6 +273,10 @@ namespace TowerDefence_Test
 
             Assert.AreEqual(Model?.CurrentPlayer.Units.Count, 0);
             Assert.AreEqual(Model?.OtherPlayer.Units.Count, 0);
+            Assert.AreEqual(Model?.CurrentPlayer.Barracks.Count, 2);
+            Assert.AreEqual(Model?.OtherPlayer.Barracks.Count, 2);
+            Assert.IsNotNull(Model?.CurrentPlayer.Castle);
+            Assert.IsNotNull(Model?.OtherPlayer.Castle);
 
             (uint, uint) bCoords = (0,0);
             Random r = new Random();
@@ -311,17 +315,17 @@ namespace TowerDefence_Test
             }
 
 
-            if (X < Model?.Table.Size.x - 1)
-            {
-                X++;
-            }
-            else
+            if (X == Model?.Table.Size.x - 1)
             {
                 X--;
             }
+            else
+            {
+                X++;
+            }
 
             Assert.AreEqual(Model?.Phase, (uint)1);
-            Model?.Advance();
+            await Model.Advance();
             Assert.AreEqual(Model?.Phase, (uint)2);
             
             Model?.SelectField(Model.Table[X, Y]);
@@ -329,17 +333,15 @@ namespace TowerDefence_Test
             Assert.IsNotNull(Model?.Table[X, Y].Placement);
             Assert.AreEqual(Model.Table[X, Y]?.Placement?.GetType(), typeof(BasicTower));
             Assert.AreEqual(Model.CurrentPlayer.Money, Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
-
-            Model?.Advance();
-            await Task.Delay(1200);
+            
+            await Model.Advance();
             Assert.AreEqual(Model?.Phase,(uint)3);
-            Model?.Advance();
+            await Model.Advance();
             Assert.AreEqual(Model?.Phase,(uint)4);
 
             Assert.AreEqual(Model?.CurrentPlayer.Units.Count,0);
             Assert.AreEqual(Model?.OtherPlayer.Units.Count, 0);
             Assert.AreEqual(Model?.OtherPlayer.Money,Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
-
         }
 
 
