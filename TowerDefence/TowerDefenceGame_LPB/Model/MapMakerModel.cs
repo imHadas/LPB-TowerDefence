@@ -61,7 +61,7 @@ namespace TowerDefenceBackend.Model
         #region Public methods
 
         /// <summary>
-        /// 
+        /// Creates a new empty map with a size of 11x11.
         /// </summary>
         public void CreateNewMap()
         {
@@ -74,11 +74,11 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Change table size, to the height and width given in parameters.
         /// </summary>
-        /// <param name="height"></param>
-        /// <param name="width"></param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="height">The height you want the map to have.</param>
+        /// <param name="width">The width you want the map to have.</param>
+        /// <exception cref="InvalidOperationException">Throw if the map size is too small or too large.</exception>
         public void ChangeTableSize(uint height, uint width)
         {
             if (width > 20 || width < 4 || height > 20 || height < 4)
@@ -116,10 +116,11 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for setting the SelectedField to the field given in parameter.
+        /// Adding menu options to a collection depending on what is on the field that we selected.
         /// </summary>
-        /// <param name="field"></param>
-        /// <returns></returns>
+        /// <param name="field">Field that is getting selected.</param>
+        /// <returns>Returns the collection we added options to.</returns>
         public override ICollection<MenuOption> SelectField(Field field)
         {
             SelectedField = field;
@@ -146,9 +147,9 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for building or destroying depending on the option given in paramter.
         /// </summary>
-        /// <param name="option"></param>
+        /// <param name="option">The option, which was chosen from the menu options available.</param>
         public override void SelectOption(MenuOption option)
         {
             switch (option)
@@ -172,9 +173,9 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for selecting the player in the parameter.
         /// </summary>
-        /// <param name="player"></param>
+        /// <param name="player">The player we want to select.</param>
         public void SelectPlayer(Player? player)
         {
             SelectedPlayer = player;
@@ -185,9 +186,11 @@ namespace TowerDefenceBackend.Model
         #region Private methods
 
         /// <summary>
-        /// 
+        /// Method for building the castle of the selected player on the selected field.
         /// </summary>
-        /// <exception cref="InvalidPlacementException"></exception>
+        /// <exception cref="InvalidPlacementException">
+        /// Throws if the player is not selected, or something is already placed on the selected field, or there is already a castle for this player on the table.
+        /// </exception>
         private void BuildCastle()
         {
             if (SelectedPlayer is null)
@@ -207,9 +210,11 @@ namespace TowerDefenceBackend.Model
         }
 
         /// <summary>
-        /// 
+        /// Method for building a barrack for the selected player on the selected field.
         /// </summary>
-        /// <exception cref="InvalidPlacementException"></exception>
+        /// <exception cref="InvalidPlacementException">
+        /// Throws if the player is not selected, or something is already on the selected field, or the player already has 2 barracks on the table, or the path between a castle and enemy barrack becomes blocked.
+        /// </exception>
         private void BuildBarrack()
         {
             if (SelectedPlayer is null)
