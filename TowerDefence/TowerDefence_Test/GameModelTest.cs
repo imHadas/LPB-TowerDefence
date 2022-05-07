@@ -5,6 +5,7 @@ using TowerDefenceBackend.DataAccess;
 using Moq;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace TowerDefence_Test
 {
@@ -157,13 +158,13 @@ namespace TowerDefence_Test
 
             if (Model is not null && Model.CurrentPlayer.Castle is not null)
             {
-                Model?.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
-                while (Model?.CurrentPlayer.Money != 0)
+                Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+                while (Model.CurrentPlayer.Money != 0)
                 {
-                    Model?.SelectOption(MenuOption.TrainTank);
+                    Model.SelectOption(MenuOption.TrainTank);
                 }
-                Assert.AreEqual((uint)Model?.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
-                Assert.AreEqual(Model?.CurrentPlayer.Money, (uint)0);
+                Assert.AreEqual((uint)Model.CurrentPlayer.Units.Count, Constants.PLAYER_STARTING_MONEY / Constants.TANK_UNIT_COST);
+                Assert.AreEqual(Model.CurrentPlayer.Money, (uint)0);
             }
         }
 
@@ -271,77 +272,44 @@ namespace TowerDefence_Test
         {
             Assert.IsNotNull(Model);
 
-            Assert.AreEqual(Model?.CurrentPlayer.Units.Count, 0);
-            Assert.AreEqual(Model?.OtherPlayer.Units.Count, 0);
-            Assert.AreEqual(Model?.CurrentPlayer.Barracks.Count, 2);
-            Assert.AreEqual(Model?.OtherPlayer.Barracks.Count, 2);
-            Assert.IsNotNull(Model?.CurrentPlayer.Castle);
-            Assert.IsNotNull(Model?.OtherPlayer.Castle);
+            Assert.AreEqual(Model.CurrentPlayer.Units.Count, 0);
+            Assert.AreEqual(Model.OtherPlayer.Units.Count, 0);
+            Assert.AreEqual(Model.CurrentPlayer.Barracks.Count, 2);
+            Assert.AreEqual(Model.OtherPlayer.Barracks.Count, 2);
+            Assert.IsNotNull(Model.CurrentPlayer.Castle);
+            Assert.IsNotNull(Model.OtherPlayer.Castle);
 
-            (uint, uint) bCoords = (0,0);
-            Random r = new Random();
-            int x = r.Next(2);
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Castle.Coords]);
+            Model.SelectOption(MenuOption.TrainBasic);
+            Assert.AreEqual(Model.CurrentPlayer.Units.Count, 1);
+            Assert.AreEqual(Model.OtherPlayer.Units.Count, 0);
+            Assert.AreEqual(Model.CurrentPlayer.Money, Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
 
-            if (Model is not null)
-            {
-                foreach (Barrack barrack in Model.CurrentPlayer.Barracks)
-                {
-                    if (x == 0)
-                        bCoords = barrack.Coords;
-                    else if (x == 1)
-                    {
-                        x = 0;
-                    }
-                }
-
-
-                Model?.SelectField(Model.Table[bCoords]);
-                Model?.SelectOption(MenuOption.TrainBasic);
-                Assert.AreEqual(Model?.CurrentPlayer.Units.Count, 1);
-                Assert.AreEqual(Model?.OtherPlayer.Units.Count, 0);
-                Assert.AreEqual(Model?.CurrentPlayer.Money, Constants.PLAYER_STARTING_MONEY - Constants.BASIC_UNIT_COST);
-            }
-            uint X = 0, Y = 0;
-            if(Model is not null)
-            {
-                foreach(Barrack barrack in Model.CurrentPlayer.Barracks)
-                {
-                    if(barrack.UnitQueue.Count == 1)
-                    {
-                        X = barrack.Coords.x;
-                        Y = barrack.Coords.y;
-                    }
-                }
-            }
-
-
-            if (X == Model?.Table.Size.x - 1)
-            {
-                X--;
-            }
-            else
-            {
-                X++;
-            }
-
-            Assert.AreEqual(Model?.Phase, (uint)1);
+            Assert.AreEqual(Model.Phase, (uint)1);
             await Model.Advance();
-            Assert.AreEqual(Model?.Phase, (uint)2);
-            
-            Model?.SelectField(Model.Table[X, Y]);
-            Model?.SelectOption(MenuOption.BuildBasic);
-            Assert.IsNotNull(Model?.Table[X, Y].Placement);
-            Assert.AreEqual(Model.Table[X, Y]?.Placement?.GetType(), typeof(BasicTower));
-            Assert.AreEqual(Model.CurrentPlayer.Money, Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST);
-            
-            await Model.Advance();
-            Assert.AreEqual(Model?.Phase,(uint)3);
-            await Model.Advance();
-            Assert.AreEqual(Model?.Phase,(uint)4);
+            Assert.AreEqual(Model.Phase, (uint)2);
 
-            Assert.AreEqual(Model?.CurrentPlayer.Units.Count,0);
-            Assert.AreEqual(Model?.OtherPlayer.Units.Count, 0);
-            Assert.AreEqual(Model?.OtherPlayer.Money,Constants.PLAYER_STARTING_MONEY - Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
+            uint beforebuymoney = Model.CurrentPlayer.Money;
+            Model.SelectField(Model.Table[1, 8]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[1, 8].Placement);
+            Assert.AreEqual(Model.Table[1, 8].Placement?.GetType(), typeof(BasicTower));
+            Assert.AreEqual(Model.CurrentPlayer.Money, beforebuymoney - Constants.BASIC_TOWER_COST);
+            beforebuymoney = Model.CurrentPlayer.Money;
+            Model.SelectField(Model.Table[1, 2]);
+            Model.SelectOption(MenuOption.BuildBasic);
+            Assert.IsNotNull(Model.Table[1, 2].Placement);
+            Assert.AreEqual(Model.Table[1, 2].Placement?.GetType(), typeof(BasicTower));
+            Assert.AreEqual(Model.CurrentPlayer.Money, beforebuymoney - Constants.BASIC_TOWER_COST);
+
+            await Model.Advance();
+            Assert.AreEqual(Model.Phase,(uint)3);
+            await Model.Advance();
+            Assert.AreEqual(Model.Phase,(uint)4);
+
+            Assert.AreEqual(Model.CurrentPlayer.Units.Count,0);
+            Assert.AreEqual(Model.OtherPlayer.Units.Count, 0);
+            Assert.AreEqual(Model.OtherPlayer.Money,Constants.PLAYER_STARTING_MONEY - 2*Constants.BASIC_TOWER_COST + (Constants.BASIC_UNIT_COST / 2) + Constants.PASSIVE_INCOME);
         }
 
 

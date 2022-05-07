@@ -262,9 +262,9 @@ namespace TowerDefenceBackend.Model
                     tower.Cool();
                     continue;
                 }
-                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i < Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
+                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i <= Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
                 {
-                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j < Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
+                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j <= Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
                     {
                         foreach (Unit unit in Table[i, j].Units)
                         {
@@ -293,9 +293,9 @@ namespace TowerDefenceBackend.Model
                     tower.Cool();
                     continue;
                 }
-                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i < Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
+                for (int i = Math.Max((int)tower.Coords.x - (int)tower.Range, 0); i <= Math.Min((int)tower.Coords.x + (int)tower.Range, Table.Size.x); i++)
                 {
-                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j < Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
+                    for (int j = Math.Max((int)tower.Coords.y - (int)tower.Range, 0); j <= Math.Min((int)tower.Coords.y + (int)tower.Range, Table.Size.y); j++)
                     {
                         foreach (Unit unit in Table[i, j].Units)
                         {
