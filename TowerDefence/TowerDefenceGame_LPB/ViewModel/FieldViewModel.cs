@@ -4,45 +4,121 @@ namespace TowerDefenceBackend.ViewModel
 {
     public class FieldViewModel : ViewModelBase
     {
+        #region Variables
+
         private int blueBasic;
         private int blueTank;
         private int redBasic;
         private int redTank;
         private bool isUnits;
-        private bool isTower; // wanna find another way for this
-        private bool isCastle; // guess who's back
-        /*
-        private bool isBarrack;
-        private bool isSniperTower;
-        private bool isBomberTower;
-        */
+        private bool isTower;
+        private bool isCastle;
         private bool isSelected;
         private PlayerType playerType;
-        private Placement placement;
-        private string placementType;
+        private Placement? placement;
+        private string? placementType;
         private int isSelectedSize;
 
-        public int IsSelectedSize
+        #endregion
+
+        #region Properties
+        public int BlueBasic
         {
-            get { return isSelectedSize; }
-            set { isSelectedSize = value; OnPropertyChanged(); }
+            get { return blueBasic; }
+            set
+            {
+                blueBasic = value;
+                IsOccupied();
+                OnPropertyChanged();
+            }
+        }
+        public int BlueTank
+        {
+            get { return blueTank; }
+            set
+            {
+                blueTank = value;
+                IsOccupied();
+                OnPropertyChanged();
+            }
         }
 
-
-        public string PlacementType
+        public int RedBasic
         {
-            get { return placementType; }
-            set { placementType = value; OnPropertyChanged();}
+            get { return redBasic; }
+            set
+            {
+                redBasic = value;
+                IsOccupied();
+                OnPropertyChanged();
+            }
         }
 
+        public int RedTank
+        {
+            get { return redTank; }
+            set
+            {
+                redTank = value;
+                IsOccupied();
+                OnPropertyChanged();
+            }
+        }
 
-        public int Number { get; set; }
-        public (int x, int y) Coords { get; set; }
+        public bool IsUnits
+        {
+            get { return isUnits; }
+            set
+            {
+                isUnits = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public Placement Placement
+        public bool IsTower
+        {
+            get { return isTower; }
+            set
+            {
+                isTower = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsCastle
+        {
+            get { return isCastle; }
+            set
+            {
+                isCastle = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set
+            {
+                isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public PlayerType PlayerType
+        {
+            get { return playerType; }
+            set
+            {
+                playerType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Placement? Placement
         {
             get { return placement; }
-            set 
+            set
             {
                 placement = value;
                 IsTower = false;
@@ -76,151 +152,41 @@ namespace TowerDefenceBackend.ViewModel
                         IsTower = true;
                         break;
                     case Terrain:
-                        Terrain terrain = value as Terrain;
-                        PlacementType = terrain.Type.ToString(); //better way to reference Type from terrain?
+                        Terrain? terrain = value as Terrain;
+                        PlacementType = terrain?.Type.ToString(); //better way to reference Type from terrain?
                         break;
                 }
-                
-                /*
-                IsBarrack = placement.GetType() == typeof(Barrack) ? true : false;
-                IsCastle = placement.GetType() == typeof(Castle) ? true : false;
-                IsBasicTower = placement.GetType() == typeof(BasicTower) ? true : false;
-                IsBomberTower = placement.GetType() == typeof(BomberTower) ? true : false;
-                IsSniperTower = placement.GetType() == typeof(SniperTower) ? true : false;
-                 */
             }
         }
 
-        public PlayerType PlayerType 
-        { 
-            get { return playerType; }
-            set 
-            { 
-                playerType = value;
-                OnPropertyChanged();
-            } 
-        }
-        
-        public bool IsTower
+        public string? PlacementType
         {
-            get { return isTower; }
-            set 
-            {
-                isTower = value;
-                OnPropertyChanged();
-            }
-        }
-        /*
-        public bool IsSniperTower
-        {
-            get { return isSniperTower; }
-            set
-            {
-                isSniperTower = value;
-                OnPropertyChanged();
-            }
-        }
-        public bool IsBomberTower
-        {
-            get { return isBomberTower; }
-            set
-            {
-                isBomberTower = value;
-                OnPropertyChanged();
-            }
+            get { return placementType; }
+            set { placementType = value; OnPropertyChanged(); }
         }
 
-
-        public bool IsBarrack
+        public int IsSelectedSize
         {
-            get { return isBarrack; }
-            set 
-            { 
-                isBarrack = value;
-                OnPropertyChanged();
-            }
-        }
-        */
-        public bool IsCastle
-        {
-            get { return isCastle; }
-            set 
-            {
-                isCastle = value;
-                OnPropertyChanged();
-            }
+            get { return isSelectedSize; }
+            set { isSelectedSize = value; OnPropertyChanged(); }
         }
 
-        public bool IsUnits
-        {
-            get { return isUnits; }
-            set 
-            { 
-                isUnits = value;
-                OnPropertyChanged();
-            }
-        }
+        public int Number { get; set; }
 
-        public int RedTank
-        {
-            get { return redTank; }
-            set 
-            { 
-                redTank = value;
-                IsOccupied();
-                OnPropertyChanged();
-            }
-        }
+        public (int x, int y) Coords { get; set; }
 
-        public int RedBasic
-        {
-            get { return redBasic; }
-            set {
-                redBasic = value;
-                IsOccupied();
-                OnPropertyChanged();
-            }
-        }
+        #endregion
 
-        public int BlueTank
-        {
-            get { return blueTank; }
-            set
-            {
-                blueTank = value;
-                IsOccupied();
-                OnPropertyChanged();
-            }
-        }
-        public int BlueBasic
-        {
-            get { return blueBasic; }
-            set 
-            { 
-                blueBasic = value;
-                IsOccupied();
-                OnPropertyChanged();
-            }
-        }
+        #region Commands
+        public DelegateCommand ClickCommand { get; set; } = null!;
+        #endregion
 
+        ///<summary>
+        ///Sets IsUnits property according to field occupation.
+        ///</summary>
         private void IsOccupied()
         {
-            if (RedBasic == 0 && RedTank == 0 && BlueBasic == 0 && BlueTank == 0)
-                IsUnits = false;
-            else
-                IsUnits = true;
+            IsUnits = 0 < RedBasic || 0 < RedTank || 0 < BlueBasic || 0 < BlueTank;
         }
-
-        public bool IsSelected 
-        { 
-            get { return isSelected; } 
-            set 
-            { 
-                isSelected = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public DelegateCommand ClickCommand { get; set; }
     }
 }
