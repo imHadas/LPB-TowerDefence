@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
+        xmlns:viewmodel="clr-namespace:TowerDefenceWPF"
+        d:DataContext="{d:DesignInstance Type=viewmodel:App}"
         mc:Ignorable="d"
         Title="Főmenü" Height="450" Width="800">
     <Grid>
@@ -20,7 +22,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
-        <Border Grid.Row="1" Grid.Column="1" CornerRadius="20" Margin="15" BorderThickness="0">
+        <Border Grid.Row="1" Grid.Column="1" CornerRadius="20" Margin="15" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                     <GradientStop Color="IndianRed" Offset="0"/>
