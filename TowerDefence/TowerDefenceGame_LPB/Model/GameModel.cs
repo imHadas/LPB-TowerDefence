@@ -38,7 +38,7 @@ namespace TowerDefenceBackend.Model
         #region Events
 
         public event EventHandler<(ICollection<Unit> friendly, ICollection<Unit> enemy)> ShowUnits;
-        public event EventHandler TowerFired;
+        public event EventHandler<Field> TowerFired;
         public event EventHandler UnitMoved;
         public event EventHandler AttackEnded;
         public event EventHandler<GameOverType> GameOver;
@@ -73,9 +73,9 @@ namespace TowerDefenceBackend.Model
             GameLoaded?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnTowerFired()
+        private void OnTowerFired(Field field)
         {
-            TowerFired?.Invoke(this, EventArgs.Empty);
+            TowerFired?.Invoke(this, field);
         }
 
         private void OnUnitMoved()
@@ -278,7 +278,7 @@ namespace TowerDefenceBackend.Model
                                 unit.Owner.Units.Remove(unit);
                                 Table[i, j].Units.Remove(unit);
                                 tower.Fire();
-                                OnTowerFired();
+                                OnTowerFired(Table[i,j]);
                                 break;
                             }
                         }
@@ -309,7 +309,7 @@ namespace TowerDefenceBackend.Model
                                 unit.Owner.Units.Remove(unit);
                                 Table[i, j].Units.Remove(unit);
                                 tower.Fire();
-                                OnTowerFired();
+                                OnTowerFired(Table[i,j]);
                                 break;
                             }
                         }

@@ -93,6 +93,14 @@ namespace TowerDefenceBackend.ViewModel
             if (SaveGame != null)
                 SaveGame(this, EventArgs.Empty);
         }
+
+        private async Task OnTowerFired(Field field)
+        {
+            int number = (int)field.Coords.x * GridSizeY + (int)field.Coords.y;
+            Fields[number].IsFiredOn = true;
+            await Task.Delay(300);
+            Fields[number].IsFiredOn = false;
+        }
         #endregion
 
         #region Commands
@@ -112,7 +120,7 @@ namespace TowerDefenceBackend.ViewModel
             SaveGameCommand = new DelegateCommand(param => OnSaveGame());
             LoadGameCommand = new DelegateCommand(param => OnLoadGame());
             LoadMapCommand = new(param => OnLoadMap());
-            model.TowerFired += new EventHandler((object? o, EventArgs e) => RefreshTable());
+            model.TowerFired += new EventHandler<Field>(async (object? o, Field f) => await OnTowerFired(f));
             model.AttackEnded += new EventHandler(async (object? o, EventArgs e) => await AdvanceGame());
             model.UnitMoved += new EventHandler((object? o, EventArgs e) => RefreshTable());
             model.GameLoaded += Model_GameLoaded;

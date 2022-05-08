@@ -120,6 +120,9 @@
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
                                                         <Setter Property="Source" Value="/Images/pond.png"/>
                                                     </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsFiredOn}" Value="true">
+                                                        <Setter Property="Source" Value="/Images/Explosion.png"></Setter>
+                                                    </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Image.Style>

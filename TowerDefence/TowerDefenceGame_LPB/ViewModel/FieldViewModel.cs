@@ -18,6 +18,7 @@ namespace TowerDefenceBackend.ViewModel
         private Placement? placement;
         private string? placementType;
         private int isSelectedSize;
+        private bool isFiredOn;
 
         #endregion
 
@@ -169,6 +170,12 @@ namespace TowerDefenceBackend.ViewModel
         {
             get { return isSelectedSize; }
             set { isSelectedSize = value; OnPropertyChanged(); }
+        }
+
+        public bool IsFiredOn
+        {
+            get { return isFiredOn; }
+            set { isFiredOn = value; OnPropertyChanged(); }
         }
 
         public int Number { get; set; }
