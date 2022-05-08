@@ -30,6 +30,9 @@ namespace TowerDefenceBackend.ViewModel
             set { selectedCastle = value; OnPropertyChanged(); }
         }
 
+        public bool CastleSelected => selectedField?.IsCastle ?? false;
+        public bool TowerSelected => selectedField?.IsTower ?? false;
+
         public Tower SelectedTower
         {
             get { return selectedTower; }
@@ -142,11 +145,11 @@ namespace TowerDefenceBackend.ViewModel
             UnitFields = new ObservableCollection<Unit>();
             GenerateTable();
             RefreshTable();
-            SelectedField = new FieldViewModel
+            /*SelectedField = new FieldViewModel
             {
                 IsCastle = false,
                 IsTower = false,
-            };
+            };*/
             SelectedTower = null;
             SelectedCastle = null;
             OptionFields.Clear();

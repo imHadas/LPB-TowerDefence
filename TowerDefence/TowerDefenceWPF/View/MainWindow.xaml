@@ -212,7 +212,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsTower, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding TowerSelected, Converter={StaticResource BoolToVis}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -229,7 +229,7 @@
             <Label Grid.Row="2" Grid.Column="0" Content="Sebesség:"/>
             <Label Grid.Row="2" Grid.Column="1" Content="{Binding SelectedTower.Speed}"/>
         </Grid>
-        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsCastle, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding CastleSelected, Converter={StaticResource BoolToVis}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
