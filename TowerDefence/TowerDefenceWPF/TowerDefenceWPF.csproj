@@ -20,11 +20,19 @@
 		<None Remove="Images\soldier.png" />
 		<None Remove="Images\tank.png" />
 		<None Remove="Images\upgrade.png" />
+		<None Remove="maps\bigmap.tdm" />
+		<None Remove="maps\lotofobsticles.tdm" />
 		<None Remove="maps\map4.tdm" />
 		<None Remove="maps\straightforward.tdm" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="maps\bigmap.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="maps\lotofobsticles.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="maps\map4.tdm">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
