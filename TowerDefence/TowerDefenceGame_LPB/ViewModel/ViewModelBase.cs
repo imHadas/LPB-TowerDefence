@@ -6,10 +6,6 @@ namespace TowerDefenceBackend.ViewModel
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
-        #region Constructor(s)
-        protected ViewModelBase() { }
-        #endregion
-
         #region Event(s)
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion

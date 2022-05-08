@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:TowerDefenceWPF"
         d:DataContext="{d:DesignInstance Type=viewmodel:App}"
         mc:Ignorable="d"
-        Title="Főmenü" Height="450" Width="800">
+        Title="Főmenü" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

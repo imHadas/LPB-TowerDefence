@@ -22,7 +22,6 @@ namespace TowerDefenceBackend.Model
 
         public bool SaveEnabled { get; private set; }
         public bool BuildEnabled { get; set; }
-        public bool GameOverProp { get; private set; }
         public uint Round { get { return Table.PhaseCounter / 3 + 1; } }
         public uint Phase
         {
@@ -63,7 +62,6 @@ namespace TowerDefenceBackend.Model
         {
             BuildEnabled = false;
             SaveEnabled = false;
-            GameOverProp = true;
             GameOver?.Invoke(this, gameOverType);
         }
 

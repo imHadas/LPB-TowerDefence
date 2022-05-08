@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using static TowerDefenceBackend.Model.GameModel;
 
 namespace TowerDefence_Test
 {
@@ -365,23 +366,11 @@ namespace TowerDefence_Test
         [TestMethod]
         public async Task GameOverTest()
         {
+            TaskCompletionSource<bool> tcs = new ();
             Assert.IsNotNull(Model);
+            Model.GameOver += new((sender, args) => tcs.TrySetResult(args.Equals(GameOverType.BLUEWIN)));
 
-            (uint, uint) bCoords = (0, 0);
-            Random r = new Random();
-            int x = r.Next(2);
-
-            foreach (Barrack barrack in Model.CurrentPlayer.Barracks)
-            {
-                if (x == 0)
-                    bCoords = barrack.Coords;
-                else if (x == 1)
-                {
-                    x = 0;
-                }
-            }
-
-            Model.SelectField(Model.Table[bCoords]);
+            Model.SelectField(Model.Table[Model.CurrentPlayer.Barracks.ElementAt(new Random().Next(2)).Coords]);
 
             while (Model.CurrentPlayer.Money != 0)
             {
@@ -393,28 +382,29 @@ namespace TowerDefence_Test
             await Model.Advance();
 
             Assert.AreEqual(Model.Round, (uint)2);
-            Assert.IsFalse(Model.GameOverProp);
+            Assert.IsFalse(tcs.Task.IsCompleted);
 
             await Model.Advance();
             await Model.Advance();
             await Model.Advance();
 
             Assert.AreEqual(Model.Round, (uint)3);
-            Assert.IsFalse(Model.GameOverProp);
+            Assert.IsFalse(tcs.Task.IsCompleted);
 
             await Model.Advance();
             await Model.Advance();
             await Model.Advance();
 
             Assert.AreEqual(Model.Round, (uint)4);
-            Assert.IsFalse(Model.GameOverProp);
+            Assert.IsFalse(tcs.Task.IsCompleted);
 
             await Model.Advance();
             await Model.Advance();
-            //Model.Advance();
 
             Assert.AreEqual(Model.Round, (uint)5);
-            Assert.IsTrue(Model.GameOverProp);
+            Task.WaitAny(Task.Delay(100), tcs.Task);
+            Assert.IsTrue(tcs.Task.IsCompleted);
+            Assert.IsTrue(tcs.Task.Result);
             Assert.IsFalse(Model.SaveEnabled);
             Assert.IsFalse(Model.BuildEnabled);
             

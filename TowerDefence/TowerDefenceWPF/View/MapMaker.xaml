@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:TowerDefenceBackend.ViewModel;assembly=TowerDefenceBackend" 
         d:DataContext="{d:DesignInstance Type=viewmodel:MapMakerViewModel}"
         mc:Ignorable="d"
-        Title="Pályaszerkesztő" Height="800" Width="800" MinHeight="500" MinWidth="768">
+        Title="Pályaszerkesztő" Height="800" Width="800" MinHeight="500" MinWidth="768" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
