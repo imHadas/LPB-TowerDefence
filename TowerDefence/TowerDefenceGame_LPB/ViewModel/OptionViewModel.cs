@@ -9,11 +9,14 @@ namespace TowerDefenceBackend.ViewModel
 {
     public class OptionField : ViewModelBase
     {
+        #region Properties
         public string Type { get; set; }
-        public DelegateCommand OptionsClickCommand { get; set; }
+
         public PlayerType Player { get; set; }
+        #endregion
+
+        #region Command(s)
+        public DelegateCommand OptionsClickCommand { get; set; }
+        #endregion
     }
-
-    
-
 }

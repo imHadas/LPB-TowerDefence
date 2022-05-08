@@ -181,6 +181,7 @@ namespace TowerDefenceBackend.ViewModel
         public DelegateCommand ClickCommand { get; set; } = null!;
         #endregion
 
+        #region Private method(s)
         ///<summary>
         ///Sets IsUnits property according to field occupation.
         ///</summary>
@@ -188,5 +189,6 @@ namespace TowerDefenceBackend.ViewModel
         {
             IsUnits = 0 < RedBasic || 0 < RedTank || 0 < BlueBasic || 0 < BlueTank;
         }
+        #endregion
     }
 }

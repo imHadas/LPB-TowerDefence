@@ -71,7 +71,7 @@ namespace TowerDefenceBackend.ViewModel
         public event EventHandler LoadMap;
         #endregion
 
-        #region On-Enevt Methods
+        #region On-Event Methods
 
         private void OnLoadMap()
         {
