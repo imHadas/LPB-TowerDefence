@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using TowerDefenceBackend.Persistence;
 using System.IO;
 using System.Text.Json;  //use the .NET 6 serializer
-using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace TowerDefenceBackend.DataAccess
 {
+    /// <summary>
+    /// Abstraction for <c>Unit</c>
+    /// </summary>
     internal class StringifiedUnit
     {
         public string Type { get; set; }
@@ -25,6 +27,9 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Abstraction for <c>Placement</c>
+    /// </summary>
     internal class StringifiedPlacement
     {
         public string Type { get; set; }
@@ -40,12 +45,18 @@ namespace TowerDefenceBackend.DataAccess
         {
             Type = placement.GetType().Name;
             Owner = placement.OwnerType.ToString();
-            if(placement is Tower) Level = ((Tower)placement).Level;
-            else if(placement is Terrain) Level = (uint)((Terrain)placement).Type;  //a bit hacky
-            else Level = 0;
+            Level = placement switch
+            {
+                Tower tower => tower.Level,
+                Terrain terrain => terrain.NumericType,
+                _ => 0,
+            };
         }
     }
 
+    /// <summary>
+    /// Abstraction for Field
+    /// </summary>
     internal class StringifiedField
     {
         public (uint x, uint y) Coords { get; set; }
@@ -85,7 +96,8 @@ namespace TowerDefenceBackend.DataAccess
 
 
     /// <summary>
-    /// You cannot serialize multi-dimensional arrays, that's why
+    /// Abstraction for Table.
+    /// Needed, because you cannot serialize multi-dimensional arrays
     /// </summary>
     internal class StringifiedTable
     {
@@ -136,6 +148,9 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Abstraction for <c>GameSaveObject</c>
+    /// </summary>
     internal class StringifiedGSO
     {
         public StringifiedTable Table { get; set; }
@@ -164,17 +179,25 @@ namespace TowerDefenceBackend.DataAccess
         }
     }
 
+    /// <summary>
+    /// Implementation of <c>IDataAccess</c> using <c>JSON</c> serialization
+    /// </summary>
     public class JsonDataAccess : IDataAccess<GameSaveObject>
     {
         private static readonly JsonSerializerOptions _options
         = new()
         {
-            //ReferenceHandler = ReferenceHandler.Preserve,
-            PropertyNameCaseInsensitive = false,
-            WriteIndented = true,
-            IncludeFields = true,
+            PropertyNameCaseInsensitive = false,    // just in case
+            WriteIndented = true,                   // pretty print
+            IncludeFields = true,                   // neccessary for tuples and the like
         };
 
+        /// <summary>
+        /// Implementation of loading
+        /// </summary>
+        /// <param name="path">Path of the file to load</param>
+        /// <returns>A <c>GameSaveObject</c> containing the game's state</returns>
+        /// <exception cref="IOException">Thrown if the <c>Serializer</c> fails to parse the file</exception>
         public async Task<GameSaveObject> LoadAsync(string path)
         {
             StringifiedGSO? sgso;
@@ -184,10 +207,11 @@ namespace TowerDefenceBackend.DataAccess
                 sgso = await JsonSerializer.DeserializeAsync<StringifiedGSO>(fs, _options);
             }
 
-            if (sgso == null) throw new Exception("Error reading file");
+            if (sgso == null) throw new IOException("Error reading file");
 
             return ConstructGSO(sgso);
 
+            return new GameSaveObject(new Table(0,0),new Player(PlayerType.BLUE), new Player(PlayerType.RED));
         }
 
 
@@ -198,9 +222,9 @@ namespace TowerDefenceBackend.DataAccess
         /// <param name="bp">Reference to output blue Player</param>
         /// <param name="rp">Reference to output red Player</param>
         /// <returns>Parsed Field</returns>
-        private Field ConstructField(StringifiedField sf, Player bp, Player rp)
+        private static Field ConstructField(StringifiedField sf, Player bp, Player rp)
         {
-            Field output = new Field(sf.Coords.Item1, sf.Coords.Item2);
+            Field output = new(sf.Coords.x, sf.Coords.y);
             foreach(StringifiedUnit unit in sf.Units.red)
             {
                 Unit nu;
@@ -237,7 +261,7 @@ namespace TowerDefenceBackend.DataAccess
                 if(owner is null)
                 {
                     if (sf.Placement.Type != "Terrain") throw new Exception($"Placement of type {sf.Placement.Type} must have owner");
-                    output.Placement = new Terrain(sf.Coords.Item1, sf.Coords.Item2, (TerrainType)sf.Placement.Level);
+                    output.Placement = new Terrain(sf.Coords.x, sf.Coords.y, (TerrainType)sf.Placement.Level);
                 }
 
                 else switch(sf.Placement.Type)
@@ -245,14 +269,14 @@ namespace TowerDefenceBackend.DataAccess
                     case "Castle":
                             if (owner.Castle != null) 
                                 throw new Exception($"{owner.Type} has multiple castles");
-                            owner.Castle = new(owner, sf.Coords.Item1, sf.Coords.Item2);
+                            owner.Castle = new(owner, sf.Coords.x, sf.Coords.y);
                             output.Placement = owner.Castle;
                         break;
                     case "Barrack":
                             try
                             {
-                                output.Placement = new Barrack(owner, sf.Coords.Item1, sf.Coords.Item2);
-                                owner.AddBarrack((Barrack)output.Placement);
+                                output.Placement = new Barrack(owner, sf.Coords.x, sf.Coords.y);
+                                owner.Barracks.Add((Barrack)output.Placement);
                             }
                             catch (ArgumentException)
                             {
@@ -260,15 +284,15 @@ namespace TowerDefenceBackend.DataAccess
                             }
                         break;
                     case "BasicTower":
-                            output.Placement = new BasicTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new BasicTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                     case "SniperTower":
-                            output.Placement = new SniperTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new SniperTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                     case "BomberTower":
-                            output.Placement = new BomberTower(owner, (sf.Coords.Item1, sf.Coords.Item2));
+                            output.Placement = new BomberTower(owner, (sf.Coords.x, sf.Coords.y));
                             owner.Towers.Add((Tower)output.Placement);
                         break;
                 }
@@ -279,7 +303,13 @@ namespace TowerDefenceBackend.DataAccess
             return output;
         }
 
-        private GameSaveObject ConstructGSO(StringifiedGSO sgso)
+        /// <summary>
+        /// Constructs <c>GameSaveObject</c> from it's stringified version
+        /// </summary>
+        /// <param name="sgso">Stringified version of <c>GameSaveObject</c> to be converted</param>
+        /// <returns>A <c>GameSaveObject</c> with parsed values</returns>
+        /// <exception cref="ArgumentException">Thrown if the input was invalid</exception>
+        private static GameSaveObject ConstructGSO(StringifiedGSO sgso)
         {
             Table table = new((uint)sgso.Table.Height, (uint)sgso.Table.Width);
             Player bp = new(PlayerType.BLUE);
@@ -296,11 +326,17 @@ namespace TowerDefenceBackend.DataAccess
             bp.Money = sgso.BPMoney;
             rp.Money = sgso.RPMoney;
             table.PhaseCounter = sgso.PhaseCounter;
-            if (bp.Castle == null || rp.Castle == null || bp.Barracks.Count < 2 || rp.Barracks.Count < 2) throw new Exception("Read table was invalid");
+            if (bp.Castle == null || rp.Castle == null || bp.Barracks.Count < 2 || rp.Barracks.Count < 2) throw new ArgumentException("Read table was invalid");
 
             return new GameSaveObject(table, bp, rp);
         }
 
+        /// <summary>
+        /// Implementation of saving
+        /// </summary>
+        /// <param name="path">Path of file to save to</param>
+        /// <param name="gameSaveObject"><c>GameSaveObject</c> containing gamestate to save</param>
+        /// <returns></returns>
         public async Task SaveAsync(string path, GameSaveObject gameSaveObject)
         {
             StringifiedGSO sgso = new(
@@ -309,10 +345,8 @@ namespace TowerDefenceBackend.DataAccess
                 gameSaveObject.RedPlayer
                 );
 
-            using (FileStream fs = File.Create(path))
-            {
-                await JsonSerializer.SerializeAsync(fs, sgso, _options);
-            }
+            using FileStream fs = File.Create(path);
+            await JsonSerializer.SerializeAsync(fs, sgso, _options);
         }
     }
 }

@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TowerDefenceWPF.View"
+        xmlns:viewmodel="clr-namespace:TowerDefenceBackend.ViewModel;assembly=TowerDefenceBackend"
+        d:DataContext="{d:DesignInstance Type=viewmodel:GameViewModel}"
         mc:Ignorable="d"
-        Title="TowerDefence" Height="800" Width="800" MinHeight="768" MinWidth="768">
+        Title="Játék" Height="600" Width="800" MinHeight="500" MinWidth="768" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
@@ -23,16 +25,14 @@
         </Grid.ColumnDefinitions>
         <Menu Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="Fájl">
-                <MenuItem Header="Mentés..." Command="{Binding SaveGameCommand}" IsEnabled="{Binding SaveEnabled}"/>
+                <MenuItem Header="Mentés" Command="{Binding SaveGameCommand}" IsEnabled="{Binding SaveEnabled}"/>
                 <MenuItem Header="Betöltés" Command="{Binding LoadGameCommand}"/>
                 <MenuItem Header="Kilépés a menübe" Command="{Binding ExitCommand}"/>
             </MenuItem>
             <MenuItem Header="Pálya">
-
+                <MenuItem Header="Pálya betöltése" Command="{Binding LoadMapCommand}"/>
             </MenuItem>
-            <MenuItem Header="Kilépés" Command="{Binding CloseGameCommand}">
-
-            </MenuItem>
+            <MenuItem Header="Kilépés" Command="{Binding CloseGameCommand}"/>
         </Menu>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
@@ -119,6 +119,9 @@
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding PlacementType}" Value="Lake">
                                                         <Setter Property="Source" Value="/Images/pond.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsFiredOn}" Value="true">
+                                                        <Setter Property="Source" Value="/Images/Explosion.png"></Setter>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -209,7 +212,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsTower, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding TowerSelected, Converter={StaticResource BoolToVis}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -226,7 +229,7 @@
             <Label Grid.Row="2" Grid.Column="0" Content="Sebesség:"/>
             <Label Grid.Row="2" Grid.Column="1" Content="{Binding SelectedTower.Speed}"/>
         </Grid>
-        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding SelectedField.IsCastle, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.Column="1" Grid.Row="3" Visibility="{Binding CastleSelected, Converter={StaticResource BoolToVis}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -237,6 +240,7 @@
             <Label Grid.Row="0" Grid.Column="0" Content="HP:"/>
             <Label Grid.Row="0" Grid.Column="1" Content="{Binding SelectedCastle.Health}"/>
         </Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Column="1" Grid.Row="3">
         <ItemsControl Grid.Column="1" Grid.Row="3" ItemsSource="{Binding UnitFields}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -282,6 +286,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        </ScrollViewer>
         <StatusBar Grid.Row="4">
             <TextBlock Text="Kör: "/>
             <TextBlock Text="{Binding Round}"/>

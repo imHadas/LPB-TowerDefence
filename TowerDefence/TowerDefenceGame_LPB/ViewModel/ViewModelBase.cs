@@ -6,14 +6,16 @@ namespace TowerDefenceBackend.ViewModel
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
-        protected ViewModelBase() { }
-
+        #region Event(s)
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
+        #region Protected method(s)
         protected virtual void OnPropertyChanged([CallerMemberName] String propertyName = null)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
     }
 }

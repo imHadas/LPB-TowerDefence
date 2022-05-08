@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using TowerDefenceBackend.Persistence;
 using TowerDefenceBackend.DataAccess;
+using System;
 
 namespace TowerDefenceBackend.Model
 {
+    /// <summary>
+    /// All possible options for a field
+    /// </summary>
     public enum MenuOption
     {
         TrainBasic,
@@ -17,7 +17,6 @@ namespace TowerDefenceBackend.Model
         BuildBomber,
         UpgradeTower,
         DestroyTower,
-        // ShowUnits,
 
         // for map maker only
         DestroyPlacement,
@@ -29,13 +28,15 @@ namespace TowerDefenceBackend.Model
         SetOwnerRed,
         SetOwnerBlue
     }
+
+    /// <summary>
+    /// Base class for both models to derive from
+    /// </summary>
     public abstract class ModelBase
     {
-        #region Variables
+        #region Fields
 
         protected IDataAccess<GameSaveObject> gameDataAccess;
-
-        protected HashSet<(uint, uint)> allCoords = new HashSet<(uint, uint)>();
 
         internal IPathfinder pathfinder;
 
@@ -49,48 +50,69 @@ namespace TowerDefenceBackend.Model
 
         #endregion
 
-        public abstract ICollection<MenuOption> SelectField(Field field);
-        
+        #region Protected Methods
+
+        /// <summary>
+        /// Sets <c>Table</c> to specified height and sets all fields to empty ones.
+        /// Also updates pathfinder
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         protected void SetupTable(uint width, uint height)  //height is the x coordinates (columns), width is the y (rows)
         {
+            if (width > 20 || width < 0 || height > 20 || height < 0)
+                throw new InvalidOperationException("You can't set the size bigger than 20x20!");
             Table = new(height, width);
-            allCoords.Clear();
             for (uint i = 0; i < height; i++) //go through every column (x coord)
             {
                 for (uint j = 0; j < width; j++) //go through every row (y coord)
                 {
                     Table[i, j] = new Field(i, j);
-                    allCoords.Add((i, j));
                 }
             }
             pathfinder = new AStar(Table);
         }
 
+        /// <summary>
+        /// Encapsulation of pathfinder's <c>FindPath</c> function
+        /// </summary>
+        /// <param name="from">Starting coordinate</param>
+        /// <param name="to">Destination coordinate</param>
+        /// <returns>List of coordinates containing the ordered path</returns>
         protected IList<(uint, uint)> FindPath((uint, uint) from, (uint, uint) to)
         {
             return pathfinder.FindPath(from, to);
         }
 
+        /// <summary>
+        /// Shorthand for finding path between 2 <c>Field</c>s instead of coordinates
+        /// </summary>
+        /// <param name="from">Starting <c>Field</c></param>
+        /// <param name="to">Destination <c>Field</c></param>
+        /// <returns>List of coordinates containing the ordered path</returns>
         protected IList<(uint, uint)> FindPath(Field from, Field to)
         {
             return FindPath(from.Coords, to.Coords);
         }
 
-        public abstract void SelectOption(MenuOption option);
-
-        #region Events
-
-        /*public EventHandler<Field> FieldChanged()
-        {
-
-        }*/
-
         #endregion
 
-        public async void LoadMap()
-        {
+        #region Public Methods
 
-        }
+        /// <summary>
+        /// Abstract method for selecting a <c>Field</c> on the <c>Table</c>
+        /// </summary>
+        /// <param name="field"><c>Field</c> to select</param>
+        /// <returns>Collection of available menu options</returns>
+        public abstract ICollection<MenuOption> SelectField(Field field);
 
+        /// <summary>
+        /// Abstract method selecting an option
+        /// </summary>
+        /// <param name="option">Option to select</param>
+        public abstract void SelectOption(MenuOption option);
+
+        #endregion
+                
     }
 }

@@ -12,6 +12,7 @@
 		<None Remove="Images\bomber.png" />
 		<None Remove="Images\castle.png" />
 		<None Remove="Images\destroy.png" />
+		<None Remove="Images\Explosion.png" />
 		<None Remove="Images\pond.png" />
 		<None Remove="Images\mountain.png" />
 		<None Remove="Images\sniper.png" />
@@ -19,6 +20,17 @@
 		<None Remove="Images\soldier.png" />
 		<None Remove="Images\tank.png" />
 		<None Remove="Images\upgrade.png" />
+		<None Remove="maps\map4.tdm" />
+		<None Remove="maps\straightforward.tdm" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="maps\map4.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="maps\straightforward.tdm">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
   <ItemGroup>
@@ -30,6 +42,7 @@
 		<Resource Include="Images\bomber.png" />
 		<Resource Include="Images\castle.png" />
 		<Resource Include="Images\destroy.png" />
+		<Resource Include="Images\Explosion.png" />
 		<Resource Include="Images\pond.png" />
 		<Resource Include="Images\mountain.png" />
 		<Resource Include="Images\sniper.png" />

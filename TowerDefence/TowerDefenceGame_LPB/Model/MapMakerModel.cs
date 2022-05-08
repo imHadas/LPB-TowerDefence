@@ -1,34 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TowerDefenceBackend.DataAccess;
 using TowerDefenceBackend.Persistence;
-using TowerDefenceBackend.ViewModel;
 
 namespace TowerDefenceBackend.Model
 {
     public class MapMakerModel : ModelBase
     {
+        #region Fields
+
         private Player rp;
         private Player bp;
 
+        #endregion
+
+        #region Properties
 
         public Player RP
         {
             get { return rp; }
             private set { rp = value; }
         }
-
         public Player BP
         {
             get { return bp; }
             private set { bp = value; }
         }
+        public Player? SelectedPlayer { get; private set; }
 
-        public Player SelectedPlayer { get; set; }
+        #endregion
+
+        #region Events
+
         public event EventHandler NewMapCreated;
+        public event EventHandler GameLoaded;
+
+        #endregion
+
+        #region On-event methods
+
+        private void OnGameLoaded()
+        {
+            GameLoaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Constructor(s)
 
         public MapMakerModel(IDataAccess<GameSaveObject> dataAccess)
         {
@@ -36,6 +56,13 @@ namespace TowerDefenceBackend.Model
             CreateNewMap();
         }
 
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Creates a new empty map with a size of 11x11.
+        /// </summary>
         public void CreateNewMap()
         {
             SetupTable(11, 11);
@@ -46,10 +73,17 @@ namespace TowerDefenceBackend.Model
                 NewMapCreated(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Change table size, to the height and width given in parameters.
+        /// </summary>
+        /// <param name="height">The height you want the map to have.</param>
+        /// <param name="width">The width you want the map to have.</param>
+        /// <exception cref="InvalidOperationException">Throw if the map size is too small or too large.</exception>
         public void ChangeTableSize(uint height, uint width)
         {
+            if (width > 20 || width < 4 || height > 20 || height < 4)
+                throw new InvalidOperationException("You can't set the size bigger than 20x20!");
             Table newTable = new Table(height, width);
-            allCoords.Clear();
             for (uint i = 0; i < height; i++)
             {
                 for (uint j = 0; j < width; j++)
@@ -58,7 +92,6 @@ namespace TowerDefenceBackend.Model
                         newTable[i, j] = Table[i, j];
                     else
                         newTable[i, j] = new Field(i, j);
-                    allCoords.Add((i, j));
                 }
             }
             Table = newTable;
@@ -82,6 +115,12 @@ namespace TowerDefenceBackend.Model
 
         }
 
+        /// <summary>
+        /// Method for setting the SelectedField to the field given in parameter.
+        /// Adding menu options to a collection depending on what is on the field that we selected.
+        /// </summary>
+        /// <param name="field">Field that is getting selected.</param>
+        /// <returns>Returns the collection we added options to.</returns>
         public override ICollection<MenuOption> SelectField(Field field)
         {
             SelectedField = field;
@@ -107,6 +146,10 @@ namespace TowerDefenceBackend.Model
             return options;
         }
 
+        /// <summary>
+        /// Method for building or destroying depending on the option given in paramter.
+        /// </summary>
+        /// <param name="option">The option, which was chosen from the menu options available.</param>
         public override void SelectOption(MenuOption option)
         {
             switch (option)
@@ -129,6 +172,25 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// Method for selecting the player in the parameter.
+        /// </summary>
+        /// <param name="player">The player we want to select.</param>
+        public void SelectPlayer(Player? player)
+        {
+            SelectedPlayer = player;
+        }
+
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// Method for building the castle of the selected player on the selected field.
+        /// </summary>
+        /// <exception cref="InvalidPlacementException">
+        /// Throws if the player is not selected, or something is already placed on the selected field, or there is already a castle for this player on the table.
+        /// </exception>
         private void BuildCastle()
         {
             if (SelectedPlayer is null)
@@ -147,6 +209,12 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// Method for building a barrack for the selected player on the selected field.
+        /// </summary>
+        /// <exception cref="InvalidPlacementException">
+        /// Throws if the player is not selected, or something is already placed on the selected field, or the player already has 2 barracks on the table, or the path between a castle and enemy barrack becomes blocked.
+        /// </exception>
         private void BuildBarrack()
         {
             if (SelectedPlayer is null)
@@ -184,6 +252,12 @@ namespace TowerDefenceBackend.Model
                 throw new InvalidPlacementException(SelectedField, "Cannot block path between castle and barracks");
             }
         }
+
+        /// <summary>
+        /// Method for building a terrain element on the selected field
+        /// </summary>
+        /// <param name="type">Type of terrain</param>
+        /// <exception cref="InvalidPlacementException">Throws if player is selected or something is already placed on the selected field</exception>
         private void BuildTerrain(TerrainType type)
         {
             if (SelectedPlayer is not null)
@@ -198,13 +272,17 @@ namespace TowerDefenceBackend.Model
             }
         }
 
+        /// <summary>
+        /// Method for validating the available path between each players barracks and the enemy castle
+        /// </summary>
+        /// <returns>If the path is valid</returns>
         private bool ValidatePath()
         {
             IList<(uint x, uint y)> path = new List<(uint x, uint y)>();
             foreach (Barrack barrack in rp.Barracks)
             {
                 if (bp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, bp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != bp.Castle.Coords)
                     return false;
@@ -212,7 +290,7 @@ namespace TowerDefenceBackend.Model
             foreach (Barrack barrack in bp.Barracks)
             {
                 if (rp.Castle is null)
-                    return true;
+                    continue;
                 path = FindPath(barrack.Coords, rp.Castle.Coords);
                 if (path.Count == 0 || path.Last() != rp.Castle.Coords)
                     return false;
@@ -221,6 +299,10 @@ namespace TowerDefenceBackend.Model
             return true;
         }
 
+        /// <summary>
+        /// Method for destroying a placement on the selected field
+        /// </summary>
+        /// <exception cref="InvalidPlacementException">Throws when the field is already empty</exception>
         private void DestroyPlacement()
         {
             if (SelectedField.Placement is null)
@@ -245,6 +327,10 @@ namespace TowerDefenceBackend.Model
 
         }
 
+        #endregion
+
+        #region Persistence methods
+
         public async Task SaveGameAsync(string path)
         {
             if (gameDataAccess == null)
@@ -267,15 +353,10 @@ namespace TowerDefenceBackend.Model
 
             GameSaveObject save = await gameDataAccess.LoadAsync(path);
             (Table, bp, rp) = (save.Table, save.BluePlayer, save.RedPlayer);
-
+            pathfinder = new AStar(Table);
             OnGameLoaded();
         }
 
-        public event EventHandler GameLoaded;
-        
-        private void OnGameLoaded()
-        {
-            GameLoaded?.Invoke(this, EventArgs.Empty);
-        }
+        #endregion
     }
 }
