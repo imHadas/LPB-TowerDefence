@@ -23,10 +23,7 @@ namespace TowerDefenceBackend.Persistence
         /// Method for leveling up the tower
         /// </summary>
         public abstract void LevelUp();
-        public virtual bool InRange((uint x, uint y) coords)
-        {
-            return Math.Sqrt(Math.Pow((int)coords.x - (int)Coords.x, 2) + Math.Pow((int)coords.y - (int)Coords.y, 2)) <= Range;
-        }
+        
         /// <summary>
         /// Starts cooldown of the <c>Tower</c>
         /// </summary>
